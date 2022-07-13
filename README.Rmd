@@ -1,0 +1,234 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# RREAS
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+This package contains support functions for the NOAA SWFSC Rockfish Recruitment and Ecosystem Assessment Survey (RREAS).
+
+This is version `r packageVersion("RREAS")`. Please report any problems! 
+
+
+## Installation
+
+To install the latest version of the package:
+
+``` r
+install.packages("devtools") #if required
+devtools::install_github("tanyalrogers/GPEDM")
+```
+
+## Loading data
+
+Loading data requires a local copy of the MS Access Database. 
+
+The function `load_mdb` will load the HAUL, CATCH, and LENGTH tables from one (or more) surveys in the RREAS database, along with the AGE, WEIGHT, and SPECIES_CODES tables from RREAS. It also creates and loads a HAULSTANDARD table containing only standard stations and with a standardized set of columns including YEAR, MONTH, JDAY, and lat/lon in decimal degrees. HAULSTANDARD tables all have the same format and so tables from multiple surveys can be stacked with `rbind`. The tables will be loaded to the global environment.
+
+The default behavior is to load just the RREAS data (`datasets = "RREAS"`), with HAULSTANDARD containing only active stations (`activestationsonly = T`):
+
+```{r dataload}
+library(RREAS)
+
+#replace the file paths with those for your machine
+load_mdb(mdb_path = "E:/Documents/NMFS laptop/Rockfish/RREAS/Survey data/juv_cruise_backup27JAN21.mdb",
+         krill_len_path = "E:/Documents/NMFS laptop/Rockfish/Index generation/length weight/krill_lengths.csv")
+ls(name = .GlobalEnv) #list objects in your workspace
+```
+
+Currently, the krill lengths are not in the database, so must be supplied as a separate file. This file is *not necessary*, however, unless you want to get krill biomass or length distributions. Just omit this argument if you don't have the file.
+
+To load data from multiple surveys, specify which ones under `datasets`. If you want to include non-active stations in HAULSTANDARD, just set (`activestationsonly = F`). ACTIVE is a column in HAULSTANDARD and can always be used to subset later.
+
+```{r dataload2}
+#replace the file paths with those for your machine
+load_mdb(mdb_path = "E:/Documents/NMFS laptop/Rockfish/RREAS/Survey data/juv_cruise_backup27JAN21.mdb",
+         krill_len_path = "E:/Documents/NMFS laptop/Rockfish/Index generation/length weight/krill_lengths.csv",
+         datasets = c("RREAS","ADAMS","PWCC","NWFSC"),
+         activestationsonly = T)
+ls(name = .GlobalEnv) #list objects in your workspace
+```
+
+There is another, optional argument to load `atsea.mdb` and append the current year's data. 
+
+See `help(load_mdb)` for more information.
+
+## Extracting data for species
+
+There are two main data extraction functions: `get_totals` and `get_distributions`. The function `get_totals` can be used to obtain total haul-level abundance, biomass, or 100-day standardized abundance. The function `get_distributions` can be used to obtain size, mass, or age distribution data. 
+
+### Formatting the species table
+
+Both functions require a specially formatted dataframe (the `speciestable`) as an input. This table specifies which species to extract (multiple species can be specified), whether/how to aggregate them, and whether any length constraints should be imposed. 
+
+The species table must have the following columns: 
+- SPECIES: Species codes
+- MATURITY: Maturity codes
+- NAME: A custom name, typically the common name. Rows with the same the same NAME value will be aggregated together.
+The table may optionally include:
+- MINLEN: The minimum length in mm, greater than or equal to (if column is missing or value is NA, defaults to 0)
+- MAXLEN: The maximum length in mm, less than (if column is missing or value is NA, defaults to Inf)
+
+Here's an example of of how you might construct a table for YOY Anchovy, Adult Anchovy, and Total Anchovy:
+
+```{r}
+anchovytable <- data.frame(SPECIES=209, MATURITY=c("Y","A","Y","A"),
+                           NAME=c("YOY Anchovy", "Adult Anchovy", "Total Anchovy", "Total Anchovy"))
+anchovytable
+```
+
+If you wanted to split Anchovy into two size classes, here's how you might do that:
+
+```{r}
+anchovytable_len <- data.frame(SPECIES=209, MATURITY="A",
+                               NAME=c("Small adult anchovy", "Large adult anchovy"),
+                               MINLEN=c(90,110),
+                               MAXLEN=c(110,NA))
+anchovytable_len
+```
+
+The package contains some pre-made species tables with common species. You can explicitly load them using `data()`, but this isn't strictly necessary. They also exist in the background, so you can just call them directly. 
+
+```{r}
+#Some common species and species groups used in ecosystem reports.
+data("sptable")
+unique(sptable$NAME) #available species and species groups
+head(sptable)
+```
+
+```{r}
+#Species for which length-weight regressions exist.
+data("sptable_lw")
+unique(sptable_lw$NAME) #available species and species groups
+```
+
+```{r}
+#Rockfish species used in the 100 day standardized abundance index.
+data("sptable_rockfish100")
+sptable_rockfish100
+```
+
+### Getting totals
+
+The function `get_totals` has 4 inputs:
+- `speciestable`: The species table data frame
+- `datasets`: Which datasets you want to use (defaults to RREAS only). Datasets have to be loaded to use them.
+- `startyear`: Start year (optional). Defaults to 1983. 
+- `what`: What kind of total you want, either "abundance","biomass", or "100day".
+
+Values will be generated for each haul in HAULSTANDARD. Note that if a station was sampled but the species requested does not appear in the CATCH table for that haul, it will appear as a 0. It your responsibility to know when species were or were not being recorded, and thus whether the 0 represents 'absent' or 'not counted'. Info can be found in the SPECIES_CODES table.
+
+Biomass is only available for species with length-weight regressions. See `help(get_lw_regression)` for more info on the regressions are done. (The function `get_lw_regression` is used internally, but can be run independently if desired.)
+
+100 day standardized abundance is only available for species with length-age regressions. This includes the rockfish species listed in `sptable_rockfish100`, hake (382) and lingcod (448). See `help(get_la_regression)` and `help(age_to_100day)` for more details on how the regressions are done. (These functions are also used internally, but can be run independently if desired.)
+
+If ask for "biomass" or "100day", the output will also include TOTAL_NO (abundance) and NMEAS (number of fish measured). If you include length constraints, the output table will include additional columns NMEAS_SIZE (number measured in the size range), and NSIZE (total number in the size range, which is probably what you want, not TOTAL_NO). 
+
+Only one table is outputted, so if you request data from multiple datasets, they results will be combined (column SURVEY differentiates source). If multiple NAME values are present, the results will be stacked in long format. See `help(get_totals)` for more details.
+
+Examples:
+
+```{r totals}
+#YOY, Adult, Total anchovy abundances
+anchovyabund <- get_totals(anchovytable, datasets = c("RREAS","NWFSC"), what = "abundance")
+head(anchovyabund)
+
+#Biomass for different anchovy size classes
+anchovybiomass_len <- get_totals(anchovytable_len, what = "biomass")
+tail(anchovybiomass_len)
+
+#100 day rockfish
+rockfish100equiv <- get_totals(sptable_rockfish100, what = "100day")
+tail(rockfish100equiv)
+```
+
+
+### Getting distributions
+
+The function `get_distributions` has the same 4 inputs, except `what` should be either "size", "mass", or "age". As with `get_totals`, regressions must exist for mass and age distributions.
+
+If a haul had no fish, it will appear in the output dataset (with TOTAL_NO=0), and the other values will be NA. If a haul had fish, but no fish were measured, there will be a TOTAL_NO>0, NMEAS will be NA, and there will be a single length/mass/age entry for that haul, which will be the average values used as a substitute.
+
+The output table will include TOTAL_NO, NMEAS (number measured), EXP (expansion factor), SP_NO (specimen number) and values for the requested distribution. If "size" is requested, will include column STD_LENGTH. If "mass" is requested, will include columns STD_LENGTH and WEIGHT. If "age" is requested, will include columns STD_LENGTH, AGE, N100i (number of 100 day equivalents), and JDAY_DOB (date of birth). If size limits are specified, will include additional columns NMEAS_SIZE (number measured in the size range), PSIZE (proportion of measured fish in the size range), and NSIZE (total number in the size range).
+
+Only one table is outputted, so if you request data from multiple datasets, they results will be combined (column SURVEY differentiates source). If multiple NAME values are present, the results will be stacked in long format. See `help(get_distributions)` for more details.
+
+```{r distributions}
+#Size distribution for anchovy
+anchovysizedist <- get_distributions(anchovytable, what = "size")
+tail(anchovysizedist)
+
+#Mass distribution for different anchovy size classes
+anchovymassdist <- get_distributions(anchovytable_len, what = "mass")
+tail(anchovymassdist)
+
+#rockfish age distributions
+rockfish100agedist <- get_distributions(sptable_rockfish100, what = "age")
+tail(rockfish100agedist)
+```
+
+
+## Generating indices
+
+Given an output table from `get_totals`, there is a function `get_logcpueindex` which will compute `mean(log(x+1))` for an `x` of your choice, for each YEAR and NAME. It allows optional grouping variables (typically STRATA).
+
+```{r indices}
+library(ggplot2)
+library(dplyr)
+
+anchovyindex1 <- get_logcpueindex(anchovyabund, var = "TOTAL_NO", group="STRATA")
+head(anchovyindex1)
+
+anchovyindex1plot <- anchovyindex1 %>% 
+  #filter(!(YEAR<2004 & STRATA!="C")) %>% #exclude non-core areas before 2004
+  mutate(STRATA=factor(STRATA, levels = c("WA","OR","N","NC","C","SC","S")))
+ggplot(anchovyindex1plot,aes(y=TOTAL_NO_INDEX,x=YEAR)) +
+  facet_grid(STRATA~NAME) +
+  geom_point() + geom_line() +
+  theme_bw() +
+  labs(x="Year", y="log Abundance")
+
+anchovyindex2 <- get_logcpueindex(anchovybiomass_len, var = "BIOMASS", group="STRATA")
+head(anchovyindex2)
+
+anchovyindex2plot <- anchovyindex2 %>% 
+  #filter(!(YEAR<2004 & STRATA!="C")) %>% #exclude non-core areas before 2004
+  mutate(STRATA=factor(STRATA, levels = c("N","NC","C","SC","S")))
+ggplot(anchovyindex2plot,aes(y=BIOMASS_INDEX,x=YEAR)) +
+  facet_grid(STRATA~NAME) +
+  geom_point() + geom_line() +
+  theme_bw() +
+  labs(x="Year", y="log Biomass")
+
+rockfish100index <- get_logcpueindex(rockfish100equiv, var="N100",group="STRATA")
+head(rockfish100index)
+
+rf100plot <- rockfish100index %>% 
+  filter(STRATA=="C" & NAME!="mel" & NAME!="lev") %>% 
+  left_join(sptable_rockfish100, by = "NAME")
+ggplot(rf100plot,aes(y=N100_INDEX_SC,x=YEAR, group=COMMON, color=COMMON)) +
+  geom_point() + geom_line() +
+  theme_bw() +
+  labs(x="Year", y="log 100-day standardized abundance", color="Rockfish species")
+
+```
+
+
+## Remaining thing to do
+
+- Need to add model-based index generation methods.
+- Need to add ERDDAP datasets and format for existing functions.
+- Jellyfish values do not take into account hauls cancelled due to jellyfish.

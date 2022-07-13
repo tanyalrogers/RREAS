@@ -1,0 +1,27 @@
+Package: RREAS
+Title: Rockfish Recruitment and Ecosystem Assessment Survey
+Version: 0.0.0.9000
+Date: 2022-07-06
+Authors@R: 
+    c(person(given = "Tanya",
+           family = "Rogers",
+           role = c("aut", "cre"),
+           email = "tanya.rogers@noaa.gov",
+           comment = c(ORCID = "0000-0003-1253-9903")),
+      person(given = "Keith",
+           family = "Sakuma",
+           role = c("aut"),
+           email = "keith.sakuma@noaa.gov"))
+Description: Support functions for the NOAA SWFSC Rockfish Recruitment and Ecosystem Assessment Survey.
+License: file LICENSE
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
+Imports: 
+    magrittr,
+    RODBC,
+    dplyr,
+    lubridate
+Depends: 
+    R (>= 2.10)
