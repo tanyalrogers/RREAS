@@ -44,8 +44,8 @@ The default behavior is to load just the RREAS data (`datasets = "RREAS"`), with
 library(RREAS)
 
 #replace the file paths with those for your machine
-load_mdb(mdb_path = "E:/Documents/NMFS laptop/Rockfish/RREAS/Survey data/juv_cruise_backup27JAN21.mdb",
-         krill_len_path = "E:/Documents/NMFS laptop/Rockfish/Index generation/length weight/krill_lengths.csv")
+load_mdb(mdb_path="E:/Documents/NMFS laptop/Rockfish/RREAS/Survey data/juv_cruise_backup27JAN21.mdb",
+         krill_len_path="E:/Documents/NMFS laptop/Rockfish/Index generation/length weight/krill_lengths.csv")
 ls(name = .GlobalEnv) #list objects in your workspace
 ```
 
@@ -55,8 +55,8 @@ To load data from multiple surveys, specify which ones under `datasets`. If you 
 
 ```{r dataload2}
 #replace the file paths with those for your machine
-load_mdb(mdb_path = "E:/Documents/NMFS laptop/Rockfish/RREAS/Survey data/juv_cruise_backup27JAN21.mdb",
-         krill_len_path = "E:/Documents/NMFS laptop/Rockfish/Index generation/length weight/krill_lengths.csv",
+load_mdb(mdb_path="E:/Documents/NMFS laptop/Rockfish/RREAS/Survey data/juv_cruise_backup27JAN21.mdb",
+         krill_len_path="E:/Documents/NMFS laptop/Rockfish/Index generation/length weight/krill_lengths.csv",
          datasets = c("RREAS","ADAMS","PWCC","NWFSC"),
          activestationsonly = T)
 ls(name = .GlobalEnv) #list objects in your workspace
@@ -78,6 +78,7 @@ The species table must have the following columns:
 - SPECIES: Species codes  
 - MATURITY: Maturity codes  
 - NAME: A custom name, typically the common name. Rows with the same the same NAME value will be aggregated together.  
+
 The table may optionally include:  
 - MINLEN: The minimum length in mm, greater than or equal to (if column is missing or value is NA, defaults to 0)  
 - MAXLEN: The maximum length in mm, less than (if column is missing or value is NA, defaults to Inf)  
@@ -185,7 +186,7 @@ tail(rockfish100agedist)
 
 Given an output table from `get_totals`, there is a function `get_logcpueindex` which will compute `mean(log(x+1))` for an `x` of your choice, for each YEAR and NAME. It allows optional grouping variables (typically STRATA).
 
-```{r indices}
+```{r indices, warning=FALSE, message=FALSE}
 library(ggplot2)
 library(dplyr)
 

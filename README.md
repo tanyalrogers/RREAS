@@ -41,8 +41,8 @@ stations (`activestationsonly = T`):
 library(RREAS)
 
 #replace the file paths with those for your machine
-load_mdb(mdb_path = "E:/Documents/NMFS laptop/Rockfish/RREAS/Survey data/juv_cruise_backup27JAN21.mdb",
-         krill_len_path = "E:/Documents/NMFS laptop/Rockfish/Index generation/length weight/krill_lengths.csv")
+load_mdb(mdb_path="E:/Documents/NMFS laptop/Rockfish/RREAS/Survey data/juv_cruise_backup27JAN21.mdb",
+         krill_len_path="E:/Documents/NMFS laptop/Rockfish/Index generation/length weight/krill_lengths.csv")
 #> Data loaded.
 ls(name = .GlobalEnv) #list objects in your workspace
 #> [1] "AGE"           "CATCH"         "HAUL"          "HAULSTANDARD" 
@@ -61,8 +61,8 @@ always be used to subset later.
 
 ``` r
 #replace the file paths with those for your machine
-load_mdb(mdb_path = "E:/Documents/NMFS laptop/Rockfish/RREAS/Survey data/juv_cruise_backup27JAN21.mdb",
-         krill_len_path = "E:/Documents/NMFS laptop/Rockfish/Index generation/length weight/krill_lengths.csv",
+load_mdb(mdb_path="E:/Documents/NMFS laptop/Rockfish/RREAS/Survey data/juv_cruise_backup27JAN21.mdb",
+         krill_len_path="E:/Documents/NMFS laptop/Rockfish/Index generation/length weight/krill_lengths.csv",
          datasets = c("RREAS","ADAMS","PWCC","NWFSC"),
          activestationsonly = T)
 #> Data loaded.
@@ -100,7 +100,8 @@ The species table must have the following columns:
 - SPECIES: Species codes  
 - MATURITY: Maturity codes  
 - NAME: A custom name, typically the common name. Rows with the same the
-same NAME value will be aggregated together.  
+same NAME value will be aggregated together.
+
 The table may optionally include:  
 - MINLEN: The minimum length in mm, greater than or equal to (if column
 is missing or value is NA, defaults to 0)  
@@ -480,17 +481,7 @@ variables (typically STRATA).
 
 ``` r
 library(ggplot2)
-#> Warning: package 'ggplot2' was built under R version 4.0.5
 library(dplyr)
-#> Warning: package 'dplyr' was built under R version 4.0.5
-#> 
-#> Attaching package: 'dplyr'
-#> The following objects are masked from 'package:stats':
-#> 
-#>     filter, lag
-#> The following objects are masked from 'package:base':
-#> 
-#>     intersect, setdiff, setequal, union
 
 anchovyindex1 <- get_logcpueindex(anchovyabund, var = "TOTAL_NO", group="STRATA")
 head(anchovyindex1)
@@ -510,8 +501,6 @@ ggplot(anchovyindex1plot,aes(y=TOTAL_NO_INDEX,x=YEAR)) +
   geom_point() + geom_line() +
   theme_bw() +
   labs(x="Year", y="log Abundance")
-#> Warning: Removed 465 rows containing missing values (geom_point).
-#> Warning: Removed 28 row(s) containing missing values (geom_path).
 ```
 
 <img src="man/figures/README-indices-1.png" width="100%" />
@@ -535,8 +524,6 @@ ggplot(anchovyindex2plot,aes(y=BIOMASS_INDEX,x=YEAR)) +
   geom_point() + geom_line() +
   theme_bw() +
   labs(x="Year", y="log Biomass")
-#> Warning: Removed 188 rows containing missing values (geom_point).
-#> Warning: Removed 30 row(s) containing missing values (geom_path).
 ```
 
 <img src="man/figures/README-indices-2.png" width="100%" />
