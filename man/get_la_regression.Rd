@@ -7,7 +7,7 @@
 get_la_regression()
 }
 \value{
-A function which takes a species code, vector or years, and vector of
+A function which takes a species code, vector of years, and vector of
 lengths (mm) as input, and returns a vector of ages (days).
 }
 \description{
@@ -18,7 +18,8 @@ it can be called independently, e.g. if you want to see what the
 regressions look like.
 }
 \details{
-This fits standard linear regressions.
+This fits standard linear regressions. Calling this functions runs the
+regressions for all available species.
 
 Length-age regressions can be done for all species in the AGE table. Run
 \code{unique(AGE$SPECIES)} for a list. These include all the rockfishes in

@@ -19,6 +19,8 @@ A data frame with 12 rows and 3 variables:
 rflwgroups
 }
 \description{
-This table is used interally for length-weight regressions.
+Length-weight groupings for all rockfish species, specifying which species
+should be pooled for regressions and used as proxies for other species.
+There are currently 4 groupings based on general body shape.
 }
 \keyword{datasets}

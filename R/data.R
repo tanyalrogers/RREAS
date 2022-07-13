@@ -1,5 +1,8 @@
 #' Species table for rockfishes used in 100 day index
 #'
+#' Table of rockfish species for which 100 day standardized indices can be generated.
+#' Specifies a minimum length of 20 mm. Includes a common name field that can be joined
+#' later for plotting purposes.
 #'
 #' @format A data frame with 12 rows and 4 variables:
 #' \describe{
@@ -14,6 +17,8 @@
 
 #' Species table for common RREAS species and species groups
 #'
+#' Table of species and species groups for which indices are commonly
+#' reported in ecosystem assessments.
 #'
 #' @format A data frame with 12 rows and 3 variables:
 #' \describe{
@@ -26,6 +31,7 @@
 
 #' Species table for RREAS species and species groups (biomass)
 #'
+#' Table of species and species groups for which biomass estimates can be obtained.
 #'
 #' @format A data frame with 12 rows and 3 variables:
 #' \describe{
@@ -38,7 +44,9 @@
 
 #' Rockfish length-weight groupings
 #'
-#' This table is used interally for length-weight regressions.
+#' Length-weight groupings for all rockfish species, specifying which species
+#' should be pooled for regressions and used as proxies for other species.
+#' There are currently 4 groupings based on general body shape.
 #'
 #' @format A data frame with 12 rows and 3 variables:
 #' \describe{

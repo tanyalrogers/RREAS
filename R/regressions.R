@@ -9,15 +9,14 @@
 #' @details
 #'
 #' This fits a linear regression to log-log data. The outputed conversion
-#' function will do the transformations and backtransformations automatically:
+#' function will do the transformations and backtransformations automatically, so
 #' the inputed lengths should be in the original units (mm).
 #'
 #' Length-weight regressions can be done for all species in the WEIGHT table
 #' (run `unique(WEIGHT$SPECIES)` for a list) and for all species in
-#' [`sptable_lw`]. For octopus (2026), which has weight but no length data, the
-#' mean weight is used.
+#' [`sptable_lw`].
 #'
-#' The rockfishes are divided into 4 groups given table [`rflwgroups`]. The
+#' The rockfishes are divided into 4 groups given in table [`rflwgroups`]. The
 #' groups are based on general body shape and similarity of regression
 #' intercepts. Within a given group, species with length-weight data are pooled,
 #' and the regression is used for all species in that group, including those
@@ -28,8 +27,11 @@
 #' regression.
 #'
 #' For northern lampfish (661) and California lanternfish (669), data from both
-#' species are combined for the regression. Unknown myctophids (407) will use
+#' species are pooled for the regression. Unknown myctophids (407) will use
 #' this regression.
+#'
+#' For octopus (2026), which has weight but no length data, the mean weight is
+#' used.
 #'
 #' This function includes and will use published length-weight regressions for
 #' select species not in the WEIGHT table. These species are sardine (562), T.
@@ -52,10 +54,10 @@
 #' @export
 #' @keywords functions
 #' @examples
+#' print(rflwgroups)
 #' \dontrun{
 #' get_lw_regression(species = 209, maturity = "A", plot=T)
 #' get_lw_regression(species = 562, maturity = "A")
-#' print(rflwgroups)
 #' }
 get_lw_regression=function(species, maturity, plot=F){
   if(species %in% unique(rflwgroups$SPECIES)) { #if species in rf table
@@ -129,7 +131,8 @@ get_lw_regression=function(species, maturity, plot=F){
 #'
 #' @details
 #'
-#' This fits standard linear regressions.
+#' This fits standard linear regressions. Calling this functions runs the
+#' regressions for all available species.
 #'
 #' Length-age regressions can be done for all species in the AGE table. Run
 #' `unique(AGE$SPECIES)` for a list. These include all the rockfishes in
@@ -150,7 +153,7 @@ get_lw_regression=function(species, maturity, plot=F){
 #' length input.
 #'
 #'
-#' @return A function which takes a species code, vector or years, and vector of
+#' @return A function which takes a species code, vector of years, and vector of
 #'   lengths (mm) as input, and returns a vector of ages (days).
 #'
 #' @export

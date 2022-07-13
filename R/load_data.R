@@ -17,11 +17,11 @@
 #' the RREAS tables.
 #'
 #'
-#' @param mdb_path File path to the juv_cruise .mdb file (required).
+#' @param mdb_path File path to the juv_cruise mdb file (required).
 #' @param atsea_path File path to "atsea.mdb" containing the current year's data (optional).
 #'   Data will be appended to the RREAS tables.
 #' @param datasets Character vector indicating which dataset(s) to load. Multiple dataset can
-#'   be specified. Options are "RREAS","ADAMS","PWCC","NWFSC". If unspecified, loads just RREAS.
+#'   be specified. Options are "RREAS", "ADAMS", "PWCC", "NWFSC". If unspecified, loads just "RREAS".
 #' @param krill_len_path File path to "krill_lengths.csv" (optional, unless you later want
 #'   to get krill biomass).
 #'   \emph{This argument will be removed once the krill lengths are added to the database.}

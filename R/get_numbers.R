@@ -72,7 +72,7 @@
 #'
 #' @return A dataframe with haul information, NAME, and totals. If "abundance"
 #'   is requested, will include column TOTAL_NO. If "biomass" is requested, will
-#'   include columns TOTAL_NO, NMEAS (number measured), and BIOMASS. If "100day"
+#'   include columns TOTAL_NO, NMEAS (number measured), and BIOMASS (g). If "100day"
 #'   is requested, will include columns TOTAL_NO, NMEAS (number measured), and
 #'   N100. If size limits are specified, will include additional columns
 #'   NMEAS_SIZE (number measured in the size range), and NSIZE (total number in
@@ -138,18 +138,18 @@ get_totals=function(speciestable,datasets="RREAS",startyear=1983,
 #'
 #' @param speciestable Dataframe containing species information (see Details).
 #' @param datasets Character vector indicating which dataset(s) to use. Multiple
-#'   dataset can be specified. Options are "RREAS","ADAMS","PWCC","NWFSC". If
-#'   unspecified, just uses RREAS.
+#'   dataset can be specified. Options are "RREAS", "ADAMS", "PWCC", "NWFSC". If
+#'   unspecified, just uses "RREAS".
 #' @param startyear Start year (default is 1983).
-#' @param what What type of distribution you want, either "size","mass", or
+#' @param what What type of distribution you want, either "size", "mass", or
 #'   "age".
 #'
 #' @return A dataframe with haul information, NAME, TOTAL_NO, NMEAS (number
-#'   measured), EXP (expansion factor), SP_NO (specimen number) and values for
+#'   measured), EXP (expansion factor), SP_NO (specimen number), and values for
 #'   the requested distribution. If "size" is requested, will include column
-#'   STD_LENGTH. If "mass" is requested, will include columns STD_LENGTH and
-#'   WEIGHT. If "age" is requested, will include columns STD_LENGTH, AGE, N100i
-#'   (number of 100 day equivalents), and JDAY_DOB (date of birth). If size
+#'   STD_LENGTH (mm). If "mass" is requested, will include columns STD_LENGTH and
+#'   WEIGHT (g). If "age" is requested, will include columns STD_LENGTH, AGE (days), N100i
+#'   (number of 100 day equivalents), and JDAY_DOB (julian date of birth). If size
 #'   limits are specified, will include additional columns NMEAS_SIZE (number
 #'   measured in the size range), PSIZE (proportion of measured fish in the size
 #'   range), and NSIZE (total number in the size range, which is probably what

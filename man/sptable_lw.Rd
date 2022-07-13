@@ -16,6 +16,6 @@ A data frame with 12 rows and 3 variables:
 sptable_lw
 }
 \description{
-Species table for RREAS species and species groups (biomass)
+Table of species and species groups for which biomass estimates can be obtained.
 }
 \keyword{datasets}

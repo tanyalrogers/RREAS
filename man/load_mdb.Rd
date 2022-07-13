@@ -14,13 +14,13 @@ load_mdb(
 )
 }
 \arguments{
-\item{mdb_path}{File path to the juv_cruise .mdb file (required).}
+\item{mdb_path}{File path to the juv_cruise mdb file (required).}
 
 \item{atsea_path}{File path to "atsea.mdb" containing the current year's data (optional).
 Data will be appended to the RREAS tables.}
 
 \item{datasets}{Character vector indicating which dataset(s) to load. Multiple dataset can
-be specified. Options are "RREAS","ADAMS","PWCC","NWFSC". If unspecified, loads just RREAS.}
+be specified. Options are "RREAS", "ADAMS", "PWCC", "NWFSC". If unspecified, loads just "RREAS".}
 
 \item{krill_len_path}{File path to "krill_lengths.csv" (optional, unless you later want
 to get krill biomass).

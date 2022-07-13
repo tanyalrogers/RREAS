@@ -29,7 +29,7 @@ To install the latest version of the package:
 
 ``` r
 install.packages("devtools") #if required
-devtools::install_github("tanyalrogers/GPEDM")
+devtools::install_github("tanyalrogers/RREAS")
 ```
 
 ## Loading data
@@ -38,7 +38,7 @@ Loading data requires a local copy of the MS Access Database.
 
 The function `load_mdb` will load the HAUL, CATCH, and LENGTH tables from one (or more) surveys in the RREAS database, along with the AGE, WEIGHT, and SPECIES_CODES tables from RREAS. It also creates and loads a HAULSTANDARD table containing only standard stations and with a standardized set of columns including YEAR, MONTH, JDAY, and lat/lon in decimal degrees. HAULSTANDARD tables all have the same format and so tables from multiple surveys can be stacked with `rbind`. The tables will be loaded to the global environment.
 
-The default behavior is to load just the RREAS data (`datasets = "RREAS"`), with HAULSTANDARD containing only active stations (`activestationsonly = T`):
+The default behavior is to load just the RREAS data (`datasets = "RREAS"`), with HAULSTANDARD containing only active stations (`activestationsonly = TRUE`):
 
 ```{r dataload}
 library(RREAS)
@@ -49,16 +49,16 @@ load_mdb(mdb_path="E:/Documents/NMFS laptop/Rockfish/RREAS/Survey data/juv_cruis
 ls(name = .GlobalEnv) #list objects in your workspace
 ```
 
-Currently, the krill lengths are not in the database, so must be supplied as a separate file. This file is *not necessary*, however, unless you want to get krill biomass or length distributions. Just omit this argument if you don't have the file.
+Currently, the krill lengths are not in the database, so must be supplied as a separate file. This file is *not necessary* however, unless you want to get krill biomass or length distributions. Just omit this argument if you don't have the file.
 
-To load data from multiple surveys, specify which ones under `datasets`. If you want to include non-active stations in HAULSTANDARD, just set (`activestationsonly = F`). ACTIVE is a column in HAULSTANDARD and can always be used to subset later.
+To load data from multiple surveys, specify which ones under `datasets`. If you want to include non-active stations in HAULSTANDARD, just set (`activestationsonly = FALSE`). ACTIVE is a column in HAULSTANDARD and can always be used to subset later.
 
 ```{r dataload2}
 #replace the file paths with those for your machine
 load_mdb(mdb_path="E:/Documents/NMFS laptop/Rockfish/RREAS/Survey data/juv_cruise_backup27JAN21.mdb",
          krill_len_path="E:/Documents/NMFS laptop/Rockfish/Index generation/length weight/krill_lengths.csv",
          datasets = c("RREAS","ADAMS","PWCC","NWFSC"),
-         activestationsonly = T)
+         activestationsonly = TRUE)
 ls(name = .GlobalEnv) #list objects in your workspace
 ```
 
@@ -91,13 +91,13 @@ anchovytable <- data.frame(SPECIES=209, MATURITY=c("Y","A","Y","A"),
 anchovytable
 ```
 
-If you wanted to split Anchovy into two size classes, here's how you might do that:
+If you wanted to split adult Anchovy into two size classes, here's how you might do that:
 
 ```{r}
 anchovytable_len <- data.frame(SPECIES=209, MATURITY="A",
                                NAME=c("Small adult anchovy", "Large adult anchovy"),
-                               MINLEN=c(90,110),
-                               MAXLEN=c(110,NA))
+                               MINLEN=c(90,120),
+                               MAXLEN=c(120,NA))
 anchovytable_len
 ```
 
@@ -132,11 +132,11 @@ The function `get_totals` has 4 inputs:
 
 Values will be generated for each haul in HAULSTANDARD. Note that if a station was sampled but the species requested does not appear in the CATCH table for that haul, it will appear as a 0. It your responsibility to know when species were or were not being recorded, and thus whether the 0 represents 'absent' or 'not counted'. Info can be found in the SPECIES_CODES table.
 
-Biomass is only available for species with length-weight regressions. See `help(get_lw_regression)` for more info on the regressions are done. (The function `get_lw_regression` is used internally, but can be run independently if desired.)
+Biomass is only available for species with length-weight regressions. See `help(get_lw_regression)` for more info on how the regressions are done. (The function `get_lw_regression` is used internally, but can be run independently if desired.)
 
-100 day standardized abundance is only available for species with length-age regressions. This includes the rockfish species listed in `sptable_rockfish100`, hake (382) and lingcod (448). See `help(get_la_regression)` and `help(age_to_100day)` for more details on how the regressions are done. (These functions are also used internally, but can be run independently if desired.)
+100 day standardized abundance is only available for species with length-age regressions. This includes the rockfish species listed in `sptable_rockfish100`, hake (382), and lingcod (448). See `help(get_la_regression)` and `help(age_to_100day)` for more details on how the regressions are done. (These functions are also used internally, but can be run independently if desired.)
 
-If ask for "biomass" or "100day", the output will also include TOTAL_NO (abundance) and NMEAS (number of fish measured). If you include length constraints, the output table will include additional columns NMEAS_SIZE (number measured in the size range), and NSIZE (total number in the size range, which is probably what you want, not TOTAL_NO). 
+If you ask for "biomass" or "100day", the output will also include TOTAL_NO (abundance) and NMEAS (number of fish measured). If you include length constraints, the output table will include additional columns NMEAS_SIZE (number measured in the size range) and NSIZE (total number in the size range, which is probably what you want, not TOTAL_NO). 
 
 Only one table is outputted, so if you request data from multiple datasets, they results will be combined (column SURVEY differentiates source). If multiple NAME values are present, the results will be stacked in long format. See `help(get_totals)` for more details.
 
@@ -170,7 +170,7 @@ Only one table is outputted, so if you request data from multiple datasets, they
 ```{r distributions}
 #Size distribution for anchovy
 anchovysizedist <- get_distributions(anchovytable, what = "size")
-tail(anchovysizedist)
+head(anchovysizedist)
 
 #Mass distribution for different anchovy size classes
 anchovymassdist <- get_distributions(anchovytable_len, what = "mass")
@@ -184,7 +184,7 @@ tail(rockfish100agedist)
 
 ## Generating indices
 
-Given an output table from `get_totals`, there is a function `get_logcpueindex` which will compute `mean(log(x+1))` for an `x` of your choice, for each YEAR and NAME. It allows optional grouping variables (typically STRATA).
+Given an output table from `get_totals`, there is a function `get_logcpueindex` which will compute `mean(log(x+1))` for an `x` of your choice, for each YEAR and NAME. It allows optional grouping variables (typically STRATA). A standardized index (within groups) is also computed by default, but can be turned off by setting `standardized=FALSE`.
 
 ```{r indices, warning=FALSE, message=FALSE}
 library(ggplot2)

@@ -18,6 +18,8 @@ A data frame with 12 rows and 4 variables:
 sptable_rockfish100
 }
 \description{
-Species table for rockfishes used in 100 day index
+Table of rockfish species for which 100 day standardized indices can be generated.
+Specifies a minimum length of 20 mm. Includes a common name field that can be joined
+later for plotting purposes.
 }
 \keyword{datasets}

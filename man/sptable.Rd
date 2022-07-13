@@ -16,6 +16,7 @@ A data frame with 12 rows and 3 variables:
 sptable
 }
 \description{
-Species table for common RREAS species and species groups
+Table of species and species groups for which indices are commonly
+reported in ecosystem assessments.
 }
 \keyword{datasets}

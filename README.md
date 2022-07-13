@@ -17,7 +17,7 @@ To install the latest version of the package:
 
 ``` r
 install.packages("devtools") #if required
-devtools::install_github("tanyalrogers/GPEDM")
+devtools::install_github("tanyalrogers/RREAS")
 ```
 
 ## Loading data
@@ -35,7 +35,7 @@ will be loaded to the global environment.
 
 The default behavior is to load just the RREAS data
 (`datasets = "RREAS"`), with HAULSTANDARD containing only active
-stations (`activestationsonly = T`):
+stations (`activestationsonly = TRUE`):
 
 ``` r
 library(RREAS)
@@ -50,21 +50,21 @@ ls(name = .GlobalEnv) #list objects in your workspace
 ```
 
 Currently, the krill lengths are not in the database, so must be
-supplied as a separate file. This file is *not necessary*, however,
+supplied as a separate file. This file is *not necessary* however,
 unless you want to get krill biomass or length distributions. Just omit
 this argument if you don’t have the file.
 
 To load data from multiple surveys, specify which ones under `datasets`.
 If you want to include non-active stations in HAULSTANDARD, just set
-(`activestationsonly = F`). ACTIVE is a column in HAULSTANDARD and can
-always be used to subset later.
+(`activestationsonly = FALSE`). ACTIVE is a column in HAULSTANDARD and
+can always be used to subset later.
 
 ``` r
 #replace the file paths with those for your machine
 load_mdb(mdb_path="E:/Documents/NMFS laptop/Rockfish/RREAS/Survey data/juv_cruise_backup27JAN21.mdb",
          krill_len_path="E:/Documents/NMFS laptop/Rockfish/Index generation/length weight/krill_lengths.csv",
          datasets = c("RREAS","ADAMS","PWCC","NWFSC"),
-         activestationsonly = T)
+         activestationsonly = TRUE)
 #> Data loaded.
 ls(name = .GlobalEnv) #list objects in your workspace
 #>  [1] "AGE"                "CATCH"              "CATCH_ADAMS"       
@@ -122,18 +122,18 @@ anchovytable
 #> 4     209        A Total Anchovy
 ```
 
-If you wanted to split Anchovy into two size classes, here’s how you
-might do that:
+If you wanted to split adult Anchovy into two size classes, here’s how
+you might do that:
 
 ``` r
 anchovytable_len <- data.frame(SPECIES=209, MATURITY="A",
                                NAME=c("Small adult anchovy", "Large adult anchovy"),
-                               MINLEN=c(90,110),
-                               MAXLEN=c(110,NA))
+                               MINLEN=c(90,120),
+                               MAXLEN=c(120,NA))
 anchovytable_len
 #>   SPECIES MATURITY                NAME MINLEN MAXLEN
-#> 1     209        A Small adult anchovy     90    110
-#> 2     209        A Large adult anchovy    110     NA
+#> 1     209        A Small adult anchovy     90    120
+#> 2     209        A Large adult anchovy    120     NA
 ```
 
 The package contains some pre-made species tables with common species.
@@ -217,22 +217,23 @@ the 0 represents ‘absent’ or ‘not counted’. Info can be found in the
 SPECIES\_CODES table.
 
 Biomass is only available for species with length-weight regressions.
-See `help(get_lw_regression)` for more info on the regressions are done.
-(The function `get_lw_regression` is used internally, but can be run
-independently if desired.)
+See `help(get_lw_regression)` for more info on how the regressions are
+done. (The function `get_lw_regression` is used internally, but can be
+run independently if desired.)
 
 100 day standardized abundance is only available for species with
 length-age regressions. This includes the rockfish species listed in
-`sptable_rockfish100`, hake (382) and lingcod (448). See
+`sptable_rockfish100`, hake (382), and lingcod (448). See
 `help(get_la_regression)` and `help(age_to_100day)` for more details on
 how the regressions are done. (These functions are also used internally,
 but can be run independently if desired.)
 
-If ask for “biomass” or “100day”, the output will also include TOTAL\_NO
-(abundance) and NMEAS (number of fish measured). If you include length
-constraints, the output table will include additional columns
-NMEAS\_SIZE (number measured in the size range), and NSIZE (total number
-in the size range, which is probably what you want, not TOTAL\_NO).
+If you ask for “biomass” or “100day”, the output will also include
+TOTAL\_NO (abundance) and NMEAS (number of fish measured). If you
+include length constraints, the output table will include additional
+columns NMEAS\_SIZE (number measured in the size range) and NSIZE (total
+number in the size range, which is probably what you want, not
+TOTAL\_NO).
 
 Only one table is outputted, so if you request data from multiple
 datasets, they results will be combined (column SURVEY differentiates
@@ -292,9 +293,9 @@ tail(anchovybiomass_len)
 #> 7037                 1045      C  Davenport      Y Small adult anchovy        0
 #> 7038                   65     SC  Point Sur      Y Small adult anchovy        0
 #>      NMEAS NMEAS_SIZE    NSIZE  BIOMASS
-#> 7033    19         12 308.8421 3442.570
+#> 7033    19         15 386.0526 4623.876
 #> 7034    22          0   0.0000    0.000
-#> 7035    20         12 550.8000 6401.688
+#> 7035    20         15 688.5000 8418.535
 #> 7036     0          0   0.0000    0.000
 #> 7037     0          0   0.0000    0.000
 #> 7038     0          0   0.0000    0.000
@@ -363,74 +364,74 @@ stacked in long format. See `help(get_distributions)` for more details.
 ``` r
 #Size distribution for anchovy
 anchovysizedist <- get_distributions(anchovytable, what = "size")
-tail(anchovysizedist)
-#>       SURVEY CRUISE HAUL_NO YEAR MONTH JDAY           HAUL_DATE STATION
-#> 38509  RREAS   2103     130 2021     6  159 2021-06-08 03:58:01     425
-#> 38510  RREAS   2103      22 2021     5  124 2021-05-04 22:33:18     124
-#> 38511  RREAS   2103      23 2021     5  125 2021-05-05 00:01:49     125
-#> 38512  RREAS   2103      24 2021     5  125 2021-05-05 01:41:27     126
-#> 38513  RREAS   2103      25 2021     5  125 2021-05-05 03:57:50     127
-#> 38514  RREAS   2103      26 2021     5  125 2021-05-05 21:03:12     101
-#>       NET_IN_LATDD NET_IN_LONGDD    LATDD     LONDD BOTTOM_DEPTH
-#> 38509     33.91300     -120.6992 33.91833 -120.7117         1851
-#> 38510     36.97217     -122.3608 36.98333 -122.3750          125
-#> 38511     36.97067     -122.4112 36.98333 -122.4250          286
-#> 38512     36.97233     -122.5807 36.98333 -122.5917          420
-#> 38513     36.97433     -122.7435 36.98333 -122.7583         1050
-#> 38514     36.30717     -121.9562 36.30000 -121.9383           75
-#>       STATION_BOTTOM_DEPTH STRATA       AREA ACTIVE SPECIES MATURITY
-#> 38509                 1848      S San Miguel      Y     209        Y
-#> 38510                  128      C  Davenport      Y     209        Y
-#> 38511                  446      C  Davenport      Y     209        Y
-#> 38512                  432      C  Davenport      Y     209        Y
-#> 38513                 1045      C  Davenport      Y     209        Y
-#> 38514                   65     SC  Point Sur      Y     209        Y
-#>              NAME TOTAL_NO NMEAS EXP SP_NO STD_LENGTH
-#> 38509 YOY Anchovy        0    NA  NA    NA         NA
-#> 38510 YOY Anchovy        0    NA  NA    NA         NA
-#> 38511 YOY Anchovy        0    NA  NA    NA         NA
-#> 38512 YOY Anchovy        0    NA  NA    NA         NA
-#> 38513 YOY Anchovy        0    NA  NA    NA         NA
-#> 38514 YOY Anchovy        0    NA  NA    NA         NA
+head(anchovysizedist)
+#>   SURVEY CRUISE HAUL_NO YEAR MONTH JDAY  HAUL_DATE STATION NET_IN_LATDD
+#> 1  RREAS   8303       7 1983     6  161 1983-06-10     104     36.28833
+#> 2  RREAS   8303      15 1983     6  163 1983-06-12     119     36.85500
+#> 3  RREAS   8303      17 1983     6  164 1983-06-13     114     36.76167
+#> 4  RREAS   8303      18 1983     6  164 1983-06-13     116     36.74667
+#> 5  RREAS   8303      24 1983     6  165 1983-06-14     117     36.70667
+#> 6  RREAS   8303      25 1983     6  165 1983-06-14     113     36.65333
+#>   NET_IN_LONGDD    LATDD     LONDD BOTTOM_DEPTH STATION_BOTTOM_DEPTH STRATA
+#> 1     -122.0833 36.30000 -122.0900          438                  354     SC
+#> 2     -121.9883 36.84667 -121.9833           80                   91      C
+#> 3     -121.8850 36.76667 -121.8667           82                   73      C
+#> 4     -121.9833 36.74000 -121.9767          444                  287      C
+#> 5     -122.1150 36.70000 -122.1083         1828                 1920      C
+#> 6     -122.0533 36.64667 -122.0500         1097                  900      C
+#>                   AREA ACTIVE SPECIES MATURITY          NAME TOTAL_NO NMEAS EXP
+#> 1            Point Sur      Y     209        A Adult Anchovy        0    NA  NA
+#> 2  Monterey Bay Inside      Y     209        A Adult Anchovy      268    NA 268
+#> 3  Monterey Bay Inside      Y     209        A Adult Anchovy       40    NA  40
+#> 4  Monterey Bay Inside      Y     209        A Adult Anchovy       14    NA  14
+#> 5 Monterey Bay Outside      Y     209        A Adult Anchovy        0    NA  NA
+#> 6 Monterey Bay Outside      Y     209        A Adult Anchovy        0    NA  NA
+#>   SP_NO STD_LENGTH
+#> 1    NA         NA
+#> 2    NA   119.9586
+#> 3    NA   119.9586
+#> 4    NA   119.9586
+#> 5    NA         NA
+#> 6    NA         NA
 
 #Mass distribution for different anchovy size classes
 anchovymassdist <- get_distributions(anchovytable_len, what = "mass")
 tail(anchovymassdist)
 #>       SURVEY CRUISE HAUL_NO YEAR MONTH JDAY           HAUL_DATE STATION
-#> 15034  RREAS   2103      23 2021     5  125 2021-05-05 00:01:49     125
-#> 15035  RREAS   2103      23 2021     5  125 2021-05-05 00:01:49     125
-#> 15036  RREAS   2103      23 2021     5  125 2021-05-05 00:01:49     125
-#> 15037  RREAS   2103      24 2021     5  125 2021-05-05 01:41:27     126
-#> 15038  RREAS   2103      25 2021     5  125 2021-05-05 03:57:50     127
-#> 15039  RREAS   2103      26 2021     5  125 2021-05-05 21:03:12     101
+#> 14954  RREAS   2103      23 2021     5  125 2021-05-05 00:01:49     125
+#> 14955  RREAS   2103      23 2021     5  125 2021-05-05 00:01:49     125
+#> 14956  RREAS   2103      23 2021     5  125 2021-05-05 00:01:49     125
+#> 14957  RREAS   2103      24 2021     5  125 2021-05-05 01:41:27     126
+#> 14958  RREAS   2103      25 2021     5  125 2021-05-05 03:57:50     127
+#> 14959  RREAS   2103      26 2021     5  125 2021-05-05 21:03:12     101
 #>       NET_IN_LATDD NET_IN_LONGDD    LATDD     LONDD BOTTOM_DEPTH
-#> 15034     36.97067     -122.4112 36.98333 -122.4250          286
-#> 15035     36.97067     -122.4112 36.98333 -122.4250          286
-#> 15036     36.97067     -122.4112 36.98333 -122.4250          286
-#> 15037     36.97233     -122.5807 36.98333 -122.5917          420
-#> 15038     36.97433     -122.7435 36.98333 -122.7583         1050
-#> 15039     36.30717     -121.9562 36.30000 -121.9383           75
+#> 14954     36.97067     -122.4112 36.98333 -122.4250          286
+#> 14955     36.97067     -122.4112 36.98333 -122.4250          286
+#> 14956     36.97067     -122.4112 36.98333 -122.4250          286
+#> 14957     36.97233     -122.5807 36.98333 -122.5917          420
+#> 14958     36.97433     -122.7435 36.98333 -122.7583         1050
+#> 14959     36.30717     -121.9562 36.30000 -121.9383           75
 #>       STATION_BOTTOM_DEPTH STRATA      AREA ACTIVE SPECIES MATURITY
-#> 15034                  446      C Davenport      Y     209        A
-#> 15035                  446      C Davenport      Y     209        A
-#> 15036                  446      C Davenport      Y     209        A
-#> 15037                  432      C Davenport      Y     209        A
-#> 15038                 1045      C Davenport      Y     209        A
-#> 15039                   65     SC Point Sur      Y     209        A
+#> 14954                  446      C Davenport      Y     209        A
+#> 14955                  446      C Davenport      Y     209        A
+#> 14956                  446      C Davenport      Y     209        A
+#> 14957                  432      C Davenport      Y     209        A
+#> 14958                 1045      C Davenport      Y     209        A
+#> 14959                   65     SC Point Sur      Y     209        A
 #>                      NAME TOTAL_NO NMEAS NMEAS_SIZE  EXP PSIZE NSIZE SP_NO
-#> 15034 Small adult anchovy      918    20         12 45.9   0.6 550.8  6515
-#> 15035 Small adult anchovy      918    20         12 45.9   0.6 550.8  6516
-#> 15036 Small adult anchovy      918    20         12 45.9   0.6 550.8  6517
-#> 15037 Small adult anchovy        0    NA         NA   NA    NA   0.0    NA
-#> 15038 Small adult anchovy        0    NA         NA   NA    NA   0.0    NA
-#> 15039 Small adult anchovy        0    NA         NA   NA    NA   0.0    NA
+#> 14954 Small adult anchovy      918    20         15 45.9  0.75 688.5  6516
+#> 14955 Small adult anchovy      918    20         15 45.9  0.75 688.5  6517
+#> 14956 Small adult anchovy      918    20         15 45.9  0.75 688.5  6518
+#> 14957 Small adult anchovy        0    NA         NA   NA    NA   0.0    NA
+#> 14958 Small adult anchovy        0    NA         NA   NA    NA   0.0    NA
+#> 14959 Small adult anchovy        0    NA         NA   NA    NA   0.0    NA
 #>       STD_LENGTH   WEIGHT
-#> 15034        105 12.10997
-#> 15035        103 11.34121
-#> 15036        105 12.10997
-#> 15037         NA       NA
-#> 15038         NA       NA
-#> 15039         NA       NA
+#> 14954        103 11.34121
+#> 14955        105 12.10997
+#> 14956        110 14.19203
+#> 14957         NA       NA
+#> 14958         NA       NA
+#> 14959         NA       NA
 
 #rockfish age distributions
 rockfish100agedist <- get_distributions(sptable_rockfish100, what = "age")
@@ -477,7 +478,9 @@ tail(rockfish100agedist)
 Given an output table from `get_totals`, there is a function
 `get_logcpueindex` which will compute `mean(log(x+1))` for an `x` of
 your choice, for each YEAR and NAME. It allows optional grouping
-variables (typically STRATA).
+variables (typically STRATA). A standardized index (within groups) is
+also computed by default, but can be turned off by setting
+`standardized=FALSE`.
 
 ``` r
 library(ggplot2)
@@ -509,12 +512,12 @@ ggplot(anchovyindex1plot,aes(y=TOTAL_NO_INDEX,x=YEAR)) +
 anchovyindex2 <- get_logcpueindex(anchovybiomass_len, var = "BIOMASS", group="STRATA")
 head(anchovyindex2)
 #>                  NAME STRATA YEAR BIOMASS_INDEX BIOMASS_INDEX_SC
-#> 1 Small adult anchovy      C 1983     1.7496052       0.80777436
-#> 2 Small adult anchovy      C 1984     2.5726484       1.55324030
-#> 3 Small adult anchovy      C 1985     2.1377010       1.15928957
-#> 4 Small adult anchovy      C 1986     0.3226575      -0.48467414
-#> 5 Small adult anchovy      C 1987     0.9774884       0.10843466
-#> 6 Small adult anchovy      C 1988     0.9197939       0.05617827
+#> 1 Small adult anchovy      C 1983     2.0613810       0.66499025
+#> 2 Small adult anchovy      C 1984     3.0168360       1.37970873
+#> 3 Small adult anchovy      C 1985     2.6174411       1.08094535
+#> 4 Small adult anchovy      C 1986     0.4256878      -0.55857346
+#> 5 Small adult anchovy      C 1987     1.1512273      -0.01584101
+#> 6 Small adult anchovy      C 1988     1.1424928      -0.02237477
 
 anchovyindex2plot <- anchovyindex2 %>% 
   #filter(!(YEAR<2004 & STRATA!="C")) %>% #exclude non-core areas before 2004

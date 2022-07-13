@@ -24,7 +24,7 @@ be specified. Options are "RREAS","ADAMS","PWCC","NWFSC". If unspecified, just u
 \value{
 A dataframe with haul information, NAME, and totals. If "abundance"
 is requested, will include column TOTAL_NO. If "biomass" is requested, will
-include columns TOTAL_NO, NMEAS (number measured), and BIOMASS. If "100day"
+include columns TOTAL_NO, NMEAS (number measured), and BIOMASS (g). If "100day"
 is requested, will include columns TOTAL_NO, NMEAS (number measured), and
 N100. If size limits are specified, will include additional columns
 NMEAS_SIZE (number measured in the size range), and NSIZE (total number in

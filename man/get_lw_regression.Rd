@@ -27,15 +27,14 @@ look like.
 }
 \details{
 This fits a linear regression to log-log data. The outputed conversion
-function will do the transformations and backtransformations automatically:
+function will do the transformations and backtransformations automatically, so
 the inputed lengths should be in the original units (mm).
 
 Length-weight regressions can be done for all species in the WEIGHT table
 (run \code{unique(WEIGHT$SPECIES)} for a list) and for all species in
-\code{\link{sptable_lw}}. For octopus (2026), which has weight but no length data, the
-mean weight is used.
+\code{\link{sptable_lw}}.
 
-The rockfishes are divided into 4 groups given table \code{\link{rflwgroups}}. The
+The rockfishes are divided into 4 groups given in table \code{\link{rflwgroups}}. The
 groups are based on general body shape and similarity of regression
 intercepts. Within a given group, species with length-weight data are pooled,
 and the regression is used for all species in that group, including those
@@ -46,8 +45,11 @@ For anchovy (209), adults (A) and juveniles (Y) are pooled for the
 regression.
 
 For northern lampfish (661) and California lanternfish (669), data from both
-species are combined for the regression. Unknown myctophids (407) will use
+species are pooled for the regression. Unknown myctophids (407) will use
 this regression.
+
+For octopus (2026), which has weight but no length data, the mean weight is
+used.
 
 This function includes and will use published length-weight regressions for
 select species not in the WEIGHT table. These species are sardine (562), T.
@@ -59,10 +61,10 @@ warning will be displayed and the resulting function will return NA for any
 length input.
 }
 \examples{
+print(rflwgroups)
 \dontrun{
 get_lw_regression(species = 209, maturity = "A", plot=T)
 get_lw_regression(species = 562, maturity = "A")
-print(rflwgroups)
 }
 }
 \seealso{
