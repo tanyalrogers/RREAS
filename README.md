@@ -96,13 +96,16 @@ Both functions require a specially formatted dataframe (the
 extract (multiple species can be specified), whether/how to aggregate
 them, and whether any length constraints should be imposed.
 
-The species table must have the following columns: - SPECIES: Species
-codes - MATURITY: Maturity codes - NAME: A custom name, typically the
-common name. Rows with the same the same NAME value will be aggregated
-together. The table may optionally include: - MINLEN: The minimum length
-in mm, greater than or equal to (if column is missing or value is NA,
-defaults to 0) - MAXLEN: The maximum length in mm, less than (if column
-is missing or value is NA, defaults to Inf)
+The species table must have the following columns:  
+- SPECIES: Species codes  
+- MATURITY: Maturity codes  
+- NAME: A custom name, typically the common name. Rows with the same the
+same NAME value will be aggregated together.  
+The table may optionally include:  
+- MINLEN: The minimum length in mm, greater than or equal to (if column
+is missing or value is NA, defaults to 0)  
+- MAXLEN: The maximum length in mm, less than (if column is missing or
+value is NA, defaults to Inf)
 
 Here’s an example of of how you might construct a table for YOY Anchovy,
 Adult Anchovy, and Total Anchovy:
@@ -197,11 +200,13 @@ sptable_rockfish100
 
 ### Getting totals
 
-The function `get_totals` has 4 inputs: - `speciestable`: The species
-table data frame - `datasets`: Which datasets you want to use (defaults
-to RREAS only). Datasets have to be loaded to use them. - `startyear`:
-Start year (optional). Defaults to 1983. - `what`: What kind of total
-you want, either “abundance”,“biomass”, or “100day”.
+The function `get_totals` has 4 inputs:  
+- `speciestable`: The species table data frame  
+- `datasets`: Which datasets you want to use (defaults to RREAS only).
+Datasets have to be loaded to use them.  
+- `startyear`: Start year (optional). Defaults to 1983.  
+- `what`: What kind of total you want, either “abundance”,“biomass”, or
+“100day”.
 
 Values will be generated for each haul in HAULSTANDARD. Note that if a
 station was sampled but the species requested does not appear in the

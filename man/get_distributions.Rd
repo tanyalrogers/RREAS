@@ -36,7 +36,8 @@ range), and NSIZE (total number in the size range, which is probably what
 you want, not TOTAL_NO). If multiple NAME values were present, the data
 will be in long format (stacked). If you request data from multiple
 datasets, they results will be combined (column SURVEY differentiates
-source).
+source). The NAME field is converted to a factor so names will plot in the
+same order supplied in \code{speciestable}.
 }
 \description{
 Obtains size, mass, or age distribution data for select species for the hauls
@@ -60,7 +61,11 @@ The \code{speciestable} should be formatted in the same way as described in
 }
 \examples{
 \dontrun{
-
+rockfish100agedist <- get_distributions(sptable_rockfish100, what = "age")
 }
+}
+\seealso{
+\code{\link{get_totals}}, \code{\link{get_numbers}}, \code{\link{get_lw_regression}}, \code{\link{get_la_regression}},
+\code{\link{age_to_100day}}, \code{\link{sptable}}, \code{\link{sptable_lw}}, \code{\link{sptable_rockfish100}}
 }
 \keyword{functions}

@@ -28,10 +28,13 @@ for each YEAR and NAME. Allows an optional grouping variable (e.g. STRATA).
 \details{
 If there are multiple hauls at the same station in a given year, these are
 averaged first, and then all stations means in a given year are averaged.
+
+NAs will be filled in for years with no hauls in a given grouping.
 }
 \examples{
 \dontrun{
-
+rockfish100equiv <- get_totals(sptable_rockfish100, what = "100day")
+rockfish100index <- get_logcpueindex(rockfish100equiv, var="N100", group="STRATA")
 }
 }
 \keyword{functions}

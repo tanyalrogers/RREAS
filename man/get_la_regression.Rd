@@ -40,7 +40,7 @@ length input.
 }
 \examples{
 \dontrun{
-len_to_age = get_len_to_age_func()
+len_to_age = get_la_regression()
 }
 }
 \keyword{functions}

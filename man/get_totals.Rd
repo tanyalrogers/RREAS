@@ -31,7 +31,8 @@ NMEAS_SIZE (number measured in the size range), and NSIZE (total number in
 the size range, which is probably what you want, not TOTAL_NO). If multiple
 NAME values were present, the data will be in long format (stacked). If you
 request data from multiple datasets, they results will be combined (column
-SURVEY differentiates source).
+SURVEY differentiates source). The NAME field is converted to a factor so
+names will plot in the same order supplied in \code{speciestable}.
 }
 \description{
 Obtains total haul-level abundance, biomass, or 100-day standardized
@@ -43,7 +44,7 @@ single function call (see Details).
 Note that if a station was sampled but the species requested does not appear
 in the CATCH table for that haul, it will appear as a 0. It your
 responsibility to know when species were or were not being recorded, and thus
-whether the 0 represents 'absent' or 'not counted'. Some info can be found in the
+whether the 0 represents 'absent' or 'not counted'. Info can be found in the
 SPECIES_CODES table.
 
 Length data are required for "biomass", "100day", and length-specific
@@ -108,5 +109,9 @@ somebiomasses=get_totals(speciestable=sptable, what="biomass")
 rockfish100day=get_totals(speciestable=sptable_rockfish100, what="100day",
   datasets=c("RREAS","ADAMS","PWCC","NWFSC"))
 }
+}
+\seealso{
+\code{\link{get_distributions}}, \code{\link{get_numbers}}, \code{\link{get_lw_regression}}, \code{\link{get_la_regression}},
+\code{\link{age_to_100day}}, \code{\link{sptable}}, \code{\link{sptable_lw}}, \code{\link{sptable_rockfish100}}
 }
 \keyword{functions}

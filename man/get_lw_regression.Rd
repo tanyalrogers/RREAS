@@ -11,8 +11,8 @@ get_lw_regression(species, maturity, plot = F)
 
 \item{maturity}{Maturity code}
 
-\item{plot}{Logical. Whether to produce a plot (logical). Plots will not be produced
-for published regressions, just ones fit using the WEIGHT data.}
+\item{plot}{Logical. Whether to produce a plot (logical). Plots will not be
+produced for published regressions, just ones fit using the WEIGHT data.}
 }
 \value{
 A function which takes a vector of lengths (mm) as input, and returns
@@ -22,19 +22,27 @@ a vector of masses (g).
 Runs a length-weight regression using data in the WEIGHT table and outputs a
 function to convert lengths into weights. This function (and the outputed
 function) are used internally in \code{\link{get_totals}} and \code{\link{get_distribution}} but
-it can be called independently, e.g. if you want to see what the
-regressions look like.
+it can be called independently, e.g. if you want to see what the regressions
+look like.
 }
 \details{
 This fits a linear regression to log-log data. The outputed conversion
 function will do the transformations and backtransformations automatically:
 the inputed lengths should be in the original units (mm).
 
-Length-weight regressions can be done for all species in the WEIGHT table.
-Run \code{unique(WEIGHT$SPECIES)} for a list. For octopus (2026), which has weight
-but no length data, the mean weight is used.
+Length-weight regressions can be done for all species in the WEIGHT table
+(run \code{unique(WEIGHT$SPECIES)} for a list) and for all species in
+\code{\link{sptable_lw}}. For octopus (2026), which has weight but no length data, the
+mean weight is used.
 
-For anchovy (209), adults (A) and juveniles (Y) are combined for the
+The rockfishes are divided into 4 groups given table \code{\link{rflwgroups}}. The
+groups are based on general body shape and similarity of regression
+intercepts. Within a given group, species with length-weight data are pooled,
+and the regression is used for all species in that group, including those
+without length-weight data. Thus the species with data act as proxies for
+species without data.
+
+For anchovy (209), adults (A) and juveniles (Y) are pooled for the
 regression.
 
 For northern lampfish (661) and California lanternfish (669), data from both
@@ -54,6 +62,10 @@ length input.
 \dontrun{
 get_lw_regression(species = 209, maturity = "A", plot=T)
 get_lw_regression(species = 562, maturity = "A")
+print(rflwgroups)
 }
+}
+\seealso{
+\code{\link{sptable_lw}}, \code{\link{rflwgroups}}
 }
 \keyword{functions}

@@ -11,6 +11,7 @@ A data frame with 12 rows and 4 variables:
 \item{MATURITY}{Maturity code}
 \item{NAME}{Name (3 letter code)}
 \item{MINLEN}{Minimum length (20 mm)}
+\item{COMMON}{Common name}
 }
 }
 \usage{
