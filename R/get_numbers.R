@@ -293,14 +293,16 @@ get_numbers=function(speciestable,datasets="RREAS",startyear=1983,
     }
 
     #get length data for species i
-    if(!is.null(krill_length)) {
+    if(exists("krill_length")) {
       if(fspecies %in% unique(krill_length$SPECIES)) { #krill
         flength<-dplyr::filter(krill_length,SPECIES==fspecies & MATURITY==fmaturity)
+        meankrilllength<-mean(krill_length$STD_LENGTH)
       } else { #not krill
         flength<-dplyr::filter(LENGTHall,SPECIES==fspecies & MATURITY==fmaturity)
       }
     } else {
       flength<-dplyr::filter(LENGTHall,SPECIES==fspecies & MATURITY==fmaturity)
+      meankrilllength<-1 #wont get used, just to stop case_when from choking
     }
 
     flength$STD_LENGTH<-round(flength$STD_LENGTH,digits=0)
@@ -348,7 +350,7 @@ get_numbers=function(speciestable,datasets="RREAS",startyear=1983,
       dplyr::group_by(SURVEY,CRUISE) %>% dplyr::mutate(MLEN_CRUISE=mean(STD_LENGTH,na.rm = T)) %>% dplyr::ungroup() %>%
       dplyr::mutate(MLEN_GLOBAL=mean(STD_LENGTH,na.rm = T),
                     MLEN=dplyr::case_when(fspecies==2026 ~ 1, #octopus dummy length
-                                          fspecies %in% c(1472,1846,1847,2829,2830,2835,2849,1791) ~ mean(krill_length$STD_LENGTH), #length for unid and rare krill
+                                          fspecies %in% c(1472,1846,1847,2829,2830,2835,2849,1791) ~ meankrilllength, #length for unid and rare krill
                                           !is.na(MLEN_AREA) ~ MLEN_AREA,
                                           !is.na(MLEN_STRATA) ~ MLEN_STRATA,
                                           !is.na(MLEN_CRUISE) ~ MLEN_CRUISE,
