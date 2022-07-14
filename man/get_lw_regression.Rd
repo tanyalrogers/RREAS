@@ -21,7 +21,7 @@ a vector of masses (g).
 \description{
 Runs a length-weight regression using data in the WEIGHT table and outputs a
 function to convert lengths into weights. This function (and the outputed
-function) are used internally in \code{\link{get_totals}} and \code{\link{get_distribution}} but
+function) are used internally in \code{\link{get_totals}} and \code{\link{get_distributions}} but
 it can be called independently, e.g. if you want to see what the regressions
 look like.
 }

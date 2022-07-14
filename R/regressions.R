@@ -2,7 +2,7 @@
 #'
 #' Runs a length-weight regression using data in the WEIGHT table and outputs a
 #' function to convert lengths into weights. This function (and the outputed
-#' function) are used internally in [`get_totals`] and [`get_distribution`] but
+#' function) are used internally in [`get_totals`] and [`get_distributions`] but
 #' it can be called independently, e.g. if you want to see what the regressions
 #' look like.
 #'
@@ -125,7 +125,7 @@ get_lw_regression=function(species, maturity, plot=F){
 #'
 #' Runs length-age regressions using data in the AGE table and outputs a
 #' function to convert lengths into ages. This function (and the outputed
-#' function) are used internally in [`get_totals`] and [`get_distribution`] but
+#' function) are used internally in [`get_totals`] and [`get_distributions`] but
 #' it can be called independently, e.g. if you want to see what the
 #' regressions look like.
 #'
@@ -271,7 +271,7 @@ get_la_regression=function() {
 #' Convert age to 100 day equivalents
 #'
 #' Convert ages into 100 day equivalents using assumed mortality rate. This
-#' function is used internally in [`get_totals`] and [`get_distribution`] but it
+#' function is used internally in [`get_totals`] and [`get_distributions`] but it
 #' can be called independently if desired.
 #'
 #' @details

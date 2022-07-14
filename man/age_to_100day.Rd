@@ -14,7 +14,7 @@ Vector of 100 day equivalents
 }
 \description{
 Convert ages into 100 day equivalents using assumed mortality rate. This
-function is used internally in \code{\link{get_totals}} and \code{\link{get_distribution}} but it
+function is used internally in \code{\link{get_totals}} and \code{\link{get_distributions}} but it
 can be called independently if desired.
 }
 \details{

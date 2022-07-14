@@ -293,11 +293,16 @@ get_numbers=function(speciestable,datasets="RREAS",startyear=1983,
     }
 
     #get length data for species i
-    if(fspecies %in% unique(krill_length$SPECIES)) { #krill
-      flength<-dplyr::filter(krill_length,SPECIES==fspecies & MATURITY==fmaturity)
-    } else { #not krill
+    if(!is.null(krill_length)) {
+      if(fspecies %in% unique(krill_length$SPECIES)) { #krill
+        flength<-dplyr::filter(krill_length,SPECIES==fspecies & MATURITY==fmaturity)
+      } else { #not krill
+        flength<-dplyr::filter(LENGTHall,SPECIES==fspecies & MATURITY==fmaturity)
+      }
+    } else {
       flength<-dplyr::filter(LENGTHall,SPECIES==fspecies & MATURITY==fmaturity)
     }
+
     flength$STD_LENGTH<-round(flength$STD_LENGTH,digits=0)
 
     #get total fish measured per trawl (total, size range), expansion factor, prop in size range
