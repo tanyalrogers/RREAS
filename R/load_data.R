@@ -9,12 +9,13 @@
 #'
 #' @details
 #'
-#' If the "NWFSC" dataset is requested, then RREAS stations sampled in the NWFSC survey will be
-#' appended to the RREAS tables, and NWFSC stations sampled in the RREAS survey will be appended
-#' to the NWFSC tables.
+#' If the "NWFSC" dataset is requested, then the HAULSTANDARD_NWFSC table will
+#' contain the NWFSC stations sampled in the NWFSC survey, the RREAS stations
+#' sampled in the NWFSC survey, and the NWFSC stations sampled in the RREAS
+#' survey.
 #'
-#' If a path to "atsea.mdb" is given, containing the current year's data, it will be appended to
-#' the RREAS tables.
+#' If a path to "atsea.mdb" is given, containing the current year's data, it
+#' will be appended to the RREAS tables.
 #'
 #'
 #' @param mdb_path File path to the juv_cruise mdb file (required).
