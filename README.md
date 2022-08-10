@@ -6,10 +6,10 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-This package contains support functions for the NOAA SWFSC Rockfish
-Recruitment and Ecosystem Assessment Survey (RREAS).
+This package contains data and support functions for the NOAA SWFSC
+Rockfish Recruitment and Ecosystem Assessment Survey (RREAS).
 
-This is version 0.0.0.9000. Please report any problems!
+This is version 0.1.0. Please report any problems!
 
 ## Installation
 
@@ -22,25 +22,58 @@ devtools::install_github("tanyalrogers/RREAS")
 
 ## Loading data
 
-Loading data requires a local copy of the MS Access Database.
-
-The function `load_mdb` will load the HAUL, CATCH, and LENGTH tables
-from one (or more) surveys in the RREAS database, along with the AGE,
-WEIGHT, and SPECIES\_CODES tables from RREAS. It also creates and loads
-a HAULSTANDARD table containing only standard stations and with a
-standardized set of columns including YEAR, MONTH, JDAY, and lat/lon in
-decimal degrees. HAULSTANDARD tables all have the same format and so
-tables from multiple surveys can be stacked with `rbind`. The tables
-will be loaded to the global environment.
-
-The default behavior is to load just the RREAS data
-(`datasets = "RREAS"`), with HAULSTANDARD containing only active
-stations (`activestationsonly = TRUE`):
-
 ``` r
 library(RREAS)
+```
 
+There are two different functions for loading RREAS data:
+
+-   `load_erddap` loads the survey data as it is currently stored on
+    [ERDDAP](https://oceanview.pfeg.noaa.gov/erddap/index.html), which
+    contains data from 1990 to 2018 for standard, active stations only.
+    The data tables are contained within the package and are reformatted
+    as relational tables (HAUL, CATCH, LENGTH, SPECIES\_CODES) to match
+    the format in the database. A HAULSTANDARD table is also loaded with
+    a standardized set of columns matching those produced by `load_mdb`.
+    Note that the AGE and WEIGHT tables are not included in this
+    dataset.
+
+-   `load_mdb` loads data from a local copy of the RREAS MS Access
+    Database (required to use this function). This function will load
+    the HAUL, CATCH, and LENGTH tables from one (or more) surveys in the
+    RREAS database, along with the AGE, WEIGHT, and SPECIES\_CODES
+    tables from RREAS. It also creates and loads a HAULSTANDARD table
+    containing only standard stations and with a standardized set of
+    columns including YEAR, MONTH, JDAY, and lat/lon in decimal degrees.
+    HAULSTANDARD tables all have the same format and so tables from
+    multiple surveys can be stacked with `rbind`.
+
+Metadata for the ERDDAP tables (also applicable to the mdb tables) can
+be found under `help(RREAS_ERDDAP)`.
+
+To load the ERDDAP data, simply run:
+
+``` r
+load_erddap()
+#> Data loaded.
+```
+
+You will see that the data tables are loaded to your global environment:
+
+``` r
+ls(name = .GlobalEnv) #list objects in your workspace
+#> [1] "CATCH"         "HAUL"          "HAULSTANDARD"  "LENGTH"       
+#> [5] "SPECIES_CODES"
+```
+
+To load data from a local MS Access Database, you will need to specify
+the file path to the database. The default behavior of `load_mdb` is to
+load just the RREAS data (`datasets = "RREAS"`), with HAULSTANDARD
+containing only active stations (`activestationsonly = TRUE`):
+
+``` r
 #replace the file paths with those for your machine
+#any previously loaded tables with the same name in your workspace will be overwritten
 load_mdb(mdb_path="E:/Documents/NMFS laptop/Rockfish/RREAS/Survey data/juv_cruise_backup27JAN21.mdb",
          krill_len_path="E:/Documents/NMFS laptop/Rockfish/Index generation/length weight/krill_lengths.csv")
 #> Data loaded.
@@ -87,7 +120,8 @@ There are two main data extraction functions: `get_totals` and
 `get_distributions`. The function `get_totals` can be used to obtain
 total haul-level abundance, biomass, or 100-day standardized abundance.
 The function `get_distributions` can be used to obtain size, mass, or
-age distribution data.
+age distribution data. Note only haul-level abundance and size
+distributions can be obtained from the ERDDAP dataset.
 
 ### Formatting the species table
 
@@ -207,7 +241,7 @@ The function `get_totals` has 4 inputs:
 Datasets have to be loaded to use them.  
 - `startyear`: Start year (optional). Defaults to 1983.  
 - `what`: What kind of total you want, either “abundance”,“biomass”, or
-“100day”.
+“100day”. Defaults to “abundance”.
 
 Values will be generated for each haul in HAULSTANDARD. Note that if a
 station was sampled but the species requested does not appear in the
@@ -532,7 +566,7 @@ ggplot(anchovyindex2plot,aes(y=BIOMASS_INDEX,x=YEAR)) +
 <img src="man/figures/README-indices-2.png" width="100%" />
 
 ``` r
-rockfish100index <- get_logcpueindex(rockfish100equiv, var="N100",group="STRATA")
+rockfish100index <- get_logcpueindex(rockfish100equiv, var="N100", group="STRATA")
 head(rockfish100index)
 #>   NAME STRATA YEAR N100_INDEX N100_INDEX_SC
 #> 1  aur      C 1983 0.00000000    -0.7036376
@@ -553,9 +587,8 @@ ggplot(rf100plot,aes(y=N100_INDEX_SC,x=YEAR, group=COMMON, color=COMMON)) +
 
 <img src="man/figures/README-indices-3.png" width="100%" />
 
-## Remaining thing to do
+## Remaining things to do
 
 -   Need to add model-based index generation methods.
--   Need to add ERDDAP datasets and format for existing functions.
 -   Jellyfish values do not take into account hauls cancelled due to
     jellyfish.

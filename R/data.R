@@ -59,3 +59,56 @@
 #' }
 #' @keywords datasets
 "rflwgroups"
+
+#' RREAS data from ERDDAP
+#'
+#' RREAS data tables pulled from ERDDAP. These are reformatted as relational tables
+#' matching the format of the table in the database. Data on ERDDAP begins
+#' in 1990 and ends about 4 years from the present.
+#'
+#' @name RREAS_ERDDAP
+#' @aliases CATCH_ERDDAP HAUL_ERDDAP HAULSTANDARD_ERDDAP SPECIES_CODES
+#'
+#' @details Contains additional SPECIES/MATURITY categories 1472/T (total krill)
+#'   and 1940/T (total rockfish).
+#'
+#' @format Data frames with some combination of the following fields
+#' \describe{
+#'   \item{CRUISE}{Cruise ID}
+#'   \item{HAUL_NO}{Haul number}
+#'   \item{VESSEL}{Survey vessel code}
+#'   \item{STATION}{Station code}
+#'   \item{HAUL_DATE}{Haul date and time}
+#'   \item{YEAR}{Survey year}
+#'   \item{MONTH}{Haul month}
+#'   \item{JDAY}{Haul julian day}
+#'   \item{NET_IN_LATDD}{Latitude at which net went in water (decimal degrees)}
+#'   \item{NET_IN_LONDD}{Longitude at which net went in water (decimal degrees)}
+#'   \item{LATDD}{Latitude of station (decimal degrees)}
+#'   \item{LONDD}{Longitude of station (decimal degrees)}
+#'   \item{BOTTOM_DEPTH}{Bottom depth of haul (m)}
+#'   \item{STATION_BOTTOM_DEPTH}{Bottom depth of station (m)}
+#'   \item{STRATA}{Survey region (C:Core, NC:North core, SC: South core, N: North, S: South)}
+#'   \item{AREA}{Survey area (transect or subregion)}
+#'   \item{SPECIES}{Species code}
+#'   \item{MATURITY}{Maturity code}
+#'   \item{COMMON_NAME}{Common name}
+#'   \item{SCI_NAME}{Scientific name}
+#'   \item{TOTAL_NO}{Number of individuals caught}
+#'   \item{STD_LENGTH}{Standard length (mm)}
+#' }
+#' @source \url{https://oceanview.pfeg.noaa.gov/erddap/tabledap/FED_Rockfish_Catch.html}
+#'   \url{https://oceanview.pfeg.noaa.gov/erddap/tabledap/FED_Rockfish_Length.html}
+#' @keywords datasets
+NULL
+
+#' @rdname RREAS_ERDDAP
+"HAUL_ERDDAP"
+#' @rdname RREAS_ERDDAP
+"HAULSTANDARD_ERDDAP"
+#' @rdname RREAS_ERDDAP
+"CATCH_ERDDAP"
+#' @rdname RREAS_ERDDAP
+"LENGTH_ERDDAP"
+#' @rdname RREAS_ERDDAP
+"SPECIES_CODES"

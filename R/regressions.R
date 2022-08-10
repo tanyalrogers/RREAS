@@ -60,6 +60,11 @@
 #' get_lw_regression(species = 562, maturity = "A")
 #' }
 get_lw_regression=function(species, maturity, plot=F){
+
+  if(!exists("WEIGHT")) {
+    stop("WEIGHT table required to obtain length-weight regression")
+  }
+
   if(species %in% unique(rflwgroups$SPECIES)) { #if species in rf table
     proxyspp<-rflwgroups$SPECIES[which(rflwgroups$RFGROUP==rflwgroups$RFGROUP[which(rflwgroups$SPECIES==species)])]
     fwts<-subset(WEIGHT,SPECIES %in% proxyspp & MATURITY==maturity)
@@ -163,6 +168,10 @@ get_lw_regression=function(species, maturity, plot=F){
 #' len_to_age = get_la_regression()
 #' }
 get_la_regression=function() {
+
+  if(!exists("AGE")) {
+    stop("AGE table required to obtain length-age regression")
+  }
 
   AGEsub <- AGE %>%
     # remove records with missing age and fish <20mm

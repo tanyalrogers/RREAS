@@ -82,7 +82,7 @@ load_mdb=function(mdb_path,atsea_path=NULL,datasets="RREAS",krill_len_path=NULL,
     standardstations$LATDD<-convertdd(standardstations$LATITUDE)
     standardstations$LONDD<-(-convertdd(standardstations$LONGITUDE))
     HAUL$NET_IN_LATDD<-convertdd(HAUL$NET_IN_LAT)
-    HAUL$NET_IN_LONGDD<-(-convertdd(HAUL$NET_IN_LONG))
+    HAUL$NET_IN_LONDD<-(-convertdd(HAUL$NET_IN_LONG))
     #add year, month, and julian day
     HAUL$YEAR<-lubridate::year(HAUL$HAUL_DATE)
     HAUL$MONTH<-lubridate::month(HAUL$HAUL_DATE)
@@ -95,7 +95,7 @@ load_mdb=function(mdb_path,atsea_path=NULL,datasets="RREAS",krill_len_path=NULL,
       dplyr::filter(STANDARD_STATION==1) %>%
       dplyr::filter(!(CRUISE %in% c("8703","8804","9003"))) %>% #not real cruises
       dplyr::mutate(SURVEY="RREAS") %>%
-      dplyr::select(SURVEY,CRUISE,HAUL_NO,YEAR,MONTH,JDAY,HAUL_DATE,STATION,NET_IN_LATDD,NET_IN_LONGDD,
+      dplyr::select(SURVEY,CRUISE,HAUL_NO,YEAR,MONTH,JDAY,HAUL_DATE,STATION,NET_IN_LATDD,NET_IN_LONDD,
                     LATDD,LONDD,BOTTOM_DEPTH,STATION_BOTTOM_DEPTH,STRATA,AREA,ACTIVE)
   }
 
@@ -107,7 +107,7 @@ load_mdb=function(mdb_path,atsea_path=NULL,datasets="RREAS",krill_len_path=NULL,
 
     #convert coords to dd
     HAUL_ADAMS$NET_IN_LATDD<-convertdd(HAUL_ADAMS$NET_IN_LAT)
-    HAUL_ADAMS$NET_IN_LONGDD<-(-convertdd(HAUL_ADAMS$NET_IN_LONG))
+    HAUL_ADAMS$NET_IN_LONDD<-(-convertdd(HAUL_ADAMS$NET_IN_LONG))
     #add year, month, and julian day
     HAUL_ADAMS$YEAR<-lubridate::year(HAUL_ADAMS$HAUL_DATE)
     HAUL_ADAMS$MONTH<-lubridate::month(HAUL_ADAMS$HAUL_DATE)
@@ -118,7 +118,7 @@ load_mdb=function(mdb_path,atsea_path=NULL,datasets="RREAS",krill_len_path=NULL,
       dplyr::arrange(YEAR) %>%
       dplyr::filter(STANDARD_STATION==1) %>%
       dplyr::mutate(SURVEY="ADAMS", BOTTOM_DEPTH=NA) %>%
-      dplyr::select(SURVEY,CRUISE,HAUL_NO,YEAR,MONTH,JDAY,HAUL_DATE,STATION,NET_IN_LATDD,NET_IN_LONGDD,
+      dplyr::select(SURVEY,CRUISE,HAUL_NO,YEAR,MONTH,JDAY,HAUL_DATE,STATION,NET_IN_LATDD,NET_IN_LONDD,
                     LATDD,LONDD,BOTTOM_DEPTH,STATION_BOTTOM_DEPTH,STRATA,AREA,ACTIVE)
   }
 
@@ -151,7 +151,7 @@ load_mdb=function(mdb_path,atsea_path=NULL,datasets="RREAS",krill_len_path=NULL,
 
     #convert coords to dd
     HAUL_PWCC$NET_IN_LATDD<-convertdd(HAUL_PWCC$NET_IN_LAT)
-    HAUL_PWCC$NET_IN_LONGDD<-(-convertdd(HAUL_PWCC$NET_IN_LONG))
+    HAUL_PWCC$NET_IN_LONDD<-(-convertdd(HAUL_PWCC$NET_IN_LONG))
     #add year, month, and julian day
     HAUL_PWCC$YEAR<-lubridate::year(HAUL_PWCC$HAUL_DATE)
     HAUL_PWCC$MONTH<-lubridate::month(HAUL_PWCC$HAUL_DATE)
@@ -161,9 +161,9 @@ load_mdb=function(mdb_path,atsea_path=NULL,datasets="RREAS",krill_len_path=NULL,
     HAULSTANDARD_PWCC<<- HAUL_PWCC %>% #inner_join(HAUL_PWCC, standardstations, by="STATION") %>%
       dplyr::arrange(YEAR) %>%
       dplyr::filter(STANDARD==1) %>%
-      dplyr::mutate(SURVEY="PWCC",LATDD=NET_IN_LATDD,LONDD=NET_IN_LONGDD) %>% #LATDD and LONDD (if not from station)
+      dplyr::mutate(SURVEY="PWCC",LATDD=NET_IN_LATDD,LONDD=NET_IN_LONDD) %>% #LATDD and LONDD (if not from station)
       dplyr::filter(!is.na(LONDD)) %>% #delete 1 station with missing lon (entry 895)
-      dplyr::select(SURVEY,CRUISE,HAUL_NO,YEAR,MONTH,JDAY,HAUL_DATE,STATION,NET_IN_LATDD,NET_IN_LONGDD,
+      dplyr::select(SURVEY,CRUISE,HAUL_NO,YEAR,MONTH,JDAY,HAUL_DATE,STATION,NET_IN_LATDD,NET_IN_LONDD,
                     LATDD,LONDD,BOTTOM_DEPTH,STATION_BOTTOM_DEPTH,STRATA,AREA,ACTIVE)
   }
 
@@ -189,7 +189,7 @@ load_mdb=function(mdb_path,atsea_path=NULL,datasets="RREAS",krill_len_path=NULL,
     standardstations_NWFSC$LATDD<-convertdd(standardstations_NWFSC$LATITUDE)
     standardstations_NWFSC$LONDD<-(-convertdd(standardstations_NWFSC$LONGITUDE))
     HAUL_NWFSC$NET_IN_LATDD<-convertdd(HAUL_NWFSC$NET_IN_LAT)
-    HAUL_NWFSC$NET_IN_LONGDD<-(-convertdd(HAUL_NWFSC$NET_IN_LONG))
+    HAUL_NWFSC$NET_IN_LONDD<-(-convertdd(HAUL_NWFSC$NET_IN_LONG))
     #add year, month, and julian day
     HAUL_NWFSC$YEAR<-lubridate::year(HAUL_NWFSC$HAUL_DATE)
     HAUL_NWFSC$MONTH<-lubridate::month(HAUL_NWFSC$HAUL_DATE)
@@ -206,13 +206,13 @@ load_mdb=function(mdb_path,atsea_path=NULL,datasets="RREAS",krill_len_path=NULL,
     HAULSTANDARD_NWFSC_RREAS<-dplyr::inner_join(HAUL, standardstations_NWFSC, by="STATION") %>%
       dplyr::filter(STANDARD_STATION==1) %>%
       dplyr::mutate(SURVEY="RREAS") %>%
-      dplyr::select(SURVEY,CRUISE,HAUL_NO,YEAR,MONTH,JDAY,HAUL_DATE,STATION,NET_IN_LATDD,NET_IN_LONGDD,
+      dplyr::select(SURVEY,CRUISE,HAUL_NO,YEAR,MONTH,JDAY,HAUL_DATE,STATION,NET_IN_LATDD,NET_IN_LONDD,
                     LATDD,LONDD,BOTTOM_DEPTH,STATION_BOTTOM_DEPTH,STRATA,AREA,ACTIVE)
     #NWFSC and RREAS stations in NWFSC table
     HAULSTANDARD_NWFSC<-dplyr::inner_join(HAUL_NWFSC, rbind(standardstations,standardstations_NWFSC), by="STATION") %>%
       dplyr::filter(STANDARD_STATION==1) %>%
       dplyr::mutate(SURVEY="NWFSC") %>%
-      dplyr::select(SURVEY,CRUISE,HAUL_NO,YEAR,MONTH,JDAY,HAUL_DATE,STATION,NET_IN_LATDD,NET_IN_LONGDD,
+      dplyr::select(SURVEY,CRUISE,HAUL_NO,YEAR,MONTH,JDAY,HAUL_DATE,STATION,NET_IN_LATDD,NET_IN_LONDD,
                     LATDD,LONDD,BOTTOM_DEPTH,STATION_BOTTOM_DEPTH,STRATA,AREA,ACTIVE)
     HAULSTANDARD_NWFSC<<-rbind(HAULSTANDARD_NWFSC,HAULSTANDARD_NWFSC_RREAS) %>%
       dplyr::arrange(YEAR)
@@ -237,7 +237,7 @@ load_mdb=function(mdb_path,atsea_path=NULL,datasets="RREAS",krill_len_path=NULL,
 
     #convert coords to dd
     HAUL_ATSEA$NET_IN_LATDD<-convertdd(HAUL_ATSEA$NET_IN_LAT)
-    HAUL_ATSEA$NET_IN_LONGDD<-(-convertdd(HAUL_ATSEA$NET_IN_LONG))
+    HAUL_ATSEA$NET_IN_LONDD<-(-convertdd(HAUL_ATSEA$NET_IN_LONG))
     #add year, month, and julian day
     HAUL_ATSEA$YEAR<-lubridate::year(HAUL_ATSEA$HAUL_DATE)
     HAUL_ATSEA$MONTH<-lubridate::month(HAUL_ATSEA$HAUL_DATE)
@@ -251,7 +251,7 @@ load_mdb=function(mdb_path,atsea_path=NULL,datasets="RREAS",krill_len_path=NULL,
       dplyr::arrange(YEAR) %>%
       dplyr::filter(STANDARD_STATION==1) %>%
       dplyr::mutate(SURVEY="RREAS") %>%
-      dplyr::select(SURVEY,CRUISE,HAUL_NO,YEAR,MONTH,JDAY,HAUL_DATE,STATION,NET_IN_LATDD,NET_IN_LONGDD,
+      dplyr::select(SURVEY,CRUISE,HAUL_NO,YEAR,MONTH,JDAY,HAUL_DATE,STATION,NET_IN_LATDD,NET_IN_LONDD,
                     LATDD,LONDD,BOTTOM_DEPTH,STATION_BOTTOM_DEPTH,STRATA,AREA,ACTIVE)
     HAULSTANDARD<<-rbind(HAULSTANDARD,HAULSTANDARD_ATSEA)
     CATCH<<-rbind(CATCH,CATCH_ATSEA)
@@ -267,5 +267,54 @@ load_mdb=function(mdb_path,atsea_path=NULL,datasets="RREAS",krill_len_path=NULL,
 
     krill_length<<-read.csv(krill_len_path, stringsAsFactors = F)
   }
+  return(cat("Data loaded."))
+}
+
+#' Load RREAS data from ERDDAP
+#'
+#' Loads the HAUL, CATCH, LENGTH, and SPECIES_CODES tables from the RREAS survey
+#' as currently stored in NOAA's ERDDAP database. These are reformatted as
+#' relational tables to match the format of the tables in the database. This
+#' dataset contains data from 1990 to 2018 and only from standard, active
+#' stations. The function also loads a HAULSTANDARD table with a standardized
+#' set of columns including YEAR, MONTH, JDAY, and lat/lon in decimal degrees.
+#' See [`RREAS_ERDDAP`] for metadata. This function has no arguments.
+#'
+#' @details
+#' The data tables are stored internally in the package (internet
+#' connection is not required). The maintainers will update the package data
+#' whenever the data on ERDDAP is updated.
+#'
+#' As all hauls on ERDDAP are from standard, active stations, HAUL and
+#' HAULSTANDARD will have the same number of rows. HAULSTANDARD will have some
+#' additional columns and the columns will be in a different order. This is just
+#' to match the HAULSTANDARD table generated from the database.
+#'
+#' This dataset (unlike the database) contains additional SPECIES/MATURITY
+#' categories 1472/T (total krill) and 1940/T (total rockfish). These export
+#' as NaN from ERDDAP (prior to 2016), but are corrected here.
+#'
+#' Abundance (including abundance with size limits) and size distributions can
+#' be obtained from this dataset using [`get_totals`] and [`get_distributions`].
+#'
+#' The WEIGHT and AGE tables are not included, so requests for biomass, age
+#' standardized abundance, mass distributions, or age distributions will be
+#' unsuccessful.
+#'
+#'
+#' @return Tables are written to the global environment (and will overwrite any existing tables
+#'   with the same names). Diplays "Data loaded" if successful.
+#' @export
+#' @seealso [`load_mdb`], [`RREAS_ERDDAP`]
+#' @keywords functions
+#' @examples
+#' load_erddap()
+#'
+load_erddap=function() {
+  HAUL <<- HAUL_ERDDAP
+  HAULSTANDARD <<- HAULSTANDARD_ERDDAP
+  CATCH <<- CATCH_ERDDAP
+  LENGTH <<- LENGTH_ERDDAP
+  data("SPECIES_CODES")
   return(cat("Data loaded."))
 }

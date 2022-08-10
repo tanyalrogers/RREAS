@@ -69,6 +69,7 @@
 #'   be specified. Options are "RREAS","ADAMS","PWCC","NWFSC". If unspecified, just uses RREAS.
 #' @param startyear Start year (default is 1983).
 #' @param what What totals you want, either "abundance","biomass", or "100day".
+#'   Defaults to "abundance".
 #'
 #' @return A dataframe with haul information, NAME, and totals. If "abundance"
 #'   is requested, will include column TOTAL_NO. If "biomass" is requested, will
@@ -299,6 +300,7 @@ get_numbers=function(speciestable,datasets="RREAS",startyear=1983,
         meankrilllength<-mean(krill_length$STD_LENGTH)
       } else { #not krill
         flength<-dplyr::filter(LENGTHall,SPECIES==fspecies & MATURITY==fmaturity)
+        meankrilllength<-1 #wont get used, just to stop case_when from choking
       }
     } else {
       flength<-dplyr::filter(LENGTHall,SPECIES==fspecies & MATURITY==fmaturity)

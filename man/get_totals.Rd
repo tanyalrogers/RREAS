@@ -19,7 +19,8 @@ be specified. Options are "RREAS","ADAMS","PWCC","NWFSC". If unspecified, just u
 
 \item{startyear}{Start year (default is 1983).}
 
-\item{what}{What totals you want, either "abundance","biomass", or "100day".}
+\item{what}{What totals you want, either "abundance","biomass", or "100day".
+Defaults to "abundance".}
 }
 \value{
 A dataframe with haul information, NAME, and totals. If "abundance"
