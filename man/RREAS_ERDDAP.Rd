@@ -6,7 +6,7 @@
 \alias{CATCH_ERDDAP}
 \alias{HAUL_ERDDAP}
 \alias{HAULSTANDARD_ERDDAP}
-\alias{SPECIES_CODES}
+\alias{SPECIES_CODES_ERDDAP}
 \alias{LENGTH_ERDDAP}
 \title{RREAS data from ERDDAP}
 \format{
@@ -59,7 +59,7 @@ CATCH_ERDDAP
 
 LENGTH_ERDDAP
 
-SPECIES_CODES
+SPECIES_CODES_ERDDAP
 }
 \description{
 RREAS data tables pulled from ERDDAP. These are reformatted as relational tables
@@ -69,5 +69,11 @@ in 1990 and ends about 4 years from the present.
 \details{
 Contains additional SPECIES/MATURITY categories 1472/T (total krill)
 and 1940/T (total rockfish).
+}
+\references{
+Sakuma, K.M., Field, J.C., Mantua, N.J., Ralston, S., Marinovic,
+B.B. and Carrion, C.N. (2016) Anomalous epipelagic micronekton assemblage patterns
+in the neritic waters of the California Current in spring 2015 during a
+period of extreme ocean conditions. CalCOFI Rep. 57:163-183
 }
 \keyword{datasets}

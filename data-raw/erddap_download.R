@@ -11,7 +11,8 @@ load_mdb(mdb_path = "E:/Documents/NMFS laptop/Rockfish/RREAS/Survey data/juv_cru
          activestationsonly = T)
 
 #save species codes table
-usethis::use_data(SPECIES_CODES, overwrite = TRUE)
+SPECIES_CODES_ERDDAP <- SPECIES_CODES
+usethis::use_data(SPECIES_CODES_ERDDAP, overwrite = TRUE)
 
 #haul and catch data
 

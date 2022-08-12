@@ -67,7 +67,7 @@
 #' in 1990 and ends about 4 years from the present.
 #'
 #' @name RREAS_ERDDAP
-#' @aliases CATCH_ERDDAP HAUL_ERDDAP HAULSTANDARD_ERDDAP SPECIES_CODES
+#' @aliases CATCH_ERDDAP HAUL_ERDDAP HAULSTANDARD_ERDDAP SPECIES_CODES_ERDDAP
 #'
 #' @details Contains additional SPECIES/MATURITY categories 1472/T (total krill)
 #'   and 1940/T (total rockfish).
@@ -97,6 +97,10 @@
 #'   \item{TOTAL_NO}{Number of individuals caught}
 #'   \item{STD_LENGTH}{Standard length (mm)}
 #' }
+#' @references Sakuma, K.M., Field, J.C., Mantua, N.J., Ralston, S., Marinovic,
+#'   B.B. and Carrion, C.N. (2016) Anomalous epipelagic micronekton assemblage patterns
+#'   in the neritic waters of the California Current in spring 2015 during a
+#'   period of extreme ocean conditions. CalCOFI Rep. 57:163-183
 #' @source \url{https://oceanview.pfeg.noaa.gov/erddap/tabledap/FED_Rockfish_Catch.html}
 #'   \url{https://oceanview.pfeg.noaa.gov/erddap/tabledap/FED_Rockfish_Length.html}
 #' @keywords datasets
@@ -111,4 +115,4 @@ NULL
 #' @rdname RREAS_ERDDAP
 "LENGTH_ERDDAP"
 #' @rdname RREAS_ERDDAP
-"SPECIES_CODES"
+"SPECIES_CODES_ERDDAP"

@@ -22,6 +22,10 @@ This package contains data and support functions for the NOAA SWFSC Rockfish Rec
 
 This is version `r packageVersion("RREAS")`. Please report any problems! 
 
+To cite this dataset, please cite:  
+Sakuma, K.M., Field, J.C., Mantua, N.J., Ralston, S., Marinovic, B.B. and Carrion, C.N. (2016) Anomalous epipelagic micronekton assemblage patterns in the neritic waters of the California Current in spring 2015 during a period of extreme ocean conditions. CalCOFI Rep. 57:163-183
+
+To cite this software package, use `citation(package = "RREAS")`.
 
 ## Installation
 

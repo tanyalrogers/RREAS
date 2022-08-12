@@ -17,7 +17,6 @@
 #' If a path to "atsea.mdb" is given, containing the current year's data, it
 #' will be appended to the RREAS tables.
 #'
-#'
 #' @param mdb_path File path to the juv_cruise mdb file (required).
 #' @param atsea_path File path to "atsea.mdb" containing the current year's data (optional).
 #'   Data will be appended to the RREAS tables.
@@ -33,6 +32,10 @@
 #'   with the same names). Diplays "Data loaded" if successful.
 #' @export
 #' @keywords functions
+#' @references Sakuma, K.M., Field, J.C., Mantua, N.J., Ralston, S., Marinovic,
+#'   B.B. and Carrion, C.N. (2016) Anomalous epipelagic micronekton assemblage patterns
+#'   in the neritic waters of the California Current in spring 2015 during a
+#'   period of extreme ocean conditions. CalCOFI Rep. 57:163-183
 #' @examples
 #' \dontrun{
 #' load_mdb(mdb_path = "insert_filepath/juv_cruise_backup27JAN21.mdb",
@@ -305,6 +308,10 @@ load_mdb=function(mdb_path,atsea_path=NULL,datasets="RREAS",krill_len_path=NULL,
 #' @return Tables are written to the global environment (and will overwrite any existing tables
 #'   with the same names). Diplays "Data loaded" if successful.
 #' @export
+#' @references Sakuma, K.M., Field, J.C., Mantua, N.J., Ralston, S., Marinovic,
+#'   B.B. and Carrion, C.N. (2016) Anomalous epipelagic micronekton assemblage patterns
+#'   in the neritic waters of the California Current in spring 2015 during a
+#'   period of extreme ocean conditions. CalCOFI Rep. 57:163-183
 #' @seealso [`load_mdb`], [`RREAS_ERDDAP`]
 #' @keywords functions
 #' @examples
@@ -315,6 +322,6 @@ load_erddap=function() {
   HAULSTANDARD <<- HAULSTANDARD_ERDDAP
   CATCH <<- CATCH_ERDDAP
   LENGTH <<- LENGTH_ERDDAP
-  data("SPECIES_CODES")
+  SPECIES_CODES <<- SPECIES_CODES_ERDDAP
   return(cat("Data loaded."))
 }

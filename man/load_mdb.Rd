@@ -60,4 +60,10 @@ load_mdb(mdb_path = "insert_filepath/juv_cruise_backup27JAN21.mdb",
   activestationsonly = F)
 }
 }
+\references{
+Sakuma, K.M., Field, J.C., Mantua, N.J., Ralston, S., Marinovic,
+B.B. and Carrion, C.N. (2016) Anomalous epipelagic micronekton assemblage patterns
+in the neritic waters of the California Current in spring 2015 during a
+period of extreme ocean conditions. CalCOFI Rep. 57:163-183
+}
 \keyword{functions}
