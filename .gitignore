@@ -5,3 +5,4 @@
 data-raw/erddap_catch.csv
 data-raw/erddap_catch_test.csv
 data-raw/erddap_length.csv
+*.xlsx

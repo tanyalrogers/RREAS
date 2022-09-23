@@ -253,6 +253,7 @@ get_numbers=function(speciestable,datasets="RREAS",startyear=1983,
     colnames(LENGTH_PWCC)<-sub("PWCC_","",colnames(LENGTH_PWCC))
     LENGTH_PWCC$SURVEY="PWCC"
     LENGTHall=rbind(LENGTHall,LENGTH_PWCC)
+    colnames(CATCH_PWCC)<-sub("PWCC_","",colnames(CATCH_PWCC))
     CATCH_PWCC$SURVEY="PWCC"
     CATCHall=rbind(CATCHall,CATCH_PWCC)
   }
