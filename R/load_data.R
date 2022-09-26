@@ -50,6 +50,10 @@ load_mdb=function(mdb_path,atsea_path=NULL,datasets="RREAS",krill_len_path=NULL,
     stop("Database not found. Check that the file path is correct.")
   }
 
+  if(!all(datasets %in% c("RREAS","ADAMS","NWFSC","PWCC"))) {
+    stop(paste(setdiff(datasets, c("RREAS","ADAMS","NWFSC","PWCC")), collapse = ", "), " is not an available dataset. Must be one or more of the following: 'RREAS','ADAMS','NWFSC','PWCC'")
+  }
+
   #convert positions to decimal degrees
   convertdd <- function(x) {
     DEG <- floor(x/100)

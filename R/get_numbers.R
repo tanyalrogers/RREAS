@@ -213,6 +213,10 @@ get_numbers=function(speciestable,datasets="RREAS",startyear=1983,
                      what=c("abundance","biomass","100day"),aggregate=TRUE) {
   what=match.arg(what)
 
+  if(!all(datasets %in% c("RREAS","ADAMS","NWFSC","PWCC"))) {
+    stop(paste(setdiff(datasets, c("RREAS","ADAMS","NWFSC","PWCC")), collapse = ", "), " is not an available dataset. Must be one or more of the following: 'RREAS','ADAMS','NWFSC','PWCC'")
+  }
+
   #species table lengths
   if("MINLEN" %in% colnames(speciestable) | "MAXLEN" %in% colnames(speciestable)) {
     sizelims=TRUE
