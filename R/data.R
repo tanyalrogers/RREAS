@@ -18,7 +18,46 @@
 #' Species table for common RREAS species and species groups
 #'
 #' Table of species and species groups for which indices are commonly
-#' reported in ecosystem assessments.
+#' reported in ecosystem assessments. Includes notes on irregularities
+#' in species classifications.
+#'
+#' @details
+#' We include notes here on some irregularities in species classifications
+#' in the RREAS database. With the exception of myctophids, these species are
+#' not in `sptable`, but users who want to generate a species table for these
+#' species or species groups should be aware of these inconsistencies.
+#' Information can also be found in the SPECIES_CODES table.
+#'
+#' **Myctophids:** Blue lanternfish (685) and California headlightfish (192) have
+#' always been identified to species and separated from unknown myctophids
+#' (407). Over time, more myctophids (e.g. Northern lampfish (661), California
+#' lanternfish (669)) have been identified to species and no longer classified
+#' as 407. Thus, depending on the survey year, 407 encompasses different
+#' species.
+#'
+#' **Squids:** Market squid (1101) have always been identified to species and
+#' separated from unknown squid (1918). Over time, more squid have been
+#' identified to species and no longer classified as 1918. Thus, depending on
+#' the survey year, 1918 encompasses different species.
+#'
+#' **Heteropods:** Prior to 2016, all heteropods were classified as unknown
+#' heteropods (1869). In 2016, this category was split into Carinaria (2050) and
+#' Pterotrachea (2853).
+#'
+#' **Smelts:** Prior to 2018, all smelts were classified as unknown smelt (453).
+#' Starting in 2018, adult smelt were identified to species. Larval smelt
+#' remained classified as 453.
+#'
+#' **Eelpouts:** Prior to CRUISE 8806, eelpouts were not consistently identified. Many
+#' unknown eelpouts (743) were probably pallid eelpouts (359). Starting with
+#' CRUISE 8806, pallid eelpouts were consistently identified to species and separated from
+#' unknown eelpouts.
+#'
+#' **Dragonfish:** Prior to 1990, dragonfish were not consistently identified. Many
+#' unknown dragonfish (378) were likely longfin dragonfish (681). Starting in
+#' 1990, longfin dragonfish were consistently identified to species and separated from
+#' unknown dragonfish.
+#'
 #'
 #' @format A data frame with 12 rows and 3 variables:
 #' \describe{

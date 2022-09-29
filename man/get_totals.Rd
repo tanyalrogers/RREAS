@@ -42,11 +42,16 @@ single entry per haul. Data from multiple species can be obtained with a
 single function call (see Details).
 }
 \details{
-Note that if a station was sampled but the species requested does not appear
-in the CATCH table for that haul, it will appear as a 0. It your
-responsibility to know when species were or were not being recorded, and thus
-whether the 0 represents 'absent' or 'not counted'. Info can be found in the
-SPECIES_CODES table.
+If a station was sampled, but the requested species was \emph{not counted} at the
+time, it will appear as an NA. If the species was counted but was \emph{not
+present}, it will appear as 0. If the species was counted but the counts
+numbers are unreliable (the case for some species prior to 1990,
+presence/absence will still be reliable), a message will be displayed.
+Description of additional irregularities in species classification can be
+found in the \code{\link{sptable}} documentation (pertains to myctophids, squids,
+heteropods, smelts, eelpouts, and dragonfish) and in the SPECIES_CODES table.
+\strong{It your responsibility to know when your focal species were or were not being
+recorded and how.}
 
 Length data are required for "biomass", "100day", and length-specific
 abundances. If length data are available for a species, but not available for

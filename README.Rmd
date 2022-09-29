@@ -18,9 +18,11 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-This package contains data and support functions for the NOAA SWFSC Rockfish Recruitment and Ecosystem Assessment Survey (RREAS).
+This package contains data and support functions for the NOAA SWFSC Rockfish Recruitment and Ecosystem Assessment Survey (RREAS). 
 
 This is version `r packageVersion("RREAS")`. Please report any problems! 
+
+An overview of methods, history, findings, and applications of the survey can be found [here](https://storymaps.arcgis.com/collections/af0fa37db2bf4f1cadb024ec0ffbdfb5).
 
 To cite this dataset, please cite:  
 Sakuma, K.M., Field, J.C., Mantua, N.J., Ralston, S., Marinovic, B.B. and Carrion, C.N. (2016) Anomalous epipelagic micronekton assemblage patterns in the neritic waters of the California Current in spring 2015 during a period of extreme ocean conditions. CalCOFI Rep. 57:163-183
@@ -151,7 +153,9 @@ The function `get_totals` has 4 inputs:
 - `startyear`: Start year (optional). Defaults to 1983.  
 - `what`: What kind of total you want, either "abundance","biomass", or "100day". Defaults to "abundance". 
 
-Values will be generated for each haul in HAULSTANDARD. Note that if a station was sampled but the species requested does not appear in the CATCH table for that haul, it will appear as a 0. It your responsibility to know when species were or were not being recorded, and thus whether the 0 represents 'absent' or 'not counted'. Info can be found in the SPECIES_CODES table.
+Values will be generated for each haul in HAULSTANDARD. 
+
+If a station was sampled, but the requested species was *not counted* at the time, it will appear as an NA. If the species was counted but was *not present*, it will appear as 0. If the species was counted but the counts numbers are unreliable (the case for some species prior to 1990, presence/absence will still be reliable), a message will be displayed. Description of additional irregularities in species classification can be found in the `sptable` documentation and in the SPECIES_CODES table. **It your responsibility to know when your focal species were or were not being recorded.**
 
 Biomass is only available for species with length-weight regressions. See `help(get_lw_regression)` for more info on how the regressions are done. (The function `get_lw_regression` is used internally, but can be run independently if desired.)
 

@@ -7,11 +7,16 @@
 #'
 #' @details
 #'
-#' Note that if a station was sampled but the species requested does not appear
-#' in the CATCH table for that haul, it will appear as a 0. It your
-#' responsibility to know when species were or were not being recorded, and thus
-#' whether the 0 represents 'absent' or 'not counted'. Info can be found in the
-#' SPECIES_CODES table.
+#' If a station was sampled, but the requested species was *not counted* at the
+#' time, it will appear as an NA. If the species was counted but was *not
+#' present*, it will appear as 0. If the species was counted but the counts
+#' numbers are unreliable (the case for some species prior to 1990,
+#' presence/absence will still be reliable), a message will be displayed.
+#' Description of additional irregularities in species classification can be
+#' found in the [`sptable`] documentation (pertains to myctophids, squids,
+#' heteropods, smelts, eelpouts, and dragonfish) and in the SPECIES_CODES table.
+#' **It your responsibility to know when your focal species were or were not being
+#' recorded and how.**
 #'
 #' Length data are required for "biomass", "100day", and length-specific
 #' abundances. If length data are available for a species, but not available for
@@ -128,11 +133,11 @@ get_totals=function(speciestable,datasets="RREAS",startyear=1983,
 #' length-age regression. See [`get_totals`] for more details.
 #'
 #' If a haul had no fish, it will appear in the output dataset (with
-#' TOTAL_NO=0), and the other values will be NA. If a haul had fish, but no fish
-#' were measured, there will be a TOTAL_NO>0, NMEAS will be NA, and there will
-#' be a single length/mass/age entry for that haul, which will be the average
-#' values used as a substitute. If a haul has length measurements, there will be
-#' multiple entries for that haul, and haul-level information will be repeated.
+#' TOTAL_NO=0). If a haul had fish, but no fish were measured, there will be a
+#' TOTAL_NO>0, NMEAS will be 0, and there will be a single length/mass/age entry
+#' for that haul, which will be the average values used as a substitute. If a
+#' haul has length measurements, there will be multiple entries for that haul,
+#' and haul-level information will be repeated.
 #'
 #' The `speciestable` should be formatted in the same way as described in
 #' [`get_totals`].
@@ -291,6 +296,23 @@ get_numbers=function(speciestable,datasets="RREAS",startyear=1983,
                      NAME=speciestable$NAME[i], TOTAL_NO=ifelse(is.na(TOTAL_NO),0,TOTAL_NO)) %>%
       dplyr::select(SURVEY, YEAR, CRUISE, HAUL_NO, STRATA, AREA, SPECIES, MATURITY, NAME, TOTAL_NO)
 
+    #set uncounted species to NA
+    if(fspecies %in% uncounted$SPECIES) {
+      nacruises=uncounted$CRUISE[uncounted$SPECIES==fspecies]
+      catchcombo=catchcombo %>%
+        dplyr::mutate(TOTAL_NO=ifelse(SURVEY=="RREAS" & CRUISE %in% nacruises, NA, TOTAL_NO))
+    }
+
+    #issue message for unreliable counts
+    if(fspecies %in% unreliable$SPECIES) {
+      tcruises=catchcombo$CRUISE[catchcombo$SURVEY=="RREAS"]
+      urcruises=unreliable$CRUISE[unreliable$SPECIES==fspecies]
+      if(any(tcruises %in% urcruises)) {
+        message("Note: Counts of SPECIES ", fspecies, " in CRUISES ",
+                paste(intersect(tcruises, urcruises), collapse = " "), " are unreliable.")
+      }
+    }
+
     ### just total adundance
     if(what=="abundance" & sizelims==FALSE & aggregate) {
       outlist[[i]]=catchcombo
@@ -320,7 +342,9 @@ get_numbers=function(speciestable,datasets="RREAS",startyear=1983,
       dplyr::ungroup()
     catchcombo<-dplyr::left_join(catchcombo,fmeasured, by = c("SURVEY", "CRUISE", "HAUL_NO")) %>%
       dplyr::mutate(EXP=TOTAL_NO/NMEAS, PSIZE=NMEAS_SIZE/NMEAS, NSIZE=TOTAL_NO*PSIZE,
-                    NSIZE=ifelse(TOTAL_NO==0,0,NSIZE))
+                    NSIZE=ifelse(TOTAL_NO==0,0,NSIZE),
+                    NMEAS=ifelse(!is.na(TOTAL_NO) & is.na(NMEAS), 0, NMEAS),
+                    NMEAS_SIZE=ifelse(!is.na(TOTAL_NO) & is.na(NMEAS_SIZE), 0, NMEAS_SIZE))
 
     #get avg prop in size range to fill in NSIZE, EXP for TOTAL_NO>0 but no length measurements
     catchcombo<-catchcombo %>%
@@ -334,6 +358,7 @@ get_numbers=function(speciestable,datasets="RREAS",startyear=1983,
                                            !is.na(MPSIZE_STRATA) ~ MPSIZE_STRATA,
                                            !is.na(MPSIZE_CRUISE) ~ MPSIZE_CRUISE,
                                            TRUE ~ MPSIZE_GLOBAL),
+                    PSIZE=ifelse(is.na(TOTAL_NO),NA,PSIZE),
                     NSIZE=ifelse(!is.na(NSIZE),NSIZE,TOTAL_NO*PSIZE),
                     EXP=ifelse(is.na(EXP) & !is.na(PSIZE),NSIZE,EXP)) %>%
       dplyr::select(-MPSIZE_AREA,-MPSIZE_STRATA,-MPSIZE_CRUISE,-MPSIZE_GLOBAL) %>%
@@ -398,9 +423,9 @@ get_numbers=function(speciestable,datasets="RREAS",startyear=1983,
 
       #sum total biomass by haul
       biomass<-lengthcatchcombo %>% dplyr::group_by(SURVEY, CRUISE, HAUL_NO) %>%
-        dplyr::summarise(BIOMASS=sum(WEIGHT*EXP),
-                         BIOMASS=ifelse(is.na(BIOMASS),0,BIOMASS))
-      biomass<-dplyr::left_join(catchcombo,biomass,by = c("SURVEY", "CRUISE", "HAUL_NO"))
+        dplyr::summarise(BIOMASS=sum(WEIGHT*EXP))
+      biomass<-dplyr::left_join(catchcombo,biomass,by = c("SURVEY", "CRUISE", "HAUL_NO")) %>%
+        dplyr::mutate(BIOMASS=ifelse(is.na(BIOMASS) & !is.na(TOTAL_NO),0,BIOMASS))
 
       ### total biomass with size limits
       if(sizelims==TRUE & aggregate) {
@@ -442,9 +467,9 @@ get_numbers=function(speciestable,datasets="RREAS",startyear=1983,
 
       #sum total N100 by haul
       N100eq<-lengthcatchcombo %>% dplyr::group_by(SURVEY, CRUISE, HAUL_NO) %>%
-        dplyr::summarise(N100=sum(N100i*EXP),
-                         N100=ifelse(is.na(N100),0,N100))
-      N100eq<-dplyr::left_join(catchcombo,N100eq,by = c("SURVEY", "CRUISE", "HAUL_NO"))
+        dplyr::summarise(N100=sum(N100i*EXP))
+      N100eq<-dplyr::left_join(catchcombo,N100eq,by = c("SURVEY", "CRUISE", "HAUL_NO")) %>%
+        dplyr::mutate(N100=ifelse(is.na(N100) & !is.na(TOTAL_NO),0,N100))
 
       ### total N100eq with size limits
       if(sizelims==TRUE & aggregate) {
@@ -468,7 +493,7 @@ get_numbers=function(speciestable,datasets="RREAS",startyear=1983,
   #sum for species with same NAME field (if aggregate==T)
   if(aggregate) {
     output=output %>% dplyr::group_by(SURVEY, CRUISE, HAUL_NO, YEAR, STRATA, AREA, NAME) %>%
-      dplyr::summarise_at(aggvars,sum,na.rm=T) %>% dplyr::ungroup()
+      dplyr::summarise_at(aggvars,sum,na.rm=F) %>% dplyr::ungroup()
   }
   #rejoin to table of standard hauls (info lost during summarizing)
   output=dplyr::left_join(HAULSTANDARDsub, output, by = c("SURVEY", "CRUISE", "HAUL_NO", "YEAR", "STRATA", "AREA")) %>%

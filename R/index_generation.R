@@ -39,7 +39,11 @@ get_logcpueindex <- function(df, var="TOTAL_NO", group=NULL, standardized=TRUE) 
   sum2 <- aggregate(f2, data=sum1, FUN=mean)
   colnames(sum2)[which(colnames(sum2)==var)] <- paste0(var,"_INDEX")
   #fill in missing years
-  sum2 <- tidyr::complete(sum2, NAME, .data[[group]], YEAR=tidyr::full_seq(YEAR, period = 1))
+  if(is.null(group)) {
+    sum2 <- tidyr::complete(sum2, NAME, YEAR=tidyr::full_seq(YEAR, period = 1))
+  } else {
+    sum2 <- tidyr::complete(sum2, NAME, .data[[group]], YEAR=tidyr::full_seq(YEAR, period = 1))
+  }
   if(standardized) {
     var2=paste0(var,"_INDEX")
     #well this is a pain in the ass

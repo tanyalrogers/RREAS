@@ -50,11 +50,11 @@ regressions, and age distributions are only available for species with
 length-age regression. See \code{\link{get_totals}} for more details.
 
 If a haul had no fish, it will appear in the output dataset (with
-TOTAL_NO=0), and the other values will be NA. If a haul had fish, but no fish
-were measured, there will be a TOTAL_NO>0, NMEAS will be NA, and there will
-be a single length/mass/age entry for that haul, which will be the average
-values used as a substitute. If a haul has length measurements, there will be
-multiple entries for that haul, and haul-level information will be repeated.
+TOTAL_NO=0). If a haul had fish, but no fish were measured, there will be a
+TOTAL_NO>0, NMEAS will be 0, and there will be a single length/mass/age entry
+for that haul, which will be the average values used as a substitute. If a
+haul has length measurements, there will be multiple entries for that haul,
+and haul-level information will be repeated.
 
 The \code{speciestable} should be formatted in the same way as described in
 \code{\link{get_totals}}.

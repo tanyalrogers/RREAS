@@ -9,7 +9,11 @@
 This package contains data and support functions for the NOAA SWFSC
 Rockfish Recruitment and Ecosystem Assessment Survey (RREAS).
 
-This is version 0.1.0. Please report any problems!
+This is version 0.1.1. Please report any problems!
+
+An overview of methods, history, findings, and applications of the
+survey can be found
+[here](https://storymaps.arcgis.com/collections/af0fa37db2bf4f1cadb024ec0ffbdfb5).
 
 To cite this dataset, please cite:  
 Sakuma, K.M., Field, J.C., Mantua, N.J., Ralston, S., Marinovic, B.B.
@@ -251,12 +255,17 @@ Datasets have to be loaded to use them.
 - `what`: What kind of total you want, either “abundance”,“biomass”, or
 “100day”. Defaults to “abundance”.
 
-Values will be generated for each haul in HAULSTANDARD. Note that if a
-station was sampled but the species requested does not appear in the
-CATCH table for that haul, it will appear as a 0. It your responsibility
-to know when species were or were not being recorded, and thus whether
-the 0 represents ‘absent’ or ‘not counted’. Info can be found in the
-SPECIES\_CODES table.
+Values will be generated for each haul in HAULSTANDARD.
+
+If a station was sampled, but the requested species was *not counted* at
+the time, it will appear as an NA. If the species was counted but was
+*not present*, it will appear as 0. If the species was counted but the
+counts numbers are unreliable (the case for some species prior to 1990,
+presence/absence will still be reliable), a message will be displayed.
+Description of additional irregularities in species classification can
+be found in the `sptable` documentation and in the SPECIES\_CODES table.
+**It your responsibility to know when your focal species were or were
+not being recorded.**
 
 Biomass is only available for species with length-weight regressions.
 See `help(get_lw_regression)` for more info on how the regressions are
@@ -422,12 +431,12 @@ head(anchovysizedist)
 #> 5    -122.1150 36.70000 -122.1083         1828                 1920      C
 #> 6    -122.0533 36.64667 -122.0500         1097                  900      C
 #>                   AREA ACTIVE SPECIES MATURITY          NAME TOTAL_NO NMEAS EXP
-#> 1            Point Sur      Y     209        A Adult Anchovy        0    NA  NA
-#> 2  Monterey Bay Inside      Y     209        A Adult Anchovy      268    NA 268
-#> 3  Monterey Bay Inside      Y     209        A Adult Anchovy       40    NA  40
-#> 4  Monterey Bay Inside      Y     209        A Adult Anchovy       14    NA  14
-#> 5 Monterey Bay Outside      Y     209        A Adult Anchovy        0    NA  NA
-#> 6 Monterey Bay Outside      Y     209        A Adult Anchovy        0    NA  NA
+#> 1            Point Sur      Y     209        A Adult Anchovy        0     0  NA
+#> 2  Monterey Bay Inside      Y     209        A Adult Anchovy      268     0 268
+#> 3  Monterey Bay Inside      Y     209        A Adult Anchovy       40     0  40
+#> 4  Monterey Bay Inside      Y     209        A Adult Anchovy       14     0  14
+#> 5 Monterey Bay Outside      Y     209        A Adult Anchovy        0     0  NA
+#> 6 Monterey Bay Outside      Y     209        A Adult Anchovy        0     0  NA
 #>   SP_NO STD_LENGTH
 #> 1    NA         NA
 #> 2    NA   119.9586
@@ -464,9 +473,9 @@ tail(anchovymassdist)
 #> 14954 Small adult anchovy      918    20         15 45.9  0.75 688.5  6516
 #> 14955 Small adult anchovy      918    20         15 45.9  0.75 688.5  6517
 #> 14956 Small adult anchovy      918    20         15 45.9  0.75 688.5  6518
-#> 14957 Small adult anchovy        0    NA         NA   NA    NA   0.0    NA
-#> 14958 Small adult anchovy        0    NA         NA   NA    NA   0.0    NA
-#> 14959 Small adult anchovy        0    NA         NA   NA    NA   0.0    NA
+#> 14957 Small adult anchovy        0     0          0   NA    NA   0.0    NA
+#> 14958 Small adult anchovy        0     0          0   NA    NA   0.0    NA
+#> 14959 Small adult anchovy        0     0          0   NA    NA   0.0    NA
 #>       STD_LENGTH   WEIGHT
 #> 14954        103 11.34121
 #> 14955        105 12.10997
@@ -505,7 +514,7 @@ tail(rockfish100agedist)
 #> 103881        5     5          5   1     1     5   101         22 74.26983
 #> 103882        5     5          5   1     1     5   102         20 70.11837
 #> 103883        1     1          1   1     1     1  1493         24 78.42129
-#> 103884        0    NA         NA  NA    NA     0    NA         NA       NA
+#> 103884        0     0          0  NA    NA     0    NA         NA       NA
 #>            N100i JDAY_DOB
 #> 103879 0.4980325 42.42725
 #> 103880 0.5411489 40.35152
