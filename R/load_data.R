@@ -236,9 +236,9 @@ load_mdb=function(mdb_path,atsea_path=NULL,datasets="RREAS",krill_len_path=NULL,
     }
 
     channel <- RODBC::odbcConnectAccess2007(atsea_path)
-    HAUL_ATSEA <- RODBC::sqlQuery(channel, "SELECT * FROM dbo_JUV_HAUL", as.is=1, stringsAsFactors = F)
-    CATCH_ATSEA <- RODBC::sqlQuery(channel, "SELECT * FROM dbo_JUV_CATCH", as.is=1, stringsAsFactors = F)
-    LENGTH_ATSEA <- RODBC::sqlQuery(channel, "SELECT * FROM dbo_JUV_LENGTH", as.is=1, stringsAsFactors = F)
+    HAUL_ATSEA <- RODBC::sqlQuery(channel, "SELECT * FROM JUV_HAUL", as.is=1, stringsAsFactors = F)
+    CATCH_ATSEA <- RODBC::sqlQuery(channel, "SELECT * FROM JUV_CATCH", as.is=1, stringsAsFactors = F)
+    LENGTH_ATSEA <- RODBC::sqlQuery(channel, "SELECT * FROM JUV_LENGTH", as.is=1, stringsAsFactors = F)
     RODBC::odbcCloseAll()
     rm(channel)
 
@@ -260,9 +260,57 @@ load_mdb=function(mdb_path,atsea_path=NULL,datasets="RREAS",krill_len_path=NULL,
       dplyr::mutate(SURVEY="RREAS") %>%
       dplyr::select(SURVEY,CRUISE,HAUL_NO,YEAR,MONTH,JDAY,HAUL_DATE,STATION,NET_IN_LATDD,NET_IN_LONDD,
                     LATDD,LONDD,BOTTOM_DEPTH,STATION_BOTTOM_DEPTH,STRATA,AREA,ACTIVE)
+    #append to existing tables
     HAULSTANDARD<<-rbind(HAULSTANDARD,HAULSTANDARD_ATSEA)
-    CATCH<<-rbind(CATCH,CATCH_ATSEA)
+    HAUL<<-rbind(HAUL,HAUL_ATSEA)
+    CATCH<<-rbind(CATCH,CATCH_ATSEA[,1:5])
     LENGTH<<-rbind(LENGTH,LENGTH_ATSEA)
+
+    if("NWFSC" %in% datasets) {
+
+      channel <- RODBC::odbcConnectAccess2007(atsea_path)
+      HAUL_NWFSC_ATSEA <- RODBC::sqlQuery(channel, "SELECT * FROM NWFSC_JUV_HAUL", as.is=1, stringsAsFactors = F)
+      CATCH_NWFSC_ATSEA <- RODBC::sqlQuery(channel, "SELECT * FROM NWFSC_JUV_CATCH", as.is=1, stringsAsFactors = F)
+      LENGTH_NWFSC_ATSEA <- RODBC::sqlQuery(channel, "SELECT * FROM NWFSC_JUV_LENGTH", as.is=1, stringsAsFactors = F)
+      RODBC::odbcCloseAll()
+      rm(channel)
+
+      #use NET_FISHING for missing NET_IN position
+      HAUL_NWFSC_ATSEA$NET_IN_LAT[is.na(HAUL_NWFSC_ATSEA$NET_IN_LAT)]<-HAUL_NWFSC_ATSEA$NET_FISHING_LAT[is.na(HAUL_NWFSC_ATSEA$NET_IN_LAT)]
+      HAUL_NWFSC_ATSEA$NET_IN_LONG[is.na(HAUL_NWFSC_ATSEA$NET_IN_LONG)]<-HAUL_NWFSC_ATSEA$NET_FISHING_LONG[is.na(HAUL_NWFSC_ATSEA$NET_IN_LONG)]
+
+      #use NET_FISHING_TIME for missing HAUL_DATE
+      HAUL_NWFSC_ATSEA$HAUL_DATE[is.na(HAUL_NWFSC_ATSEA$HAUL_DATE)]<-HAUL_NWFSC_ATSEA$NET_FISHING_TIME[is.na(HAUL_NWFSC_ATSEA$HAUL_DATE)]
+
+      #convert coords to dd
+      HAUL_NWFSC_ATSEA$NET_IN_LATDD<-convertdd(HAUL_NWFSC_ATSEA$NET_IN_LAT)
+      HAUL_NWFSC_ATSEA$NET_IN_LONDD<-(-convertdd(HAUL_NWFSC_ATSEA$NET_IN_LONG))
+      #add year, month, and julian day
+      HAUL_NWFSC_ATSEA$YEAR<-lubridate::year(HAUL_NWFSC_ATSEA$HAUL_DATE)
+      HAUL_NWFSC_ATSEA$MONTH<-lubridate::month(HAUL_NWFSC_ATSEA$HAUL_DATE)
+      HAUL_NWFSC_ATSEA$JDAY<-lubridate::yday(HAUL_NWFSC_ATSEA$HAUL_DATE)
+
+      #join HAUL and standard station info, filter
+      #NWFSC stations in RREAS table
+      HAULSTANDARD_NWFSC_RREAS_ATSEA<-dplyr::inner_join(HAUL_ATSEA, standardstations_NWFSC, by="STATION") %>%
+        dplyr::filter(STANDARD_STATION==1) %>%
+        dplyr::mutate(SURVEY="RREAS") %>%
+        dplyr::select(SURVEY,CRUISE,HAUL_NO,YEAR,MONTH,JDAY,HAUL_DATE,STATION,NET_IN_LATDD,NET_IN_LONDD,
+                      LATDD,LONDD,BOTTOM_DEPTH,STATION_BOTTOM_DEPTH,STRATA,AREA,ACTIVE)
+      #NWFSC and RREAS stations in NWFSC table
+      HAULSTANDARD_NWFSC_ATSEA<-dplyr::inner_join(HAUL_NWFSC_ATSEA, rbind(standardstations,standardstations_NWFSC), by="STATION") %>%
+        dplyr::filter(STANDARD_STATION==1) %>%
+        dplyr::mutate(SURVEY="NWFSC") %>%
+        dplyr::select(SURVEY,CRUISE,HAUL_NO,YEAR,MONTH,JDAY,HAUL_DATE,STATION,NET_IN_LATDD,NET_IN_LONDD,
+                      LATDD,LONDD,BOTTOM_DEPTH,STATION_BOTTOM_DEPTH,STRATA,AREA,ACTIVE)
+      #append to existing NWFSC tables
+      HAULSTANDARD_NWFSC<<-rbind(HAULSTANDARD_NWFSC,HAULSTANDARD_NWFSC_RREAS,
+                                 HAULSTANDARD_NWFSC_ATSEA,HAULSTANDARD_NWFSC_RREAS_ATSEA) %>%
+        dplyr::arrange(YEAR)
+      HAUL_NWFSC<<-rbind(HAUL_NWFSC,HAUL_NWFSC_ATSEA)
+      CATCH_NWFSC<<-rbind(CATCH_NWFSC,CATCH_NWFSC_ATSEA[,1:5])
+      LENGTH_NWFSC<<-rbind(LENGTH_NWFSC,LENGTH_NWFSC_ATSEA)
+    }
   }
 
   #krill length data
