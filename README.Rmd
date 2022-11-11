@@ -186,7 +186,7 @@ tail(rockfish100equiv)
 
 The function `get_distributions` has the same 4 inputs, except `what` should be either "size", "mass", or "age". As with `get_totals`, regressions must exist for mass and age distributions.
 
-If a haul had no fish, it will appear in the output dataset (with TOTAL_NO=0), and the other values will be NA. If a haul had fish, but no fish were measured, there will be a TOTAL_NO>0, NMEAS will be NA, and there will be a single length/mass/age entry for that haul, which will be the average values used as a substitute.
+If a haul had no fish, it will appear in the output dataset (with TOTAL_NO=0). If a haul had fish, but no fish were measured, there will be a TOTAL_NO>0, NMEAS will be 0, and there will be a single length/mass/age entry for that haul, which will be the average values used as a substitute.
 
 The output table will include TOTAL_NO, NMEAS (number measured), EXP (expansion factor), SP_NO (specimen number) and values for the requested distribution. If "size" is requested, will include column STD_LENGTH. If "mass" is requested, will include columns STD_LENGTH and WEIGHT. If "age" is requested, will include columns STD_LENGTH, AGE, N100i (number of 100 day equivalents), and JDAY_DOB (date of birth). If size limits are specified, will include additional columns NMEAS_SIZE (number measured in the size range), PSIZE (proportion of measured fish in the size range), and NSIZE (total number in the size range).
 

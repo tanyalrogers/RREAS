@@ -391,8 +391,8 @@ should be either “size”, “mass”, or “age”. As with `get_totals`,
 regressions must exist for mass and age distributions.
 
 If a haul had no fish, it will appear in the output dataset (with
-TOTAL\_NO=0), and the other values will be NA. If a haul had fish, but
-no fish were measured, there will be a TOTAL\_NO&gt;0, NMEAS will be NA,
+TOTAL\_NO=0). If a haul had fish, but
+no fish were measured, there will be a TOTAL\_NO&gt;0, NMEAS will be 0,
 and there will be a single length/mass/age entry for that haul, which
 will be the average values used as a substitute.
 
