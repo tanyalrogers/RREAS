@@ -493,7 +493,7 @@ get_numbers=function(speciestable,datasets="RREAS",startyear=1983,
   #sum for species with same NAME field (if aggregate==T)
   if(aggregate) {
     output=output %>% dplyr::group_by(SURVEY, CRUISE, HAUL_NO, YEAR, STRATA, AREA, NAME) %>%
-      dplyr::summarise_at(aggvars,sum,na.rm=F) %>% dplyr::ungroup()
+      dplyr::summarise_at(aggvars,sum,na.rm=T) %>% dplyr::ungroup()
   }
   #rejoin to table of standard hauls (info lost during summarizing)
   output=dplyr::left_join(HAULSTANDARDsub, output, by = c("SURVEY", "CRUISE", "HAUL_NO", "YEAR", "STRATA", "AREA")) %>%

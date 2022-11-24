@@ -48,7 +48,7 @@ get_logcpueindex <- function(df, var="TOTAL_NO", group=NULL, standardized=TRUE) 
     var2=paste0(var,"_INDEX")
     #well this is a pain in the ass
     sum2 <- sum2 %>% dplyr::group_by(sum2[c(group,"NAME")]) %>%
-      dplyr::mutate("{paste0(var2,'_SC')}" := scale(.data[[var2]])) %>%
+      dplyr::mutate("{paste0(var2,'_SC')}" := (.data[[var2]]-mean(.data[[var2]], na.rm=T))/sd(.data[[var2]], na.rm=T)) %>%
       dplyr::ungroup() %>% as.data.frame()
   }
   return(sum2)
