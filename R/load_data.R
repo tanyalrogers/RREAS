@@ -320,7 +320,7 @@ load_mdb=function(mdb_path,atsea_path=NULL,datasets="RREAS",krill_len_path=NULL,
       stop("Krill length file not found. Check that the file path is correct.")
     }
 
-    krill_length<<-read.csv(krill_len_path, stringsAsFactors = F)
+    krill_length<<-read.csv(krill_len_path, stringsAsFactors = F, colClasses = c(CRUISE = "character"))
   }
   return(cat("Data loaded."))
 }

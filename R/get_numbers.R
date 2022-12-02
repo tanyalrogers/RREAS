@@ -324,6 +324,7 @@ get_numbers=function(speciestable,datasets="RREAS",startyear=1983,
     if(exists("krill_length")) {
       if(fspecies %in% unique(krill_length$SPECIES)) { #krill
         flength<-dplyr::filter(krill_length,SPECIES==fspecies & MATURITY==fmaturity)
+        flength$SURVEY<-"RREAS"
         meankrilllength<-mean(krill_length$STD_LENGTH)
       } else { #not krill
         flength<-dplyr::filter(LENGTHall,SPECIES==fspecies & MATURITY==fmaturity)
