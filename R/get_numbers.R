@@ -26,7 +26,10 @@
 #' output table, if TOTAL_NO>0 but NMEAS is 0, this indicates that length data
 #' were unavailable and means were used. If size limits are specified, the mean
 #' proportion of fish in the length range will also be used for hauls missing
-#' length data, with the same rank ordering of available mean values.
+#' length data, with the same rank ordering of available mean values. Note that
+#' size limits currently can't be used for species that use proxy lengths: unknown
+#' mycophids (407) and unknown/umeasured krill (1472,1846,1847,2829,2830,2835,2849,1791),
+#' which currently assume a proportion of 1.
 #'
 #' Biomass is only available for species with length-weight regressions. Species
 #' available for biomass estimates are listed in [`sptable_lw`]. See
@@ -322,17 +325,23 @@ get_numbers=function(speciestable,datasets="RREAS",startyear=1983,
 
     #get length data for species i
     if(exists("krill_length")) {
-      if(fspecies %in% unique(krill_length$SPECIES)) { #krill
+      meankrilllength<-mean(krill_length$STD_LENGTH)
+      if(fspecies %in% unique(krill_length$SPECIES)) { #krill with length data
         flength<-dplyr::filter(krill_length,SPECIES==fspecies & MATURITY==fmaturity)
         flength$SURVEY<-"RREAS"
-        meankrilllength<-mean(krill_length$STD_LENGTH)
-      } else { #not krill
+      } else { #not krill, or krill without length data
         flength<-dplyr::filter(LENGTHall,SPECIES==fspecies & MATURITY==fmaturity)
-        meankrilllength<-1 #wont get used, just to stop case_when from choking
       }
     } else {
       flength<-dplyr::filter(LENGTHall,SPECIES==fspecies & MATURITY==fmaturity)
       meankrilllength<-1 #wont get used, just to stop case_when from choking
+    }
+    #unknown myctophids
+    if(fspecies==407) {
+      m661=dplyr::filter(LENGTHall, SPECIES==661 & MATURITY=="U")
+      mean661length = mean(m661$STD_LENGTH)
+    } else {
+      mean661length = 1
     }
 
     flength$STD_LENGTH<-round(flength$STD_LENGTH,digits=0)
@@ -353,7 +362,9 @@ get_numbers=function(speciestable,datasets="RREAS",startyear=1983,
       dplyr::group_by(SURVEY,CRUISE,STRATA) %>% dplyr::mutate(MPSIZE_STRATA=mean(PSIZE,na.rm = T)) %>% dplyr::ungroup() %>%
       dplyr::group_by(SURVEY,CRUISE) %>% dplyr::mutate(MPSIZE_CRUISE=mean(PSIZE,na.rm = T)) %>% dplyr::ungroup() %>%
       dplyr::mutate(MPSIZE_GLOBAL=mean(PSIZE,na.rm = T),
-                    PSIZE=dplyr::case_when(fspecies==2026 ~ 1,
+                    PSIZE=dplyr::case_when(fspecies==2026 ~ 1, #Octopus
+                                           fspecies %in% c(1472,1846,1847,2829,2830,2835,2849,1791) ~ 1, #Krill
+                                           fspecies %in% c(407) ~ 1, #Unk myctophids
                                            !is.na(PSIZE) | !is.na(NSIZE) ~ PSIZE,
                                            !is.na(MPSIZE_AREA) ~ MPSIZE_AREA,
                                            !is.na(MPSIZE_STRATA) ~ MPSIZE_STRATA,
@@ -384,6 +395,7 @@ get_numbers=function(speciestable,datasets="RREAS",startyear=1983,
       dplyr::mutate(MLEN_GLOBAL=mean(STD_LENGTH,na.rm = T),
                     MLEN=dplyr::case_when(fspecies==2026 ~ 1, #octopus dummy length
                                           fspecies %in% c(1472,1846,1847,2829,2830,2835,2849,1791) ~ meankrilllength, #length for unid and rare krill
+                                          fspecies %in% c(407) ~ mean661length,
                                           !is.na(MLEN_AREA) ~ MLEN_AREA,
                                           !is.na(MLEN_STRATA) ~ MLEN_STRATA,
                                           !is.na(MLEN_CRUISE) ~ MLEN_CRUISE,

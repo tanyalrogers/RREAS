@@ -46,7 +46,7 @@ regression.
 
 For northern lampfish (661) and California lanternfish (669), data from both
 species are pooled for the regression. Unknown myctophids (407) will use
-this regression.
+this regression, and are assumed to be the mean size of northern lampfish.
 
 For octopus (2026), which has weight but no length data, the mean weight is
 used.
@@ -54,7 +54,8 @@ used.
 This function includes and will use published length-weight regressions for
 select species not in the WEIGHT table. These species are sardine (562), T.
 spinfera (1473, also used by 1791), and E. pacifica (1816, also used by 1472,
-1846, 1847, 2829, 2830, 2835, 2849).
+1846, 1847, 2829, 2830, 2835, 2849 assumed to be the mean size of all
+measured krill).
 
 If the function is unable to generate a regression for the input species, a
 warning will be displayed and the resulting function will return NA for any

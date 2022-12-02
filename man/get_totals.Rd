@@ -61,7 +61,10 @@ followed by CRUISE and STRATA, then CRUISE, then the global mean. In the
 output table, if TOTAL_NO>0 but NMEAS is 0, this indicates that length data
 were unavailable and means were used. If size limits are specified, the mean
 proportion of fish in the length range will also be used for hauls missing
-length data, with the same rank ordering of available mean values.
+length data, with the same rank ordering of available mean values. Note that
+size limits currently can't be used for species that use proxy lengths: unknown
+mycophids (407) and unknown/umeasured krill (1472,1846,1847,2829,2830,2835,2849,1791),
+which currently assume a proportion of 1.
 
 Biomass is only available for species with length-weight regressions. Species
 available for biomass estimates are listed in \code{\link{sptable_lw}}. See
