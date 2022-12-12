@@ -42,3 +42,20 @@ usethis::use_data(rflwgroups, overwrite = TRUE)
 sptable_lw<-read.csv("data-raw/lw species table.csv", stringsAsFactors = F)
 usethis::use_data(sptable_lw, overwrite = TRUE)
 
+#in lw regression table, but:
+#never caught
+uncaught=setdiff(sptable_lw$SPECIES, unique(c(CATCH$SPECIES, CATCH_ADAMS$SPECIES, CATCH_NWFSC$SPECIES, CATCH_PWCC$SPECIES)))
+caught=intersect(sptable_lw$SPECIES, unique(c(CATCH$SPECIES, CATCH_ADAMS$SPECIES, CATCH_NWFSC$SPECIES, CATCH_PWCC$SPECIES)))
+#caught not measured
+caught_unmeas=setdiff(caught,unique(c(LENGTH$SPECIES, LENGTH_ADAMS$SPECIES, LENGTH_NWFSC$SPECIES, LENGTH_PWCC$SPECIES)))
+caught_meas=intersect(caught,unique(c(LENGTH$SPECIES, LENGTH_ADAMS$SPECIES, LENGTH_NWFSC$SPECIES, LENGTH_PWCC$SPECIES)))
+
+caught_unmeas #ensure there are procedures for dealing with these species
+# 2375 2026 1472 1473 1791 1816 1846 1847 2829 2830 2835 2849
+# 2375: Blue/widow rockfish complex: only 1 record from CRUISE 8608, counts 0 towards biomass
+# 2026: Octopus
+# 1816 1847 1473: In krill length table
+# 1472 1791 1846 2829 2830 2835 2849: Other krill species
+uncaught
+# 586 579 581 585 587 588 590 608 613 589 591 596 598 600 602 605 614 617 622 623 625 631 633
+# These are all rockfishes

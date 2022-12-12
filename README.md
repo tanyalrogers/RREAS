@@ -19,7 +19,7 @@ To cite this dataset, please cite:
 Sakuma, K.M., Field, J.C., Mantua, N.J., Ralston, S., Marinovic, B.B.
 and Carrion, C.N. (2016) Anomalous epipelagic micronekton assemblage
 patterns in the neritic waters of the California Current in spring 2015
-during a period of extreme ocean conditions. CalCOFI Rep. 57:163-183
+during a period of extreme ocean conditions. CalCOFI Rep. 57:163-183
 
 To cite this software package, use `citation(package = "RREAS")`.
 
@@ -40,25 +40,24 @@ library(RREAS)
 
 There are two different functions for loading RREAS data:
 
--   `load_erddap` loads the survey data as it is currently stored on
-    [ERDDAP](https://oceanview.pfeg.noaa.gov/erddap/index.html), which
-    contains data from 1990 to 2018 for standard, active stations only.
-    The data tables are contained within the package and are reformatted
-    as relational tables (HAUL, CATCH, LENGTH, SPECIES\_CODES) to match
-    the format in the database. A HAULSTANDARD table is also loaded with
-    a standardized set of columns matching those produced by `load_mdb`.
-    Note that the AGE and WEIGHT tables are not included in this
-    dataset.
+- `load_erddap` loads the survey data as it is currently stored on
+  [ERDDAP](https://oceanview.pfeg.noaa.gov/erddap/index.html), which
+  contains data from 1990 to 2018 for standard, active stations only.
+  The data tables are contained within the package and are reformatted
+  as relational tables (HAUL, CATCH, LENGTH, SPECIES_CODES) to match the
+  format in the database. A HAULSTANDARD table is also loaded with a
+  standardized set of columns matching those produced by `load_mdb`.
+  Note that the AGE and WEIGHT tables are not included in this dataset.
 
--   `load_mdb` loads data from a local copy of the RREAS MS Access
-    Database (required to use this function). This function will load
-    the HAUL, CATCH, and LENGTH tables from one (or more) surveys in the
-    RREAS database, along with the AGE, WEIGHT, and SPECIES\_CODES
-    tables from RREAS. It also creates and loads a HAULSTANDARD table
-    containing only standard stations and with a standardized set of
-    columns including YEAR, MONTH, JDAY, and lat/lon in decimal degrees.
-    HAULSTANDARD tables all have the same format and so tables from
-    multiple surveys can be stacked with `rbind`.
+- `load_mdb` loads data from a local copy of the RREAS MS Access
+  Database (required to use this function). This function will load the
+  HAUL, CATCH, and LENGTH tables from one (or more) surveys in the RREAS
+  database, along with the AGE, WEIGHT, and SPECIES_CODES tables from
+  RREAS. It also creates and loads a HAULSTANDARD table containing only
+  standard stations and with a standardized set of columns including
+  YEAR, MONTH, JDAY, and lat/lon in decimal degrees. HAULSTANDARD tables
+  all have the same format and so tables from multiple surveys can be
+  stacked with `rbind`.
 
 Metadata for the ERDDAP tables (also applicable to the mdb tables) can
 be found under `help(RREAS_ERDDAP)`.
@@ -214,7 +213,7 @@ unique(sptable_lw$NAME) #available species and species groups
 #>  [7] "California Smoothtongue"  "YOY Pacific Hake"        
 #>  [9] "YOY Lingcod"              "YOY Sardine"             
 #> [11] "Adult Sardine"            "Total Sardine"           
-#> [13] "Market squid"             "Sea nettle"              
+#> [13] "Market Squid"             "Sea nettle"              
 #> [15] "Octopus"                  "Pyrosome"                
 #> [17] "Armhook squid"            "Thetys salp"             
 #> [19] "Blacktip squid"           "Moon jelly"              
@@ -263,7 +262,7 @@ the time, it will appear as an NA. If the species was counted but was
 counts numbers are unreliable (the case for some species prior to 1990,
 presence/absence will still be reliable), a message will be displayed.
 Description of additional irregularities in species classification can
-be found in the `sptable` documentation and in the SPECIES\_CODES table.
+be found in the `sptable` documentation and in the SPECIES_CODES table.
 **It your responsibility to know when your focal species were or were
 not being recorded.**
 
@@ -280,11 +279,10 @@ how the regressions are done. (These functions are also used internally,
 but can be run independently if desired.)
 
 If you ask for “biomass” or “100day”, the output will also include
-TOTAL\_NO (abundance) and NMEAS (number of fish measured). If you
-include length constraints, the output table will include additional
-columns NMEAS\_SIZE (number measured in the size range) and NSIZE (total
-number in the size range, which is probably what you want, not
-TOTAL\_NO).
+TOTAL_NO (abundance) and NMEAS (number of fish measured). If you include
+length constraints, the output table will include additional columns
+NMEAS_SIZE (number measured in the size range) and NSIZE (total number
+in the size range, which is probably what you want, not TOTAL_NO).
 
 Only one table is outputted, so if you request data from multiple
 datasets, they results will be combined (column SURVEY differentiates
@@ -377,10 +375,10 @@ tail(rockfish100equiv)
 #> 42228                   65     SC  Point Sur      Y  sax        0     0
 #>       NMEAS_SIZE NSIZE      N100
 #> 42223          0     0 0.0000000
-#> 42224         16    16 7.6749502
-#> 42225          5     5 2.6742781
-#> 42226          5     5 2.2870935
-#> 42227          1     1 0.4218319
+#> 42224         16    16 7.6758936
+#> 42225          5     5 2.6746351
+#> 42226          5     5 2.2873666
+#> 42227          1     1 0.4218778
 #> 42228          0     0 0.0000000
 ```
 
@@ -391,21 +389,20 @@ should be either “size”, “mass”, or “age”. As with `get_totals`,
 regressions must exist for mass and age distributions.
 
 If a haul had no fish, it will appear in the output dataset (with
-TOTAL\_NO=0). If a haul had fish, but
-no fish were measured, there will be a TOTAL\_NO&gt;0, NMEAS will be 0,
-and there will be a single length/mass/age entry for that haul, which
-will be the average values used as a substitute.
+TOTAL_NO=0). If a haul had fish, but no fish were measured, there will
+be a TOTAL_NO\>0, NMEAS will be 0, and there will be a single
+length/mass/age entry for that haul, which will be the average values
+used as a substitute.
 
-The output table will include TOTAL\_NO, NMEAS (number measured), EXP
-(expansion factor), SP\_NO (specimen number) and values for the
-requested distribution. If “size” is requested, will include column
-STD\_LENGTH. If “mass” is requested, will include columns STD\_LENGTH
-and WEIGHT. If “age” is requested, will include columns STD\_LENGTH,
-AGE, N100i (number of 100 day equivalents), and JDAY\_DOB (date of
-birth). If size limits are specified, will include additional columns
-NMEAS\_SIZE (number measured in the size range), PSIZE (proportion of
-measured fish in the size range), and NSIZE (total number in the size
-range).
+The output table will include TOTAL_NO, NMEAS (number measured), EXP
+(expansion factor), SP_NO (specimen number) and values for the requested
+distribution. If “size” is requested, will include column STD_LENGTH. If
+“mass” is requested, will include columns STD_LENGTH and WEIGHT. If
+“age” is requested, will include columns STD_LENGTH, AGE, N100i (number
+of 100 day equivalents), and JDAY_DOB (date of birth). If size limits
+are specified, will include additional columns NMEAS_SIZE (number
+measured in the size range), PSIZE (proportion of measured fish in the
+size range), and NSIZE (total number in the size range).
 
 Only one table is outputted, so if you request data from multiple
 datasets, they results will be combined (column SURVEY differentiates
@@ -509,18 +506,18 @@ tail(rockfish100agedist)
 #> 103883                 1045      C Davenport      Y     627        Y  sax
 #> 103884                   65     SC Point Sur      Y     627        Y  sax
 #>        TOTAL_NO NMEAS NMEAS_SIZE EXP PSIZE NSIZE SP_NO STD_LENGTH      AGE
-#> 103879        5     5          5   1     1     5    99         26 82.57275
-#> 103880        5     5          5   1     1     5   100         27 84.64848
-#> 103881        5     5          5   1     1     5   101         22 74.26983
-#> 103882        5     5          5   1     1     5   102         20 70.11837
-#> 103883        1     1          1   1     1     1  1493         24 78.42129
+#> 103879        5     5          5   1     1     5    99         26 82.57587
+#> 103880        5     5          5   1     1     5   100         27 84.65180
+#> 103881        5     5          5   1     1     5   101         22 74.27215
+#> 103882        5     5          5   1     1     5   102         20 70.12030
+#> 103883        1     1          1   1     1     1  1493         24 78.42401
 #> 103884        0     0          0  NA    NA     0    NA         NA       NA
 #>            N100i JDAY_DOB
-#> 103879 0.4980325 42.42725
-#> 103880 0.5411489 40.35152
-#> 103881 0.3572902 50.73017
-#> 103882 0.3026236 54.88163
-#> 103883 0.4218319 46.57871
+#> 103879 0.4980946 42.42413
+#> 103880 0.5412207 40.34820
+#> 103881 0.3573235 50.72785
+#> 103882 0.3026470 54.87970
+#> 103883 0.4218778 46.57599
 #> 103884        NA       NA
 ```
 
@@ -560,6 +557,7 @@ ggplot(anchovyindex1plot,aes(y=TOTAL_NO_INDEX,x=YEAR)) +
 <img src="man/figures/README-indices-1.png" width="100%" />
 
 ``` r
+
 anchovyindex2 <- get_logcpueindex(anchovybiomass_len, var = "BIOMASS", group="STRATA")
 head(anchovyindex2)
 #>                  NAME STRATA YEAR BIOMASS_INDEX BIOMASS_INDEX_SC
@@ -583,15 +581,16 @@ ggplot(anchovyindex2plot,aes(y=BIOMASS_INDEX,x=YEAR)) +
 <img src="man/figures/README-indices-2.png" width="100%" />
 
 ``` r
+
 rockfish100index <- get_logcpueindex(rockfish100equiv, var="N100", group="STRATA")
 head(rockfish100index)
 #>   NAME STRATA YEAR N100_INDEX N100_INDEX_SC
-#> 1  aur      C 1983 0.00000000    -0.7036376
-#> 2  aur      C 1984 0.22407490     0.8647763
-#> 3  aur      C 1985 0.00000000    -0.7036376
-#> 4  aur      C 1986 0.35335498     1.7696731
-#> 5  aur      C 1987 0.01174408    -0.6214348
-#> 6  aur      C 1988 0.00000000    -0.7036376
+#> 1  aur      C 1983 0.00000000    -0.7036166
+#> 2  aur      C 1984 0.22410049     0.8650105
+#> 3  aur      C 1985 0.00000000    -0.7036166
+#> 4  aur      C 1986 0.35336455     1.7698149
+#> 5  aur      C 1987 0.01173913    -0.6214467
+#> 6  aur      C 1988 0.00000000    -0.7036166
 
 rf100plot <- rockfish100index %>% 
   filter(STRATA=="C" & NAME!="mel" & NAME!="lev") %>% 
@@ -606,6 +605,6 @@ ggplot(rf100plot,aes(y=N100_INDEX_SC,x=YEAR, group=COMMON, color=COMMON)) +
 
 ## Remaining things to do
 
--   Need to add model-based index generation methods.
--   Jellyfish values do not take into account hauls cancelled due to
-    jellyfish.
+- Need to add model-based index generation methods.
+- Jellyfish values do not take into account hauls cancelled due to
+  jellyfish.

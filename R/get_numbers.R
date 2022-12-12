@@ -27,8 +27,8 @@
 #' were unavailable and means were used. If size limits are specified, the mean
 #' proportion of fish in the length range will also be used for hauls missing
 #' length data, with the same rank ordering of available mean values. Note that
-#' size limits currently can't be used for species that use proxy lengths: unknown
-#' mycophids (407) and unknown/umeasured krill (1472,1846,1847,2829,2830,2835,2849,1791),
+#' size limits currently can't be used for species that use proxy lengths:
+#' octopus (2026) and unknown/umeasured krill (1472,1846,2829,2830,2835,2849,1791),
 #' which currently assume a proportion of 1.
 #'
 #' Biomass is only available for species with length-weight regressions. Species
@@ -304,6 +304,10 @@ get_numbers=function(speciestable,datasets="RREAS",startyear=1983,
       nacruises=uncounted$CRUISE[uncounted$SPECIES==fspecies]
       catchcombo=catchcombo %>%
         dplyr::mutate(TOTAL_NO=ifelse(SURVEY=="RREAS" & CRUISE %in% nacruises, NA, TOTAL_NO))
+      if(any(is.na(catchcombo$TOTAL_NO))) { #issue message if NAs present
+        message("Note: NAs inserted for SPECIES ", fspecies, " which was uncounted in CRUISES ",
+                paste(nacruises, collapse = " "))
+      }
     }
 
     #issue message for unreliable counts
@@ -336,13 +340,6 @@ get_numbers=function(speciestable,datasets="RREAS",startyear=1983,
       flength<-dplyr::filter(LENGTHall,SPECIES==fspecies & MATURITY==fmaturity)
       meankrilllength<-1 #wont get used, just to stop case_when from choking
     }
-    #unknown myctophids
-    if(fspecies==407) {
-      m661=dplyr::filter(LENGTHall, SPECIES==661 & MATURITY=="U")
-      mean661length = mean(m661$STD_LENGTH)
-    } else {
-      mean661length = 1
-    }
 
     flength$STD_LENGTH<-round(flength$STD_LENGTH,digits=0)
 
@@ -363,8 +360,7 @@ get_numbers=function(speciestable,datasets="RREAS",startyear=1983,
       dplyr::group_by(SURVEY,CRUISE) %>% dplyr::mutate(MPSIZE_CRUISE=mean(PSIZE,na.rm = T)) %>% dplyr::ungroup() %>%
       dplyr::mutate(MPSIZE_GLOBAL=mean(PSIZE,na.rm = T),
                     PSIZE=dplyr::case_when(fspecies==2026 ~ 1, #Octopus
-                                           fspecies %in% c(1472,1846,1847,2829,2830,2835,2849,1791) ~ 1, #Krill
-                                           fspecies %in% c(407) ~ 1, #Unk myctophids
+                                           fspecies %in% c(1472,1846,2829,2830,2835,2849,1791) ~ 1, #Krill
                                            !is.na(PSIZE) | !is.na(NSIZE) ~ PSIZE,
                                            !is.na(MPSIZE_AREA) ~ MPSIZE_AREA,
                                            !is.na(MPSIZE_STRATA) ~ MPSIZE_STRATA,
@@ -394,8 +390,7 @@ get_numbers=function(speciestable,datasets="RREAS",startyear=1983,
       dplyr::group_by(SURVEY,CRUISE) %>% dplyr::mutate(MLEN_CRUISE=mean(STD_LENGTH,na.rm = T)) %>% dplyr::ungroup() %>%
       dplyr::mutate(MLEN_GLOBAL=mean(STD_LENGTH,na.rm = T),
                     MLEN=dplyr::case_when(fspecies==2026 ~ 1, #octopus dummy length
-                                          fspecies %in% c(1472,1846,1847,2829,2830,2835,2849,1791) ~ meankrilllength, #length for unid and rare krill
-                                          fspecies %in% c(407) ~ mean661length,
+                                          fspecies %in% c(1472,1846,2829,2830,2835,2849,1791) ~ meankrilllength, #length for unid and rare krill
                                           !is.na(MLEN_AREA) ~ MLEN_AREA,
                                           !is.na(MLEN_STRATA) ~ MLEN_STRATA,
                                           !is.na(MLEN_CRUISE) ~ MLEN_CRUISE,
@@ -506,7 +501,7 @@ get_numbers=function(speciestable,datasets="RREAS",startyear=1983,
   #sum for species with same NAME field (if aggregate==T)
   if(aggregate) {
     output=output %>% dplyr::group_by(SURVEY, CRUISE, HAUL_NO, YEAR, STRATA, AREA, NAME) %>%
-      dplyr::summarise_at(aggvars,sum,na.rm=T) %>% dplyr::ungroup()
+      dplyr::summarise_at(aggvars,sumNA,na.rm=T) %>% dplyr::ungroup()
   }
   #rejoin to table of standard hauls (info lost during summarizing)
   output=dplyr::left_join(HAULSTANDARDsub, output, by = c("SURVEY", "CRUISE", "HAUL_NO", "YEAR", "STRATA", "AREA")) %>%
@@ -516,4 +511,11 @@ get_numbers=function(speciestable,datasets="RREAS",startyear=1983,
   output$NAME=factor(output$NAME,levels=unique(speciestable$NAME))
 
   return(output)
+}
+
+#borrowed from https://github.com/paulponcet/bazar/blob/master/R/sumNA.R
+sumNA <- function(..., na.rm = FALSE) {
+    x <- unlist(list(...))
+    if (na.rm && length(x) && all(is.na(x))) return(x[1] + NA)
+    sum(x, na.rm = na.rm)
 }
