@@ -8,7 +8,7 @@
 #' @details
 #'
 #' If a station was sampled, but the requested species was *not counted* at the
-#' time, it will appear as an NA. If the species was counted but was *not
+#' time, it will appear as an NA (a message will be displayed). If the species was counted but was *not
 #' present*, it will appear as 0. If the species was counted but the counts
 #' numbers are unreliable (the case for some species prior to 1990,
 #' presence/absence will still be reliable), a message will be displayed.
@@ -304,9 +304,14 @@ get_numbers=function(speciestable,datasets="RREAS",startyear=1983,
       nacruises=uncounted$CRUISE[uncounted$SPECIES==fspecies]
       catchcombo=catchcombo %>%
         dplyr::mutate(TOTAL_NO=ifelse(SURVEY=="RREAS" & CRUISE %in% nacruises, NA, TOTAL_NO))
+      if(fspecies %in% c(2058, 2468, 2393, 1869)) { #omit gelatinous species from beginning of 2012 cruise
+        catchcombo=catchcombo %>%
+          dplyr::mutate(TOTAL_NO=ifelse(SURVEY=="RREAS" & CRUISE=="1203" & HAUL_NO<=25, NA, TOTAL_NO))
+        nacruises=c(nacruises,"1203")
+      }
       if(any(is.na(catchcombo$TOTAL_NO))) { #issue message if NAs present
         message("Note: NAs inserted for SPECIES ", fspecies, " which was uncounted in CRUISES ",
-                paste(nacruises, collapse = " "))
+                paste(intersect(nacruises, unique(catchcombo$CRUISE[catchcombo$SURVEY=="RREAS"])), collapse = " "))
       }
     }
 
