@@ -31,13 +31,13 @@ HAUL_ERDDAP=select(CATCH_HAUL_ERDDAP, CRUISE, HAUL_NO, VESSEL, STATION, HAUL_DAT
   group_by(CRUISE, HAUL_NO) %>% slice(1) %>% as.data.frame()
 
 #fix total krill and total rockfish
-krillind=which(is.nan(CATCH_ERDDAP$SPECIES) & CATCH_ERDDAP$MATURITY=="U")
-rfind=which(is.nan(CATCH_ERDDAP$SPECIES) & CATCH_ERDDAP$MATURITY=="Y")
-CATCH_ERDDAP$SPECIES[krillind] <- 1472
-CATCH_ERDDAP$MATURITY[krillind] <- "T"
-CATCH_ERDDAP$SPECIES[rfind] <- 1940
-CATCH_ERDDAP$MATURITY[rfind] <- "T"
-
+# krillind=which(is.nan(CATCH_ERDDAP$SPECIES) & CATCH_ERDDAP$MATURITY=="U")
+# rfind=which(is.nan(CATCH_ERDDAP$SPECIES) & CATCH_ERDDAP$MATURITY=="Y")
+# CATCH_ERDDAP$SPECIES[krillind] <- 1472
+# CATCH_ERDDAP$MATURITY[krillind] <- "T"
+# CATCH_ERDDAP$SPECIES[rfind] <- 1940
+# CATCH_ERDDAP$MATURITY[rfind] <- "T"
+### fixed in most recent update
 
 usethis::use_data(CATCH_ERDDAP, overwrite = TRUE)
 usethis::use_data(HAUL_ERDDAP, overwrite = TRUE)
@@ -48,6 +48,7 @@ table(HAUL_ERDDAP$CRUISE)
 table(test$CRUISE)
 anti_join( test[,c("CRUISE","HAUL_NO")], HAUL_ERDDAP[,c("CRUISE","HAUL_NO")])
 #there is one extra haul in the database that's not on erddap (1802 haul 135)
+### fixed
 
 #haulstandard table
 

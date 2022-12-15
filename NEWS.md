@@ -1,3 +1,11 @@
+# RREAS 0.1.2
+
+* Update ERDAPP data (still 1990-2018, but with errors fixed)
+* Displays message if NAs are inserted
+* Includes NAs for gelatinous species uncounted for part of the 2012 survey
+* Added gelatinous species to `sptable` so that it contains all CCIEA species
+* Bug fixes, mostly related to biomass calculations
+
 # RREAS 0.1.1
 
 * Reports uncounted species as NAs instead of 0s (uses internal table generated from xlsx file).
