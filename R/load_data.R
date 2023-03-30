@@ -64,7 +64,7 @@ load_mdb=function(mdb_path,atsea_path=NULL,datasets="RREAS",krill_len_path=NULL,
 
   channel <- RODBC::odbcConnectAccess2007(mdb_path)
   #RREAS standard stations
-  standardstations<-RODBC::sqlQuery(channel, "SELECT * FROM dbo_STANDARD_STATIONS WHERE station<1000", stringsAsFactors = F)
+  standardstations<-RODBC::sqlQuery(channel, "SELECT * FROM dbo_STANDARD_STATIONS", stringsAsFactors = F)
   if(activestationsonly) {
     standardstations<-dplyr::filter(standardstations,ACTIVE=="Y")
   }
@@ -135,7 +135,7 @@ load_mdb=function(mdb_path,atsea_path=NULL,datasets="RREAS",krill_len_path=NULL,
     CATCH_PWCC <<- RODBC::sqlQuery(channel, "SELECT * FROM dbo_PWCC_CATCH", as.is=1, stringsAsFactors = F)
     LENGTH_PWCC <<- RODBC::sqlQuery(channel, "SELECT * FROM dbo_PWCC_LENGTH", as.is=1, stringsAsFactors = F)
 
-    #rename columns
+    #rename columns (if using old version of database)
     colnames(HAUL_PWCC)<-sub("PWCC_","",colnames(HAUL_PWCC))
     colnames(CATCH_PWCC)<-sub("PWCC_","",colnames(CATCH_PWCC))
     colnames(LENGTH_PWCC)<-sub("PWCC_","",colnames(LENGTH_PWCC))
@@ -164,10 +164,15 @@ load_mdb=function(mdb_path,atsea_path=NULL,datasets="RREAS",krill_len_path=NULL,
     HAUL_PWCC$MONTH<-lubridate::month(HAUL_PWCC$HAUL_DATE)
     HAUL_PWCC$JDAY<-lubridate::yday(HAUL_PWCC$HAUL_DATE)
 
+    #change column name for STANDARD_STATION (if using old database version)
+    if("STANDARD" %in% colnames(HAUL_PWCC)) {
+      HAUL_PWCC<-HAUL_PWCC %>% dplyr::rename(STANDARD_STATION=STANDARD)
+    }
+
     #join HAUL and standard station info, filter
     HAULSTANDARD_PWCC<<- HAUL_PWCC %>% #inner_join(HAUL_PWCC, standardstations, by="STATION") %>%
       dplyr::arrange(YEAR) %>%
-      dplyr::filter(STANDARD==1) %>%
+      dplyr::filter(STANDARD_STATION==1) %>%
       dplyr::mutate(SURVEY="PWCC",LATDD=NET_IN_LATDD,LONDD=NET_IN_LONDD) %>% #LATDD and LONDD (if not from station)
       dplyr::filter(!is.na(LONDD)) %>% #delete 1 station with missing lon (entry 895)
       dplyr::select(SURVEY,CRUISE,HAUL_NO,YEAR,MONTH,JDAY,HAUL_DATE,STATION,NET_IN_LATDD,NET_IN_LONDD,
@@ -180,7 +185,7 @@ load_mdb=function(mdb_path,atsea_path=NULL,datasets="RREAS",krill_len_path=NULL,
     CATCH_NWFSC <<- RODBC::sqlQuery(channel, "SELECT * FROM dbo_NWFSC_JUV_CATCH", as.is=1, stringsAsFactors = F)
     LENGTH_NWFSC <<- RODBC::sqlQuery(channel, "SELECT * FROM dbo_NWFSC_JUV_LENGTH", as.is=1, stringsAsFactors = F)
     #NWFSC standard stations
-    standardstations_NWFSC<-RODBC::sqlQuery(channel, "SELECT * FROM dbo_NWFSC_STANDARD_STATIONS WHERE station<1000", stringsAsFactors = F)
+    standardstations_NWFSC<-RODBC::sqlQuery(channel, "SELECT * FROM dbo_NWFSC_STANDARD_STATIONS", stringsAsFactors = F)
     if(activestationsonly) {
       standardstations_NWFSC<-dplyr::filter(standardstations_NWFSC,ACTIVE=="Y")
     }
@@ -222,7 +227,7 @@ load_mdb=function(mdb_path,atsea_path=NULL,datasets="RREAS",krill_len_path=NULL,
       dplyr::select(SURVEY,CRUISE,HAUL_NO,YEAR,MONTH,JDAY,HAUL_DATE,STATION,NET_IN_LATDD,NET_IN_LONDD,
                     LATDD,LONDD,BOTTOM_DEPTH,STATION_BOTTOM_DEPTH,STRATA,AREA,ACTIVE)
     HAULSTANDARD_NWFSC<<-rbind(HAULSTANDARD_NWFSC,HAULSTANDARD_NWFSC_RREAS) %>%
-      dplyr::arrange(YEAR)
+      dplyr::arrange(YEAR, HAUL_NO)
   }
 
   RODBC::odbcCloseAll()

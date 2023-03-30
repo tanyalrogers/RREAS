@@ -28,6 +28,11 @@
 #' rockfish100index <- get_logcpueindex(rockfish100equiv, var="N100", group="STRATA")
 #' }
 get_logcpueindex <- function(df, var="TOTAL_NO", group=NULL, standardized=TRUE) {
+  if(any(is.na(df$STATION))) {
+    stop("Data has missing STATION numbers, please fill in values.",
+         "\ne.g. df$STATION=ifelse(is.na(df$STATION),paste0(df$CRUISE,df$HAUL_NO),df$STATION)")
+  }
+  #df$STATION=ifelse(is.na(df$STATION),paste0(df$CRUISE,df$HAUL_NO),df$STATION)
   if(is.null(group)) {
     f1 <- as.formula(paste(var, "~ YEAR+STATION+NAME"))
     f2 <- as.formula(paste(var, "~ YEAR+NAME"))
