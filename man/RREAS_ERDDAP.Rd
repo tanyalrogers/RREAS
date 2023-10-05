@@ -40,11 +40,11 @@ An object of class \code{data.frame} with 2909 rows and 14 columns.
 
 An object of class \code{data.frame} with 2909 rows and 17 columns.
 
-An object of class \code{data.frame} with 45203 rows and 5 columns.
+An object of class \code{data.frame} with 45905 rows and 5 columns.
 
-An object of class \code{data.frame} with 193044 rows and 5 columns.
+An object of class \code{data.frame} with 193047 rows and 5 columns.
 
-An object of class \code{data.frame} with 319 rows and 7 columns.
+An object of class \code{data.frame} with 320 rows and 7 columns.
 }
 \source{
 \url{https://oceanview.pfeg.noaa.gov/erddap/tabledap/FED_Rockfish_Catch.html}

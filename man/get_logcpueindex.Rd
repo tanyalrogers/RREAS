@@ -4,7 +4,13 @@
 \alias{get_logcpueindex}
 \title{Get CPUE index}
 \usage{
-get_logcpueindex(df, var = "TOTAL_NO", group = NULL, standardized = TRUE)
+get_logcpueindex(
+  df,
+  var = "TOTAL_NO",
+  group = NULL,
+  standardized = TRUE,
+  sd = FALSE
+)
 }
 \arguments{
 \item{df}{Data frame output from \code{\link{get_totals}}.}
@@ -17,6 +23,9 @@ indices. Typically "STRATA". Multiple grouping variables are allowed.}
 
 \item{standardized}{Whether or not to compute a scaled index, in addition. Defaults
 to TRUE. Scaling is done within groups for each NAME, across years.}
+
+\item{sd}{Calculate standard deviations and standard errors. This is done after averaging
+repeat tows at the same station, so n is the number of stations. Defaults of FALSE.}
 }
 \value{
 A data frame with columns NAME, YEAR, any grouping variables, and an index.
