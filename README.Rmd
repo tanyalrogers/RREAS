@@ -67,8 +67,8 @@ To load data from a local MS Access Database, you will need to specify the file 
 ```{r dataload}
 #replace the file paths with those for your machine
 #any previously loaded tables with the same name in your workspace will be overwritten
-load_mdb(mdb_path="E:/Documents/NMFS laptop/Rockfish/RREAS/Survey data/juv_cruise_backup27JAN21.mdb",
-         krill_len_path="E:/Documents/NMFS laptop/Rockfish/Index generation/length weight/krill_lengths.csv")
+load_mdb(mdb_path="C:/Users/trogers/Documents/Rockfish/RREAS/Survey data/juv_cruise_backup28MAR23.mdb",
+         krill_len_path="C:/Users/trogers/Documents/Rockfish/Index generation/length weight/krill_lengths.csv")
 ls(name = .GlobalEnv) #list objects in your workspace
 ```
 
@@ -78,8 +78,8 @@ To load data from multiple surveys, specify which ones under `datasets`. If you 
 
 ```{r dataload2}
 #replace the file paths with those for your machine
-load_mdb(mdb_path="E:/Documents/NMFS laptop/Rockfish/RREAS/Survey data/juv_cruise_backup27JAN21.mdb",
-         krill_len_path="E:/Documents/NMFS laptop/Rockfish/Index generation/length weight/krill_lengths.csv",
+load_mdb(mdb_path="C:/Users/trogers/Documents/Rockfish/RREAS/Survey data/juv_cruise_backup28MAR23.mdb",
+         krill_len_path="C:/Users/trogers/Documents/Rockfish/Index generation/length weight/krill_lengths.csv",
          datasets = c("RREAS","ADAMS","PWCC","NWFSC"),
          activestationsonly = TRUE)
 ls(name = .GlobalEnv) #list objects in your workspace

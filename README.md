@@ -9,7 +9,7 @@
 This package contains data and support functions for the NOAA SWFSC
 Rockfish Recruitment and Ecosystem Assessment Survey (RREAS).
 
-This is version 0.1.2. Please report any problems!
+This is version 0.1.3. Please report any problems!
 
 An overview of methods, history, findings, and applications of the
 survey can be found
@@ -42,7 +42,7 @@ There are two different functions for loading RREAS data:
 
 - `load_erddap` loads the survey data as it is currently stored on
   [ERDDAP](https://oceanview.pfeg.noaa.gov/erddap/index.html), which
-  contains data from 1990 to 2018 for standard, active stations only.
+  contains data from 1990 to 2022 for standard, active stations only.
   The data tables are contained within the package and are reformatted
   as relational tables (HAUL, CATCH, LENGTH, SPECIES_CODES) to match the
   format in the database. A HAULSTANDARD table is also loaded with a
@@ -85,8 +85,8 @@ containing only active stations (`activestationsonly = TRUE`):
 ``` r
 #replace the file paths with those for your machine
 #any previously loaded tables with the same name in your workspace will be overwritten
-load_mdb(mdb_path="E:/Documents/NMFS laptop/Rockfish/RREAS/Survey data/juv_cruise_backup27JAN21.mdb",
-         krill_len_path="E:/Documents/NMFS laptop/Rockfish/Index generation/length weight/krill_lengths.csv")
+load_mdb(mdb_path="C:/Users/trogers/Documents/Rockfish/RREAS/Survey data/juv_cruise_backup28MAR23.mdb",
+         krill_len_path="C:/Users/trogers/Documents/Rockfish/Index generation/length weight/krill_lengths.csv")
 #> Data loaded.
 ls(name = .GlobalEnv) #list objects in your workspace
 #> [1] "AGE"           "CATCH"         "HAUL"          "HAULSTANDARD" 
@@ -105,8 +105,8 @@ can always be used to subset later.
 
 ``` r
 #replace the file paths with those for your machine
-load_mdb(mdb_path="E:/Documents/NMFS laptop/Rockfish/RREAS/Survey data/juv_cruise_backup27JAN21.mdb",
-         krill_len_path="E:/Documents/NMFS laptop/Rockfish/Index generation/length weight/krill_lengths.csv",
+load_mdb(mdb_path="C:/Users/trogers/Documents/Rockfish/RREAS/Survey data/juv_cruise_backup28MAR23.mdb",
+         krill_len_path="C:/Users/trogers/Documents/Rockfish/Index generation/length weight/krill_lengths.csv",
          datasets = c("RREAS","ADAMS","PWCC","NWFSC"),
          activestationsonly = TRUE)
 #> Data loaded.
@@ -191,8 +191,9 @@ directly.
 data("sptable")
 unique(sptable$NAME) #available species and species groups
 #>  [1] "YOY Rockfish"     "Market Squid"     "YOY Pacific Hake" "Adult Anchovy"   
-#>  [5] "YOY Anchovy"      "Adult Sardine"    "YOY Sardine"      "YOY Sanddabs"    
-#>  [9] "Total Myctophids" "Octopus"          "Total Krill"
+#>  [5] "YOY Anchovy"      "Adult Sardine"    "YOY Sardine"      "Pyrosomes"       
+#>  [9] "Thetys"           "Salps"            "YOY Sanddabs"     "Total Myctophids"
+#> [13] "Octopus"          "Total Krill"
 head(sptable)
 #>   SPECIES MATURITY         NAME
 #> 1     579        Y YOY Rockfish
@@ -321,65 +322,65 @@ head(anchovyabund)
 anchovybiomass_len <- get_totals(anchovytable_len, what = "biomass")
 tail(anchovybiomass_len)
 #>      SURVEY CRUISE HAUL_NO YEAR MONTH JDAY           HAUL_DATE STATION
-#> 7033  RREAS   2103     130 2021     6  159 2021-06-08 03:58:01     425
-#> 7034  RREAS   2103      22 2021     5  124 2021-05-04 22:33:18     124
-#> 7035  RREAS   2103      23 2021     5  125 2021-05-05 00:01:49     125
-#> 7036  RREAS   2103      24 2021     5  125 2021-05-05 01:41:27     126
-#> 7037  RREAS   2103      25 2021     5  125 2021-05-05 03:57:50     127
-#> 7038  RREAS   2103      26 2021     5  125 2021-05-05 21:03:12     101
+#> 7179  RREAS   2206       7 2022     6  171 2022-06-20 01:53:34     133
+#> 7180  RREAS   2206       8 2022     6  172 2022-06-21 22:02:37     170
+#> 7181  RREAS   2206       9 2022     6  173 2022-06-22 00:59:25     171
+#> 7182  RREAS   2206      10 2022     6  173 2022-06-22 23:29:49     454
+#> 7183  RREAS   2206      11 2022     6  174 2022-06-23 01:58:31     453
+#> 7184  RREAS   2206      12 2022     6  174 2022-06-23 03:55:09     183
 #>      NET_IN_LATDD NET_IN_LONDD    LATDD     LONDD BOTTOM_DEPTH
-#> 7033     33.91300    -120.6992 33.91833 -120.7117         1851
-#> 7034     36.97217    -122.3608 36.98333 -122.3750          125
-#> 7035     36.97067    -122.4112 36.98333 -122.4250          286
-#> 7036     36.97233    -122.5807 36.98333 -122.5917          420
-#> 7037     36.97433    -122.7435 36.98333 -122.7583         1050
-#> 7038     36.30717    -121.9562 36.30000 -121.9383           75
-#>      STATION_BOTTOM_DEPTH STRATA       AREA ACTIVE                NAME TOTAL_NO
-#> 7033                 1848      S San Miguel      Y Small adult anchovy      489
-#> 7034                  128      C  Davenport      Y Small adult anchovy       28
-#> 7035                  446      C  Davenport      Y Small adult anchovy      918
-#> 7036                  432      C  Davenport      Y Small adult anchovy        0
-#> 7037                 1045      C  Davenport      Y Small adult anchovy        0
-#> 7038                   65     SC  Point Sur      Y Small adult anchovy        0
-#>      NMEAS NMEAS_SIZE    NSIZE  BIOMASS
-#> 7033    19         15 386.0526 4623.876
-#> 7034    22          0   0.0000    0.000
-#> 7035    20         15 688.5000 8418.535
-#> 7036     0          0   0.0000    0.000
-#> 7037     0          0   0.0000    0.000
-#> 7038     0          0   0.0000    0.000
+#> 7179     37.27325    -122.8156 37.27500 -122.8167          184
+#> 7180     38.16799    -123.3720 38.16667 -123.3667          195
+#> 7181     38.16522    -123.4824 38.16667 -123.4833          403
+#> 7182     38.46328    -123.7115 38.46667 -123.7100          924
+#> 7183     38.46770    -123.3862 38.46667 -123.3867          117
+#> 7184     38.47054    -123.2381 38.46667 -123.2333           60
+#>      STATION_BOTTOM_DEPTH STRATA        AREA ACTIVE                NAME
+#> 7179                  184      C   Pescadero      Y Small adult anchovy
+#> 7180                  183      C Point Reyes      Y Small adult anchovy
+#> 7181                  400      C Point Reyes      Y Small adult anchovy
+#> 7182                  910     NC   Fort Ross      Y Small adult anchovy
+#> 7183                  115     NC   Fort Ross      Y Small adult anchovy
+#> 7184                   53     NC   Fort Ross      Y Small adult anchovy
+#>      TOTAL_NO NMEAS NMEAS_SIZE NSIZE BIOMASS
+#> 7179        0     0          0     0       0
+#> 7180        0     0          0     0       0
+#> 7181        0     0          0     0       0
+#> 7182        0     0          0     0       0
+#> 7183        0     0          0     0       0
+#> 7184        0     0          0     0       0
 
 #100 day rockfish
 rockfish100equiv <- get_totals(sptable_rockfish100, what = "100day")
 tail(rockfish100equiv)
 #>       SURVEY CRUISE HAUL_NO YEAR MONTH JDAY           HAUL_DATE STATION
-#> 42223  RREAS   2103     130 2021     6  159 2021-06-08 03:58:01     425
-#> 42224  RREAS   2103      22 2021     5  124 2021-05-04 22:33:18     124
-#> 42225  RREAS   2103      23 2021     5  125 2021-05-05 00:01:49     125
-#> 42226  RREAS   2103      24 2021     5  125 2021-05-05 01:41:27     126
-#> 42227  RREAS   2103      25 2021     5  125 2021-05-05 03:57:50     127
-#> 42228  RREAS   2103      26 2021     5  125 2021-05-05 21:03:12     101
+#> 43099  RREAS   2206       7 2022     6  171 2022-06-20 01:53:34     133
+#> 43100  RREAS   2206       8 2022     6  172 2022-06-21 22:02:37     170
+#> 43101  RREAS   2206       9 2022     6  173 2022-06-22 00:59:25     171
+#> 43102  RREAS   2206      10 2022     6  173 2022-06-22 23:29:49     454
+#> 43103  RREAS   2206      11 2022     6  174 2022-06-23 01:58:31     453
+#> 43104  RREAS   2206      12 2022     6  174 2022-06-23 03:55:09     183
 #>       NET_IN_LATDD NET_IN_LONDD    LATDD     LONDD BOTTOM_DEPTH
-#> 42223     33.91300    -120.6992 33.91833 -120.7117         1851
-#> 42224     36.97217    -122.3608 36.98333 -122.3750          125
-#> 42225     36.97067    -122.4112 36.98333 -122.4250          286
-#> 42226     36.97233    -122.5807 36.98333 -122.5917          420
-#> 42227     36.97433    -122.7435 36.98333 -122.7583         1050
-#> 42228     36.30717    -121.9562 36.30000 -121.9383           75
-#>       STATION_BOTTOM_DEPTH STRATA       AREA ACTIVE NAME TOTAL_NO NMEAS
-#> 42223                 1848      S San Miguel      Y  sax        0     0
-#> 42224                  128      C  Davenport      Y  sax       17    17
-#> 42225                  446      C  Davenport      Y  sax        5     5
-#> 42226                  432      C  Davenport      Y  sax        5     5
-#> 42227                 1045      C  Davenport      Y  sax        1     1
-#> 42228                   65     SC  Point Sur      Y  sax        0     0
-#>       NMEAS_SIZE NSIZE      N100
-#> 42223          0     0 0.0000000
-#> 42224         16    16 7.6758936
-#> 42225          5     5 2.6746351
-#> 42226          5     5 2.2873666
-#> 42227          1     1 0.4218778
-#> 42228          0     0 0.0000000
+#> 43099     37.27325    -122.8156 37.27500 -122.8167          184
+#> 43100     38.16799    -123.3720 38.16667 -123.3667          195
+#> 43101     38.16522    -123.4824 38.16667 -123.4833          403
+#> 43102     38.46328    -123.7115 38.46667 -123.7100          924
+#> 43103     38.46770    -123.3862 38.46667 -123.3867          117
+#> 43104     38.47054    -123.2381 38.46667 -123.2333           60
+#>       STATION_BOTTOM_DEPTH STRATA        AREA ACTIVE NAME TOTAL_NO NMEAS
+#> 43099                  184      C   Pescadero      Y  sax        0     0
+#> 43100                  183      C Point Reyes      Y  sax        0     0
+#> 43101                  400      C Point Reyes      Y  sax        0     0
+#> 43102                  910     NC   Fort Ross      Y  sax        0     0
+#> 43103                  115     NC   Fort Ross      Y  sax        0     0
+#> 43104                   53     NC   Fort Ross      Y  sax        0     0
+#>       NMEAS_SIZE NSIZE N100
+#> 43099          0     0    0
+#> 43100          0     0    0
+#> 43101          0     0    0
+#> 43102          0     0    0
+#> 43103          0     0    0
+#> 43104          0     0    0
 ```
 
 ### Getting distributions
@@ -436,9 +437,9 @@ head(anchovysizedist)
 #> 6 Monterey Bay Outside      Y     209        A Adult Anchovy        0     0  NA
 #>   SP_NO STD_LENGTH
 #> 1    NA         NA
-#> 2    NA   119.9586
-#> 3    NA   119.9586
-#> 4    NA   119.9586
+#> 2    NA   120.0395
+#> 3    NA   120.0395
+#> 4    NA   120.0395
 #> 5    NA         NA
 #> 6    NA         NA
 
@@ -446,79 +447,79 @@ head(anchovysizedist)
 anchovymassdist <- get_distributions(anchovytable_len, what = "mass")
 tail(anchovymassdist)
 #>       SURVEY CRUISE HAUL_NO YEAR MONTH JDAY           HAUL_DATE STATION
-#> 14954  RREAS   2103      23 2021     5  125 2021-05-05 00:01:49     125
-#> 14955  RREAS   2103      23 2021     5  125 2021-05-05 00:01:49     125
-#> 14956  RREAS   2103      23 2021     5  125 2021-05-05 00:01:49     125
-#> 14957  RREAS   2103      24 2021     5  125 2021-05-05 01:41:27     126
-#> 14958  RREAS   2103      25 2021     5  125 2021-05-05 03:57:50     127
-#> 14959  RREAS   2103      26 2021     5  125 2021-05-05 21:03:12     101
+#> 15383  RREAS   2206       7 2022     6  171 2022-06-20 01:53:34     133
+#> 15384  RREAS   2206       8 2022     6  172 2022-06-21 22:02:37     170
+#> 15385  RREAS   2206       9 2022     6  173 2022-06-22 00:59:25     171
+#> 15386  RREAS   2206      10 2022     6  173 2022-06-22 23:29:49     454
+#> 15387  RREAS   2206      11 2022     6  174 2022-06-23 01:58:31     453
+#> 15388  RREAS   2206      12 2022     6  174 2022-06-23 03:55:09     183
 #>       NET_IN_LATDD NET_IN_LONDD    LATDD     LONDD BOTTOM_DEPTH
-#> 14954     36.97067    -122.4112 36.98333 -122.4250          286
-#> 14955     36.97067    -122.4112 36.98333 -122.4250          286
-#> 14956     36.97067    -122.4112 36.98333 -122.4250          286
-#> 14957     36.97233    -122.5807 36.98333 -122.5917          420
-#> 14958     36.97433    -122.7435 36.98333 -122.7583         1050
-#> 14959     36.30717    -121.9562 36.30000 -121.9383           75
-#>       STATION_BOTTOM_DEPTH STRATA      AREA ACTIVE SPECIES MATURITY
-#> 14954                  446      C Davenport      Y     209        A
-#> 14955                  446      C Davenport      Y     209        A
-#> 14956                  446      C Davenport      Y     209        A
-#> 14957                  432      C Davenport      Y     209        A
-#> 14958                 1045      C Davenport      Y     209        A
-#> 14959                   65     SC Point Sur      Y     209        A
-#>                      NAME TOTAL_NO NMEAS NMEAS_SIZE  EXP PSIZE NSIZE SP_NO
-#> 14954 Small adult anchovy      918    20         15 45.9  0.75 688.5  6516
-#> 14955 Small adult anchovy      918    20         15 45.9  0.75 688.5  6517
-#> 14956 Small adult anchovy      918    20         15 45.9  0.75 688.5  6518
-#> 14957 Small adult anchovy        0     0          0   NA    NA   0.0    NA
-#> 14958 Small adult anchovy        0     0          0   NA    NA   0.0    NA
-#> 14959 Small adult anchovy        0     0          0   NA    NA   0.0    NA
-#>       STD_LENGTH   WEIGHT
-#> 14954        103 11.34121
-#> 14955        105 12.10997
-#> 14956        110 14.19203
-#> 14957         NA       NA
-#> 14958         NA       NA
-#> 14959         NA       NA
+#> 15383     37.27325    -122.8156 37.27500 -122.8167          184
+#> 15384     38.16799    -123.3720 38.16667 -123.3667          195
+#> 15385     38.16522    -123.4824 38.16667 -123.4833          403
+#> 15386     38.46328    -123.7115 38.46667 -123.7100          924
+#> 15387     38.46770    -123.3862 38.46667 -123.3867          117
+#> 15388     38.47054    -123.2381 38.46667 -123.2333           60
+#>       STATION_BOTTOM_DEPTH STRATA        AREA ACTIVE SPECIES MATURITY
+#> 15383                  184      C   Pescadero      Y     209        A
+#> 15384                  183      C Point Reyes      Y     209        A
+#> 15385                  400      C Point Reyes      Y     209        A
+#> 15386                  910     NC   Fort Ross      Y     209        A
+#> 15387                  115     NC   Fort Ross      Y     209        A
+#> 15388                   53     NC   Fort Ross      Y     209        A
+#>                      NAME TOTAL_NO NMEAS NMEAS_SIZE EXP PSIZE NSIZE SP_NO
+#> 15383 Small adult anchovy        0     0          0  NA    NA     0    NA
+#> 15384 Small adult anchovy        0     0          0  NA    NA     0    NA
+#> 15385 Small adult anchovy        0     0          0  NA    NA     0    NA
+#> 15386 Small adult anchovy        0     0          0  NA    NA     0    NA
+#> 15387 Small adult anchovy        0     0          0  NA    NA     0    NA
+#> 15388 Small adult anchovy        0     0          0  NA    NA     0    NA
+#>       STD_LENGTH WEIGHT
+#> 15383         NA     NA
+#> 15384         NA     NA
+#> 15385         NA     NA
+#> 15386         NA     NA
+#> 15387         NA     NA
+#> 15388         NA     NA
 
 #rockfish age distributions
 rockfish100agedist <- get_distributions(sptable_rockfish100, what = "age")
 tail(rockfish100agedist)
 #>        SURVEY CRUISE HAUL_NO YEAR MONTH JDAY           HAUL_DATE STATION
-#> 103879  RREAS   2103      24 2021     5  125 2021-05-05 01:41:27     126
-#> 103880  RREAS   2103      24 2021     5  125 2021-05-05 01:41:27     126
-#> 103881  RREAS   2103      24 2021     5  125 2021-05-05 01:41:27     126
-#> 103882  RREAS   2103      24 2021     5  125 2021-05-05 01:41:27     126
-#> 103883  RREAS   2103      25 2021     5  125 2021-05-05 03:57:50     127
-#> 103884  RREAS   2103      26 2021     5  125 2021-05-05 21:03:12     101
+#> 105630  RREAS   2206       7 2022     6  171 2022-06-20 01:53:34     133
+#> 105631  RREAS   2206       8 2022     6  172 2022-06-21 22:02:37     170
+#> 105632  RREAS   2206       9 2022     6  173 2022-06-22 00:59:25     171
+#> 105633  RREAS   2206      10 2022     6  173 2022-06-22 23:29:49     454
+#> 105634  RREAS   2206      11 2022     6  174 2022-06-23 01:58:31     453
+#> 105635  RREAS   2206      12 2022     6  174 2022-06-23 03:55:09     183
 #>        NET_IN_LATDD NET_IN_LONDD    LATDD     LONDD BOTTOM_DEPTH
-#> 103879     36.97233    -122.5807 36.98333 -122.5917          420
-#> 103880     36.97233    -122.5807 36.98333 -122.5917          420
-#> 103881     36.97233    -122.5807 36.98333 -122.5917          420
-#> 103882     36.97233    -122.5807 36.98333 -122.5917          420
-#> 103883     36.97433    -122.7435 36.98333 -122.7583         1050
-#> 103884     36.30717    -121.9562 36.30000 -121.9383           75
-#>        STATION_BOTTOM_DEPTH STRATA      AREA ACTIVE SPECIES MATURITY NAME
-#> 103879                  432      C Davenport      Y     627        Y  sax
-#> 103880                  432      C Davenport      Y     627        Y  sax
-#> 103881                  432      C Davenport      Y     627        Y  sax
-#> 103882                  432      C Davenport      Y     627        Y  sax
-#> 103883                 1045      C Davenport      Y     627        Y  sax
-#> 103884                   65     SC Point Sur      Y     627        Y  sax
-#>        TOTAL_NO NMEAS NMEAS_SIZE EXP PSIZE NSIZE SP_NO STD_LENGTH      AGE
-#> 103879        5     5          5   1     1     5    99         26 82.57587
-#> 103880        5     5          5   1     1     5   100         27 84.65180
-#> 103881        5     5          5   1     1     5   101         22 74.27215
-#> 103882        5     5          5   1     1     5   102         20 70.12030
-#> 103883        1     1          1   1     1     1  1493         24 78.42401
-#> 103884        0     0          0  NA    NA     0    NA         NA       NA
-#>            N100i JDAY_DOB
-#> 103879 0.4980946 42.42413
-#> 103880 0.5412207 40.34820
-#> 103881 0.3573235 50.72785
-#> 103882 0.3026470 54.87970
-#> 103883 0.4218778 46.57599
-#> 103884        NA       NA
+#> 105630     37.27325    -122.8156 37.27500 -122.8167          184
+#> 105631     38.16799    -123.3720 38.16667 -123.3667          195
+#> 105632     38.16522    -123.4824 38.16667 -123.4833          403
+#> 105633     38.46328    -123.7115 38.46667 -123.7100          924
+#> 105634     38.46770    -123.3862 38.46667 -123.3867          117
+#> 105635     38.47054    -123.2381 38.46667 -123.2333           60
+#>        STATION_BOTTOM_DEPTH STRATA        AREA ACTIVE SPECIES MATURITY NAME
+#> 105630                  184      C   Pescadero      Y     627        Y  sax
+#> 105631                  183      C Point Reyes      Y     627        Y  sax
+#> 105632                  400      C Point Reyes      Y     627        Y  sax
+#> 105633                  910     NC   Fort Ross      Y     627        Y  sax
+#> 105634                  115     NC   Fort Ross      Y     627        Y  sax
+#> 105635                   53     NC   Fort Ross      Y     627        Y  sax
+#>        TOTAL_NO NMEAS NMEAS_SIZE EXP PSIZE NSIZE SP_NO STD_LENGTH AGE N100i
+#> 105630        0     0          0  NA    NA     0    NA         NA  NA    NA
+#> 105631        0     0          0  NA    NA     0    NA         NA  NA    NA
+#> 105632        0     0          0  NA    NA     0    NA         NA  NA    NA
+#> 105633        0     0          0  NA    NA     0    NA         NA  NA    NA
+#> 105634        0     0          0  NA    NA     0    NA         NA  NA    NA
+#> 105635        0     0          0  NA    NA     0    NA         NA  NA    NA
+#>        JDAY_DOB
+#> 105630       NA
+#> 105631       NA
+#> 105632       NA
+#> 105633       NA
+#> 105634       NA
+#> 105635       NA
 ```
 
 ## Generating indices
@@ -537,12 +538,12 @@ library(dplyr)
 anchovyindex1 <- get_logcpueindex(anchovyabund, var = "TOTAL_NO", group="STRATA")
 head(anchovyindex1)
 #>          NAME STRATA YEAR TOTAL_NO_INDEX TOTAL_NO_INDEX_SC
-#> 1 YOY Anchovy      C 1983     0.00000000        -0.6362502
-#> 2 YOY Anchovy      C 1984     0.04993692        -0.5594029
-#> 3 YOY Anchovy      C 1985     0.08788898        -0.5009989
-#> 4 YOY Anchovy      C 1986     0.72783491         0.4838058
-#> 5 YOY Anchovy      C 1987     0.48685054         0.1129580
-#> 6 YOY Anchovy      C 1988     0.17104788        -0.3730267
+#> 1 YOY Anchovy      C 1983     0.00000000        -0.6370075
+#> 2 YOY Anchovy      C 1984     0.04993692        -0.5592849
+#> 3 YOY Anchovy      C 1985     0.08788898        -0.5002158
+#> 4 YOY Anchovy      C 1986     0.72783491         0.4958057
+#> 5 YOY Anchovy      C 1987     0.48685054         0.1207340
+#> 6 YOY Anchovy      C 1988     0.17104788        -0.3707860
 
 anchovyindex1plot <- anchovyindex1 %>% 
   #filter(!(YEAR<2004 & STRATA!="C")) %>% #exclude non-core areas before 2004
@@ -561,12 +562,12 @@ ggplot(anchovyindex1plot,aes(y=TOTAL_NO_INDEX,x=YEAR)) +
 anchovyindex2 <- get_logcpueindex(anchovybiomass_len, var = "BIOMASS", group="STRATA")
 head(anchovyindex2)
 #>                  NAME STRATA YEAR BIOMASS_INDEX BIOMASS_INDEX_SC
-#> 1 Small adult anchovy      C 1983     2.0613810       0.66499025
-#> 2 Small adult anchovy      C 1984     3.0168360       1.37970873
-#> 3 Small adult anchovy      C 1985     2.6174411       1.08094535
-#> 4 Small adult anchovy      C 1986     0.4256878      -0.55857346
-#> 5 Small adult anchovy      C 1987     1.1512273      -0.01584101
-#> 6 Small adult anchovy      C 1988     1.1424928      -0.02237477
+#> 1 Small adult anchovy      C 1983     2.0626474       0.65754758
+#> 2 Small adult anchovy      C 1984     3.0186536       1.37906687
+#> 3 Small adult anchovy      C 1985     2.6194156       1.07775305
+#> 4 Small adult anchovy      C 1986     0.4261133      -0.57758135
+#> 5 Small adult anchovy      C 1987     1.1519343      -0.02978795
+#> 6 Small adult anchovy      C 1988     1.1434087      -0.03622244
 
 anchovyindex2plot <- anchovyindex2 %>% 
   #filter(!(YEAR<2004 & STRATA!="C")) %>% #exclude non-core areas before 2004
@@ -585,12 +586,12 @@ ggplot(anchovyindex2plot,aes(y=BIOMASS_INDEX,x=YEAR)) +
 rockfish100index <- get_logcpueindex(rockfish100equiv, var="N100", group="STRATA")
 head(rockfish100index)
 #>   NAME STRATA YEAR N100_INDEX N100_INDEX_SC
-#> 1  aur      C 1983 0.00000000    -0.7036166
-#> 2  aur      C 1984 0.22410049     0.8650105
-#> 3  aur      C 1985 0.00000000    -0.7036166
-#> 4  aur      C 1986 0.35336455     1.7698149
-#> 5  aur      C 1987 0.01173913    -0.6214467
-#> 6  aur      C 1988 0.00000000    -0.7036166
+#> 1  aur      C 1983 0.00000000    -0.6922385
+#> 2  aur      C 1984 0.22410049     0.8906193
+#> 3  aur      C 1985 0.00000000    -0.6922385
+#> 4  aur      C 1986 0.35336455     1.8036321
+#> 5  aur      C 1987 0.01173913    -0.6093232
+#> 6  aur      C 1988 0.00000000    -0.6922385
 
 rf100plot <- rockfish100index %>% 
   filter(STRATA=="C" & NAME!="mel" & NAME!="lev") %>% 
