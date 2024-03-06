@@ -30,6 +30,8 @@
 #' species are pooled for the regression. Unknown myctophids (407) will use
 #' this regression.
 #'
+#' For speckled sanddab (148), the regression for pacific sanddab (147) is used.
+#'
 #' For octopus (2026), which has weight but no length data, the mean weight is
 #' used.
 #'
@@ -97,8 +99,15 @@ get_lw_regression=function(species, maturity, plot=F){
     len_to_wt<-function(length) {
       exp(predict(len_reg, newdata = data.frame(STD_LENGTH=length)))
     }
-  } else if(species %in% c(407,661,669)) { #N lampfish, CA lanternsfish, unknown myctophid
+  } else if(species %in% c(407,661,669)) { #N lampfish, CA lanternfish, unknown myctophid
     fwts<-subset(WEIGHT,SPECIES %in% c(661,669))
+    len_reg<-lm(log(WEIGHT)~log(STD_LENGTH), data=fwts)
+    len_to_wt<-function(length) {
+      exp(predict(len_reg, newdata = data.frame(STD_LENGTH=length)))
+    }
+  } else if(species==148) { #spec dab, use regression for pac dab
+    species=147
+    fwts<-subset(WEIGHT,SPECIES==species & MATURITY==maturity)
     len_reg<-lm(log(WEIGHT)~log(STD_LENGTH), data=fwts)
     len_to_wt<-function(length) {
       exp(predict(len_reg, newdata = data.frame(STD_LENGTH=length)))

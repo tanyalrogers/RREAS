@@ -34,6 +34,12 @@ sptable=rbind(rockfishes, otherspecies, sanddabs, myctophids, octopus, krill)
 #write.csv(speciestable,"data-raw/species_table.csv",row.names = F)
 usethis::use_data(sptable, overwrite = TRUE)
 
+#species in sptable, but never caught
+setdiff(sptable$SPECIES, SPECIES_CODES$SPECIES)
+# krill 791 1759 2060 2836 (not in sptable_lw)
+# myctophids 331 510 2808 (not in sptable_lw)
+# rockfishes 579 581 585 586 587 588 589 590 591 596 598 600 602 605 608 613 614 617 622 623 625 631 632 633 634
+
 #rockfish length-weight groups
 rflwgroups<-read.csv("data-raw/rockfish lw groups.csv", stringsAsFactors = F)
 usethis::use_data(rflwgroups, overwrite = TRUE)
@@ -41,6 +47,15 @@ usethis::use_data(rflwgroups, overwrite = TRUE)
 #lw regression species
 sptable_lw<-read.csv("data-raw/lw species table.csv", stringsAsFactors = F)
 usethis::use_data(sptable_lw, overwrite = TRUE)
+
+#species in sptable, but not in sptable_lw
+setdiff(sptable$SPECIES, sptable_lw$SPECIES)
+# krill 791 1759 2060 2836 (not in sptable_lw)
+# myctophids 331 510 2808 2847 (not in sptable_lw)
+# octopus  2844 2855
+# sanddabs 150
+# salps 2393
+# rockfishes 632 634
 
 #in lw regression table, but:
 #never caught
