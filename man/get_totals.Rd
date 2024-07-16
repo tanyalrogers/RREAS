@@ -8,7 +8,8 @@ get_totals(
   speciestable,
   datasets = "RREAS",
   startyear = 1983,
-  what = c("abundance", "biomass", "100day")
+  what = c("abundance", "biomass", "100day"),
+  haultable = HAULSTANDARD
 )
 }
 \arguments{
@@ -21,6 +22,11 @@ be specified. Options are "RREAS","ADAMS","PWCC","NWFSC". If unspecified, just u
 
 \item{what}{What totals you want, either "abundance","biomass", or "100day".
 Defaults to "abundance".}
+
+\item{haultable}{The table of hauls from which to obtain data. Defaults to
+HAULSTANDARD. If you do not want to use HAULSTANDARD, you
+can specify another table here, but it should have all of the same columns as
+HAULSTANDARD.}
 }
 \value{
 A dataframe with haul information, NAME, and totals. If "abundance"
@@ -105,6 +111,14 @@ length defaults to 0 and max length to Inf (in other words, no constraints).
 
 If multiple datasets are specified, these will be combined in the output table (column SURVEY
 will indicate origin).
+
+If you want to pull data for hauls other than those in HAULSTANDARD, another table
+can be supplied under \code{haultable}, but it should have all of the same columns as
+HAULSTANDARD (extra columns are ok). For example, you could use HAULDEPTHSTRATIFIED
+(see \code{\link{load_depth_stratified_tows}}), or a subset of HAULSTANDARD. If you specify an
+alternate \code{haultable}, \code{datasets} will be reset (if necessary) to whichever ones appear
+in the SURVEY column of the alternate \code{haultable}. So, it is ok for multiple SURVEYs to
+be included.
 }
 \examples{
 \dontrun{

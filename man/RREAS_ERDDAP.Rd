@@ -36,13 +36,13 @@ Data frames with some combination of the following fields
 \item{STD_LENGTH}{Standard length (mm)}
 }
 
-An object of class \code{data.frame} with 2909 rows and 14 columns.
+An object of class \code{data.frame} with 3211 rows and 14 columns.
 
-An object of class \code{data.frame} with 2909 rows and 17 columns.
+An object of class \code{data.frame} with 3211 rows and 17 columns.
 
-An object of class \code{data.frame} with 45905 rows and 5 columns.
+An object of class \code{data.frame} with 51202 rows and 5 columns.
 
-An object of class \code{data.frame} with 193047 rows and 5 columns.
+An object of class \code{data.frame} with 223936 rows and 5 columns.
 
 An object of class \code{data.frame} with 320 rows and 7 columns.
 }
@@ -64,7 +64,7 @@ SPECIES_CODES_ERDDAP
 \description{
 RREAS data tables pulled from ERDDAP. These are reformatted as relational tables
 matching the format of the table in the database. Data on ERDDAP begins
-in 1990 and ends about 4 years from the present.
+in 1990 and ends about 2 years from the present.
 }
 \details{
 Contains additional SPECIES/MATURITY categories 1472/T (total krill)

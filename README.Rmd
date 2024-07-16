@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# RREAS
+# RREAS <img src='man/figures/rreas-logo.png' align="right" style="height:139px;"/>
 
 <!-- badges: start -->
 <!-- badges: end -->
@@ -28,6 +28,8 @@ To cite this dataset, please cite:
 Sakuma, K.M., Field, J.C., Mantua, N.J., Ralston, S., Marinovic, B.B. and Carrion, C.N. (2016) Anomalous epipelagic micronekton assemblage patterns in the neritic waters of the California Current in spring 2015 during a period of extreme ocean conditions. CalCOFI Rep. 57:163-183
 
 To cite this software package, use `citation(package = "RREAS")`.
+
+Juvenile cowcod illustration in our logo by Sophie Webb.  
 
 ## Installation
 
@@ -67,7 +69,7 @@ To load data from a local MS Access Database, you will need to specify the file 
 ```{r dataload}
 #replace the file paths with those for your machine
 #any previously loaded tables with the same name in your workspace will be overwritten
-load_mdb(mdb_path="C:/Users/trogers/Documents/Rockfish/RREAS/Survey data/juv_cruise_backup28MAR23.mdb",
+load_mdb(mdb_path="C:/Users/trogers/Documents/Rockfish/RREAS/Survey data/juv_cruise_backup10JAN24.mdb",
          krill_len_path="C:/Users/trogers/Documents/Rockfish/Index generation/length weight/krill_lengths.csv")
 ls(name = .GlobalEnv) #list objects in your workspace
 ```
@@ -78,7 +80,7 @@ To load data from multiple surveys, specify which ones under `datasets`. If you 
 
 ```{r dataload2}
 #replace the file paths with those for your machine
-load_mdb(mdb_path="C:/Users/trogers/Documents/Rockfish/RREAS/Survey data/juv_cruise_backup28MAR23.mdb",
+load_mdb(mdb_path="C:/Users/trogers/Documents/Rockfish/RREAS/Survey data/juv_cruise_backup10JAN24.mdb",
          krill_len_path="C:/Users/trogers/Documents/Rockfish/Index generation/length weight/krill_lengths.csv",
          datasets = c("RREAS","ADAMS","PWCC","NWFSC"),
          activestationsonly = TRUE)
@@ -147,13 +149,14 @@ sptable_rockfish100
 
 ### Getting totals
 
-The function `get_totals` has 4 inputs:  
+The function `get_totals` has 5 inputs:  
 - `speciestable`: The species table data frame   
 - `datasets`: Which datasets you want to use (defaults to RREAS only). Datasets have to be loaded to use them.  
 - `startyear`: Start year (optional). Defaults to 1983.  
-- `what`: What kind of total you want, either "abundance","biomass", or "100day". Defaults to "abundance". 
+- `what`: What kind of total you want, either "abundance","biomass", or "100day". Defaults to "abundance".  
+- `haultable`: Table of hauls to from which to obtain totals. Defaults to HAULSTANDARD.
 
-Values will be generated for each haul in HAULSTANDARD. 
+Values will be generated for each haul in HAULSTANDARD, unless another table is specified under `haultable`. See `help(get_totals)` for more detail.  
 
 If a station was sampled, but the requested species was *not counted* at the time, it will appear as an NA. If the species was counted but was *not present*, it will appear as 0. If the species was counted but the counts numbers are unreliable (the case for some species prior to 1990, presence/absence will still be reliable), a message will be displayed. Description of additional irregularities in species classification can be found in the `sptable` documentation and in the SPECIES_CODES table. **It your responsibility to know when your focal species were or were not being recorded.**
 
@@ -184,7 +187,7 @@ tail(rockfish100equiv)
 
 ### Getting distributions
 
-The function `get_distributions` has the same 4 inputs, except `what` should be either "size", "mass", or "age". As with `get_totals`, regressions must exist for mass and age distributions.
+The function `get_distributions` has the same 5 inputs, except `what` should be either "size", "mass", or "age". As with `get_totals`, regressions must exist for mass and age distributions.
 
 If a haul had no fish, it will appear in the output dataset (with TOTAL_NO=0). If a haul had fish, but no fish were measured, there will be a TOTAL_NO>0, NMEAS will be 0, and there will be a single length/mass/age entry for that haul, which will be the average values used as a substitute.
 
@@ -250,6 +253,35 @@ ggplot(rf100plot,aes(y=N100_INDEX_SC,x=YEAR, group=COMMON, color=COMMON)) +
   theme_bw() +
   labs(x="Year", y="log 100-day standardized abundance", color="Rockfish species")
 
+```
+
+## Depth-stratified tows
+
+RREAS standard tows are conducted at 30 m headrope depth (DEPTH_STRATA 2), with the exception of stations with a bottom depth of less than 60 m, which are towed at 10 m headrope depth (DEPTH_STRATA 1). These are the tows which appear in HAULSTANDARD.
+
+Historically, mostly before the coastwide expansion in 2004, multiple depth strata (DEPTH_STRATA 1: 10 m, DEPTH_STRATA 2: 30 m, DEPTH_STRATA 3: 90 m) were sampled in succession at specific stations, mostly at stations 110, 125, 133, and 170, but occassionally others. The function `load_depth_stratified_tows` pulls out these depth-stratified tows into the table HAULDEPTHSTRATIFED. It has the same format as HAULSTANDARD, but with a few extra columns: DEPTH_STRATA, SWEEP (indicates which of the 3 passes the sampling is from; there is generally one set of depth-stratified tows per sweep, but not always), and SWEEP_SEP (separates cases in which there are multiple sets of depth stratified tows per sweep, and sets of depth stratified tows where SWEEP in NA, which occurs after 2004; otherwise equal to SWEEP). Each set of consecutive depth stratified tows will have a unique CRUISE/STATION/SWEEP_SEP value.
+
+HAULDEPTHSTRATIFED can be passed to `get_totals` or `get_distributions` to get catch data from these hauls instead of HAULSTANDARD by supplying it under `haultable`. Note that all of the depth-stratified tows are not present in the ERDDAP dataset.
+
+Note that to get *all* of the depth-stratified tows, you have to include the non-active stations (`activestationsonly = FALSE`).
+
+```{r}
+load_mdb(mdb_path="C:/Users/trogers/Documents/Rockfish/RREAS/Survey data/juv_cruise_backup10JAN24.mdb",
+         activestationsonly = FALSE)
+load_depth_stratified_tows()
+str(HAULDEPTHSTRATIFIED)
+
+anchovyabund_ds <- get_totals(anchovytable, what = "abundance", haultable = HAULDEPTHSTRATIFIED)
+
+#to get depth stratified tows with all 3 strata sampled
+HAULDEPTHSTRATIFIED=HAULDEPTHSTRATIFIED %>% group_by(CRUISE,STATION,SWEEP_SEP) %>%
+  mutate(ustrata=length(unique(DEPTH_STRATA)))
+filter(HAULDEPTHSTRATIFIED, ustrata==3) %>% nrow()
+filter(HAULDEPTHSTRATIFIED, ustrata==3 & YEAR>=1990) %>% nrow()
+
+#see which tows have CTDs
+HAULDEPTHSTRATIFIED=HAULDEPTHSTRATIFIED %>%
+  left_join(HAUL %>% select(CRUISE, HAUL_NO, CTD_INDEX), by = c("CRUISE", "HAUL_NO"))
 ```
 
 

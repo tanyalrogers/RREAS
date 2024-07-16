@@ -48,6 +48,8 @@ For northern lampfish (661) and California lanternfish (669), data from both
 species are pooled for the regression. Unknown myctophids (407) will use
 this regression.
 
+For speckled sanddab (148), the regression for pacific sanddab (147) is used.
+
 For octopus (2026), which has weight but no length data, the mean weight is
 used.
 

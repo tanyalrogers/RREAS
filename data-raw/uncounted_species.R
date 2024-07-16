@@ -12,4 +12,8 @@ uncounted=uncounted0[,c("SPECIES","CRUISE")]
 unreliable0=readxl::read_xlsx("data-raw/MWT species NA cruises.xlsx", sheet=2)
 unreliable=unreliable0[,c("SPECIES","CRUISE")]
 
-usethis::use_data(uncounted, unreliable, internal = TRUE)
+# List of depth stratified tows
+
+ds_tows=read.csv("data-raw/depth_stratified_final.csv")
+
+usethis::use_data(uncounted, unreliable, ds_tows, internal = TRUE, overwrite = TRUE)

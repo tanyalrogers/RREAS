@@ -8,7 +8,8 @@ get_distributions(
   speciestable,
   datasets = "RREAS",
   startyear = 1983,
-  what = c("size", "mass", "age")
+  what = c("size", "mass", "age"),
+  haultable = HAULSTANDARD
 )
 }
 \arguments{
@@ -22,6 +23,11 @@ unspecified, just uses "RREAS".}
 
 \item{what}{What type of distribution you want, either "size", "mass", or
 "age".}
+
+\item{haultable}{The table of hauls from which to obtain data. Defaults to
+HAULSTANDARD. If you do not want to use HAULSTANDARD, you
+can specify another table here, but it should have all of the same columns as
+HAULSTANDARD.}
 }
 \value{
 A dataframe with haul information, NAME, TOTAL_NO, NMEAS (number

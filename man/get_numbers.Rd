@@ -9,6 +9,7 @@ get_numbers(
   datasets = "RREAS",
   startyear = 1983,
   what = c("abundance", "biomass", "100day"),
+  haultable = HAULSTANDARD,
   aggregate = TRUE
 )
 }
@@ -21,6 +22,11 @@ be specified. Options are "RREAS","ADAMS","PWCC","NWFSC". If unspecified, just u
 \item{startyear}{Start year (default is 1983).}
 
 \item{what}{Either "abundance","biomass", or "100day".}
+
+\item{haultable}{The table of hauls from which to obtain data. Defaults to
+HAULSTANDARD. If you do not want to use HAULSTANDARD, you
+can specify another table here, but it should have all of the same columns as
+HAULSTANDARD.}
 
 \item{aggregate}{If TRUE, function will produce total abundance if
 what="abundance", total biomass if what="biomass", and 100 day standardized

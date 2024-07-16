@@ -103,7 +103,7 @@
 #'
 #' RREAS data tables pulled from ERDDAP. These are reformatted as relational tables
 #' matching the format of the table in the database. Data on ERDDAP begins
-#' in 1990 and ends about 4 years from the present.
+#' in 1990 and ends about 2 years from the present.
 #'
 #' @name RREAS_ERDDAP
 #' @aliases CATCH_ERDDAP HAUL_ERDDAP HAULSTANDARD_ERDDAP SPECIES_CODES_ERDDAP

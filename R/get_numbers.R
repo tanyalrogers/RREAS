@@ -72,12 +72,24 @@
 #' If multiple datasets are specified, these will be combined in the output table (column SURVEY
 #' will indicate origin).
 #'
+#' If you want to pull data for hauls other than those in HAULSTANDARD, another table
+#' can be supplied under `haultable`, but it should have all of the same columns as
+#' HAULSTANDARD (extra columns are ok). For example, you could use HAULDEPTHSTRATIFIED
+#' (see [`load_depth_stratified_tows`]), or a subset of HAULSTANDARD. If you specify an
+#' alternate `haultable`, `datasets` will be reset (if necessary) to whichever ones appear
+#' in the SURVEY column of the alternate `haultable`. So, it is ok for multiple SURVEYs to
+#' be included.
+#'
 #' @param speciestable Dataframe containing species information (see Details).
 #' @param datasets Character vector indicating which dataset(s) to use. Multiple dataset can
 #'   be specified. Options are "RREAS","ADAMS","PWCC","NWFSC". If unspecified, just uses RREAS.
 #' @param startyear Start year (default is 1983).
 #' @param what What totals you want, either "abundance","biomass", or "100day".
 #'   Defaults to "abundance".
+#' @param haultable The table of hauls from which to obtain data. Defaults to
+#'   HAULSTANDARD. If you do not want to use HAULSTANDARD, you
+#'   can specify another table here, but it should have all of the same columns as
+#'   HAULSTANDARD.
 #'
 #' @return A dataframe with haul information, NAME, and totals. If "abundance"
 #'   is requested, will include column TOTAL_NO. If "biomass" is requested, will
@@ -108,16 +120,16 @@
 #'   datasets=c("RREAS","ADAMS","PWCC","NWFSC"))
 #' }
 get_totals=function(speciestable,datasets="RREAS",startyear=1983,
-                    what=c("abundance","biomass","100day")) {
+                    what=c("abundance","biomass","100day"),haultable=HAULSTANDARD) {
   what=match.arg(what)
   if(what=="abundance") {
-    out=get_numbers(speciestable,datasets,startyear,what="abundance",aggregate=TRUE)
+    out=get_numbers(speciestable,datasets,startyear,what="abundance",haultable=haultable,aggregate=TRUE)
   }
   if(what=="biomass") {
-    out=get_numbers(speciestable,datasets,startyear,what="biomass",aggregate=TRUE)
+    out=get_numbers(speciestable,datasets,startyear,what="biomass",haultable=haultable,aggregate=TRUE)
   }
   if(what=="100day") {
-    out=get_numbers(speciestable,datasets,startyear,what="100day",aggregate=TRUE)
+    out=get_numbers(speciestable,datasets,startyear,what="100day",haultable=haultable,aggregate=TRUE)
   }
   return(out)
 }
@@ -152,6 +164,10 @@ get_totals=function(speciestable,datasets="RREAS",startyear=1983,
 #' @param startyear Start year (default is 1983).
 #' @param what What type of distribution you want, either "size", "mass", or
 #'   "age".
+#' @param haultable The table of hauls from which to obtain data. Defaults to
+#'   HAULSTANDARD. If you do not want to use HAULSTANDARD, you
+#'   can specify another table here, but it should have all of the same columns as
+#'   HAULSTANDARD.
 #'
 #' @return A dataframe with haul information, NAME, TOTAL_NO, NMEAS (number
 #'   measured), EXP (expansion factor), SP_NO (specimen number), and values for
@@ -177,16 +193,16 @@ get_totals=function(speciestable,datasets="RREAS",startyear=1983,
 #' rockfish100agedist <- get_distributions(sptable_rockfish100, what = "age")
 #' }
 get_distributions=function(speciestable,datasets="RREAS",startyear=1983,
-                          what=c("size","mass","age")) {
+                          what=c("size","mass","age"),haultable=HAULSTANDARD) {
   what=match.arg(what)
   if(what=="size") {
-    out=get_numbers(speciestable,datasets,startyear,what="abundance",aggregate=FALSE)
+    out=get_numbers(speciestable,datasets,startyear,what="abundance",haultable=haultable,aggregate=FALSE)
   }
   if(what=="mass") {
-    out=get_numbers(speciestable,datasets,startyear,what="biomass",aggregate=FALSE)
+    out=get_numbers(speciestable,datasets,startyear,what="biomass",haultable=haultable,aggregate=FALSE)
   }
   if(what=="age") {
-    out=get_numbers(speciestable,datasets,startyear,what="100day",aggregate=FALSE)
+    out=get_numbers(speciestable,datasets,startyear,what="100day",haultable=haultable,aggregate=FALSE)
   }
   return(out)
 }
@@ -208,6 +224,10 @@ get_distributions=function(speciestable,datasets="RREAS",startyear=1983,
 #'   be specified. Options are "RREAS","ADAMS","PWCC","NWFSC". If unspecified, just uses RREAS.
 #' @param startyear Start year (default is 1983).
 #' @param what Either "abundance","biomass", or "100day".
+#' @param haultable The table of hauls from which to obtain data. Defaults to
+#'   HAULSTANDARD. If you do not want to use HAULSTANDARD, you
+#'   can specify another table here, but it should have all of the same columns as
+#'   HAULSTANDARD.
 #' @param aggregate If TRUE, function will produce total abundance if
 #'   what="abundance", total biomass if what="biomass", and 100 day standardized
 #'   abundance if what="100day". If FALSE, function will produce size
@@ -218,7 +238,7 @@ get_distributions=function(speciestable,datasets="RREAS",startyear=1983,
 #' @seealso [`get_totals`], [`get_distributions`]
 #' @keywords functions
 get_numbers=function(speciestable,datasets="RREAS",startyear=1983,
-                     what=c("abundance","biomass","100day"),aggregate=TRUE) {
+                     what=c("abundance","biomass","100day"),haultable=HAULSTANDARD,aggregate=TRUE) {
   what=match.arg(what)
 
   if(!all(datasets %in% c("RREAS","ADAMS","NWFSC","PWCC"))) {
@@ -242,26 +262,52 @@ get_numbers=function(speciestable,datasets="RREAS",startyear=1983,
   speciestable$MINLEN[is.na(speciestable$MINLEN)]=0
   speciestable$MAXLEN[is.na(speciestable$MAXLEN)]=Inf
 
-  #select datasets
-  HAULSTANDARDall=NULL
+  if(identical(haultable, HAULSTANDARD)) {
+
+    #if using HAULSTANDARD
+    #select datasets
+    HAULSTANDARDall=NULL
+    if("RREAS" %in% datasets) {
+      HAULSTANDARDall=rbind(HAULSTANDARDall,HAULSTANDARD)
+    }
+    if("ADAMS" %in% datasets) {
+      HAULSTANDARDall=rbind(HAULSTANDARDall,HAULSTANDARD_ADAMS)
+    }
+    if("PWCC" %in% datasets) {
+      HAULSTANDARDall=rbind(HAULSTANDARDall,HAULSTANDARD_PWCC)
+    }
+    if("NWFSC" %in% datasets) {
+      HAULSTANDARDall=rbind(HAULSTANDARDall,HAULSTANDARD_NWFSC)
+    }
+
+  } else {
+
+    #if using custom table
+    surveys=unique(haultable$SURVEY)
+    if(!identical(surveys,datasets)) {
+      message("Setting datasets to ", paste(surveys, collapse = ", ")," which are present in haultable")
+      datasets=surveys
+    }
+    HAULSTANDARDall=haultable
+
+  }
+
+  #pull length and catch datasets
   LENGTHall=NULL
   CATCHall=NULL
   if("RREAS" %in% datasets) {
-    HAULSTANDARDall=rbind(HAULSTANDARDall,HAULSTANDARD)
     LENGTH$SURVEY="RREAS"
     LENGTHall=rbind(LENGTHall,LENGTH)
     CATCH$SURVEY="RREAS"
     CATCHall=rbind(CATCHall,CATCH)
   }
   if("ADAMS" %in% datasets) {
-    HAULSTANDARDall=rbind(HAULSTANDARDall,HAULSTANDARD_ADAMS)
     LENGTH_ADAMS$SURVEY="ADAMS"
     LENGTHall=rbind(LENGTHall,LENGTH_ADAMS)
     CATCH_ADAMS$SURVEY="ADAMS"
     CATCHall=rbind(CATCHall,CATCH_ADAMS)
   }
   if("PWCC" %in% datasets) {
-    HAULSTANDARDall=rbind(HAULSTANDARDall,HAULSTANDARD_PWCC)
     colnames(LENGTH_PWCC)<-sub("PWCC_","",colnames(LENGTH_PWCC))
     LENGTH_PWCC$SURVEY="PWCC"
     LENGTHall=rbind(LENGTHall,LENGTH_PWCC)
@@ -270,7 +316,6 @@ get_numbers=function(speciestable,datasets="RREAS",startyear=1983,
     CATCHall=rbind(CATCHall,CATCH_PWCC)
   }
   if("NWFSC" %in% datasets) {
-    HAULSTANDARDall=rbind(HAULSTANDARDall,HAULSTANDARD_NWFSC)
     LENGTH_NWFSC$SURVEY="NWFSC"
     LENGTHall=rbind(LENGTHall,LENGTH_NWFSC)
     CATCH_NWFSC$SURVEY="NWFSC"
