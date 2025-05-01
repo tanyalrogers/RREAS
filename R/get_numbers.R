@@ -377,6 +377,10 @@ get_numbers=function(speciestable,datasets="RREAS",startyear=1983,
       next
     }
 
+    if(fspecies %in% c(1816, 1847, 1473) & !exists("krill_length")) {
+      stop("krill_length file required for this query")
+    }
+
     #get length data for species i
     if(exists("krill_length")) {
       meankrilllength<-mean(krill_length$STD_LENGTH)

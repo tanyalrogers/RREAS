@@ -192,6 +192,12 @@ get_la_regression=function() {
     #convert SPECIES and YEAR to factor
     dplyr::mutate(YEAR=factor(YEAR),SPECIES=factor(SPECIES))
 
+  if("DUPLICATE" %in% colnames(AGE)) {
+    AGEsub <- AGEsub %>%
+      # remove duplicates (column added in 2024)
+      dplyr::filter(DUPLICATE==0)
+  }
+
   rockfishes <- AGEsub %>%
     dplyr::filter(SPECIES %in% sptable_rockfish100$SPECIES)
   lingcod <- AGEsub %>%

@@ -177,6 +177,8 @@ load_mdb=function(mdb_path,atsea_path=NULL,datasets="RREAS",krill_len_path=NULL,
       dplyr::filter(!is.na(LONDD)) %>% #delete 1 station with missing lon (entry 895)
       dplyr::select(SURVEY,CRUISE,HAUL_NO,YEAR,MONTH,JDAY,HAUL_DATE,STATION,NET_IN_LATDD,NET_IN_LONDD,
                     LATDD,LONDD,BOTTOM_DEPTH,STATION_BOTTOM_DEPTH,STRATA,AREA,ACTIVE)
+
+    message("Note: HAULSTANDARD_PWCC has missing STATION numbers.")
   }
 
   if("NWFSC" %in% datasets) {
@@ -221,13 +223,16 @@ load_mdb=function(mdb_path,atsea_path=NULL,datasets="RREAS",krill_len_path=NULL,
       dplyr::select(SURVEY,CRUISE,HAUL_NO,YEAR,MONTH,JDAY,HAUL_DATE,STATION,NET_IN_LATDD,NET_IN_LONDD,
                     LATDD,LONDD,BOTTOM_DEPTH,STATION_BOTTOM_DEPTH,STRATA,AREA,ACTIVE)
     #NWFSC and RREAS stations in NWFSC table
-    HAULSTANDARD_NWFSC<-dplyr::inner_join(HAUL_NWFSC, rbind(standardstations,standardstations_NWFSC), by="STATION") %>%
+    HAULSTANDARD_NWFSC<-dplyr::left_join(HAUL_NWFSC, rbind(standardstations,standardstations_NWFSC), by="STATION") %>%
       dplyr::filter(STANDARD_STATION==1) %>%
       dplyr::mutate(SURVEY="NWFSC") %>%
       dplyr::select(SURVEY,CRUISE,HAUL_NO,YEAR,MONTH,JDAY,HAUL_DATE,STATION,NET_IN_LATDD,NET_IN_LONDD,
                     LATDD,LONDD,BOTTOM_DEPTH,STATION_BOTTOM_DEPTH,STRATA,AREA,ACTIVE)
     HAULSTANDARD_NWFSC<<-rbind(HAULSTANDARD_NWFSC,HAULSTANDARD_NWFSC_RREAS) %>%
       dplyr::arrange(YEAR, HAUL_NO)
+    if(any(is.na(HAULSTANDARD_NWFSC$STATION))) {
+      message("Note: HAULSTANDARD_NWFSC has missing STATION numbers.")
+    }
   }
 
   RODBC::odbcCloseAll()

@@ -69,7 +69,7 @@ To load data from a local MS Access Database, you will need to specify the file 
 ```{r dataload}
 #replace the file paths with those for your machine
 #any previously loaded tables with the same name in your workspace will be overwritten
-load_mdb(mdb_path="C:/Users/trogers/Documents/Rockfish/RREAS/Survey data/juv_cruise_backup10JAN24.mdb",
+load_mdb(mdb_path="C:/Users/trogers/Documents/Rockfish/RREAS/Survey data/juv_cruise_backup02APR25.mdb",
          krill_len_path="C:/Users/trogers/Documents/Rockfish/Index generation/length weight/krill_lengths.csv")
 ls(name = .GlobalEnv) #list objects in your workspace
 ```
@@ -80,14 +80,14 @@ To load data from multiple surveys, specify which ones under `datasets`. If you 
 
 ```{r dataload2}
 #replace the file paths with those for your machine
-load_mdb(mdb_path="C:/Users/trogers/Documents/Rockfish/RREAS/Survey data/juv_cruise_backup10JAN24.mdb",
+load_mdb(mdb_path="C:/Users/trogers/Documents/Rockfish/RREAS/Survey data/juv_cruise_backup02APR25.mdb",
          krill_len_path="C:/Users/trogers/Documents/Rockfish/Index generation/length weight/krill_lengths.csv",
          datasets = c("RREAS","ADAMS","PWCC","NWFSC"),
          activestationsonly = TRUE)
 ls(name = .GlobalEnv) #list objects in your workspace
 ```
 
-There is another, optional argument to load `atsea.mdb` and append the current year's data. 
+There is another, optional argument to load `atsea.mdb` and append the current year's data if it is not in the primary database.
 
 See `help(load_mdb)` for more information.
 
@@ -218,6 +218,11 @@ Given an output table from `get_totals`, there is a function `get_logcpueindex` 
 library(ggplot2)
 library(dplyr)
 
+#Note that anchovyabund includes the NWFSC hauls and that the 2024 data have
+#some missing stations numbers that need to be filled in for get_logcpueindex to work. This will otherwise produce an error.
+anchovyabund$STATION=ifelse(is.na(anchovyabund$STATION),
+                            paste0(anchovyabund$CRUISE,anchovyabund$HAUL_NO),
+                            anchovyabund$STATION)
 anchovyindex1 <- get_logcpueindex(anchovyabund, var = "TOTAL_NO", group="STRATA")
 head(anchovyindex1)
 
@@ -266,7 +271,7 @@ HAULDEPTHSTRATIFED can be passed to `get_totals` or `get_distributions` to get c
 Note that to get *all* of the depth-stratified tows, you have to include the non-active stations (`activestationsonly = FALSE`).
 
 ```{r}
-load_mdb(mdb_path="C:/Users/trogers/Documents/Rockfish/RREAS/Survey data/juv_cruise_backup10JAN24.mdb",
+load_mdb(mdb_path="C:/Users/trogers/Documents/Rockfish/RREAS/Survey data/juv_cruise_backup02APR25.mdb",
          activestationsonly = FALSE)
 load_depth_stratified_tows()
 str(HAULDEPTHSTRATIFIED)

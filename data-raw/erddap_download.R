@@ -7,7 +7,7 @@ library(tidyr)
 library(lubridate)
 library(RREAS)
 
-load_mdb(mdb_path = "C:/Users/trogers/Documents/Rockfish/RREAS/Survey data/juv_cruise_backup28MAR23.mdb",
+load_mdb(mdb_path = "C:/Users/trogers/Documents/Rockfish/RREAS/Survey data/juv_cruise_backup02APR25.mdb",
          datasets = "RREAS",
          activestationsonly = T)
 
@@ -17,7 +17,7 @@ usethis::use_data(SPECIES_CODES_ERDDAP, overwrite = TRUE)
 
 #haul and catch data
 
-download.file(url="https://oceanview.pfeg.noaa.gov/erddap/tabledap/FED_Rockfish_Catch.csv?time%2Clatitude%2Clongitude%2Ccruise%2Chaul_no%2Cvessel%2Cstation%2Ccatch%2Cspecies_code%2Cmaturity%2Cstation_latitude%2Cstation_longitude%2Cstation_bottom_depth%2Carea%2Cstrata%2Cbottom_depth%2Cstation_active&time%3E=1990-05-13&time%3C=2022-06-24T03%3A55%3A09Z",
+download.file(url="https://oceanview.pfeg.noaa.gov/erddap/tabledap/FED_Rockfish_Catch.csv?time%2Clatitude%2Clongitude%2Ccruise%2Chaul_no%2Cvessel%2Cstation%2Ccatch%2Cspecies_code%2Cmaturity%2Cstation_latitude%2Cstation_longitude%2Cstation_bottom_depth%2Carea%2Cstrata%2Cbottom_depth%2Cstation_active&time%3E=1990-05-13&time%3C=2023-06-21T01%3A23%3A00Z",
               destfile = "data-raw/erddap_catch.csv")
 
 # have to set end date 1 day later, or last haul does not download
@@ -62,12 +62,13 @@ HAUL_ERDDAP$JDAY<-lubridate::yday(HAUL_ERDDAP$HAUL_DATE)
 HAULSTANDARD_ERDDAP <- HAUL_ERDDAP %>%
   dplyr::mutate(SURVEY="RREAS") %>%
   dplyr::select(SURVEY,CRUISE,HAUL_NO,YEAR,MONTH,JDAY,HAUL_DATE,STATION,NET_IN_LATDD,NET_IN_LONDD,
-                LATDD,LONDD,BOTTOM_DEPTH,STATION_BOTTOM_DEPTH,STRATA,AREA,ACTIVE)
+                LATDD,LONDD,BOTTOM_DEPTH,STATION_BOTTOM_DEPTH,STRATA,AREA,ACTIVE) %>%
+  dplyr::arrange(YEAR)
 
 usethis::use_data(HAULSTANDARD_ERDDAP, overwrite = TRUE)
 
 #length data
-download.file(url="https://oceanview.pfeg.noaa.gov/erddap/tabledap/FED_Rockfish_Length.csv?cruise%2Chaul_no%2Cstd_length%2Cspecies_code%2Cmaturity&time%3E=1990-05-13&time%3C=2022-06-24T03%3A55%3A09Z",
+download.file(url="https://oceanview.pfeg.noaa.gov/erddap/tabledap/FED_Rockfish_Length.csv?cruise%2Chaul_no%2Cstd_length%2Cspecies_code%2Cmaturity&time%3E=1990-05-13&time%3C=2023-06-21T01%3A23%3A00Z",
               destfile = "data-raw/erddap_length.csv")
 
 cnames2=names(read.csv("data-raw/erddap_length.csv", stringsAsFactors = F, header = T, nrows = 1))

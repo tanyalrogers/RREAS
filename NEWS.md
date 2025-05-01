@@ -1,3 +1,8 @@
+# RREAS 0.1.5
+* Update ERDAPP data through 2023
+* Add more messages to prevent inadvertent mistakes
+* Update to accomodate missing stations numbers in 2024 NWFSC survey
+
 # RREAS 0.1.2
 
 * Update ERDAPP data (still 1990-2018, but with errors fixed)
