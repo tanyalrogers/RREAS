@@ -36,15 +36,15 @@ Data frames with some combination of the following fields
 \item{STD_LENGTH}{Standard length (mm)}
 }
 
-An object of class \code{data.frame} with 3211 rows and 14 columns.
+An object of class \code{data.frame} with 3274 rows and 14 columns.
 
-An object of class \code{data.frame} with 3211 rows and 17 columns.
+An object of class \code{data.frame} with 3274 rows and 17 columns.
 
-An object of class \code{data.frame} with 51202 rows and 5 columns.
+An object of class \code{data.frame} with 52604 rows and 5 columns.
 
-An object of class \code{data.frame} with 223936 rows and 5 columns.
+An object of class \code{data.frame} with 231494 rows and 5 columns.
 
-An object of class \code{data.frame} with 320 rows and 7 columns.
+An object of class \code{data.frame} with 252 rows and 6 columns.
 }
 \source{
 \url{https://oceanview.pfeg.noaa.gov/erddap/tabledap/FED_Rockfish_Catch.html}

@@ -5,7 +5,7 @@
 \alias{rflwgroups}
 \title{Rockfish length-weight groupings}
 \format{
-A data frame with 12 rows and 3 variables:
+A data frame with 62 rows and 6 variables:
 \describe{
 \item{SPECIES}{Species code}
 \item{COMMON_NAME}{Common name}

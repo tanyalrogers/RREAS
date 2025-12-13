@@ -5,7 +5,7 @@
 \alias{sptable_lw}
 \title{Species table for RREAS species and species groups (biomass)}
 \format{
-A data frame with 12 rows and 3 variables:
+A data frame with 113 rows and 3 variables:
 \describe{
 \item{SPECIES}{Species code}
 \item{MATURITY}{Maturity code}

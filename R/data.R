@@ -59,7 +59,7 @@
 #' unknown dragonfish.
 #'
 #'
-#' @format A data frame with 12 rows and 3 variables:
+#' @format A data frame with 104 rows and 3 variables:
 #' \describe{
 #'   \item{SPECIES}{Species code}
 #'   \item{MATURITY}{Maturity code}
@@ -72,7 +72,7 @@
 #'
 #' Table of species and species groups for which biomass estimates can be obtained.
 #'
-#' @format A data frame with 12 rows and 3 variables:
+#' @format A data frame with 113 rows and 3 variables:
 #' \describe{
 #'   \item{SPECIES}{Species code}
 #'   \item{MATURITY}{Maturity code}
@@ -87,7 +87,7 @@
 #' should be pooled for regressions and used as proxies for other species.
 #' There are currently 4 groupings based on general body shape.
 #'
-#' @format A data frame with 12 rows and 3 variables:
+#' @format A data frame with 62 rows and 6 variables:
 #' \describe{
 #'   \item{SPECIES}{Species code}
 #'   \item{COMMON_NAME}{Common name}
