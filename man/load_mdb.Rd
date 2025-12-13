@@ -10,7 +10,8 @@ load_mdb(
   datasets = "RREAS",
   krill_len_path = NULL,
   startyear = 1983,
-  activestationsonly = TRUE
+  activestationsonly = TRUE,
+  stdtimeperiodonly = TRUE
 )
 }
 \arguments{
@@ -28,8 +29,11 @@ to get krill biomass).
 
 \item{startyear}{Start year (default is 1983).}
 
-\item{activestationsonly}{Logical. Include only active stations in the resulting tables.
-ACTIVE is a column in HAULSTANDARD and can always be used to subset later.}
+\item{activestationsonly}{Logical. Include only active stations in HAULSTANDARD. Defaults to TRUE.
+If FALSE, the ACTIVE column can always be used to subset later.}
+
+\item{stdtimeperiodonly}{Logical. Include only surveys performed during the standard sampling
+time period in HAULSTANDARD (exclude early April surveys). Defaults to TRUE.}
 }
 \value{
 Tables are written to the global environment (and will overwrite any existing tables

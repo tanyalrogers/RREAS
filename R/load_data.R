@@ -26,8 +26,10 @@
 #'   to get krill biomass).
 #'   \emph{This argument will be removed once the krill lengths are added to the database.}
 #' @param startyear Start year (default is 1983).
-#' @param activestationsonly Logical. Include only active stations in the resulting tables.
-#'   ACTIVE is a column in HAULSTANDARD and can always be used to subset later.
+#' @param activestationsonly Logical. Include only active stations in HAULSTANDARD. Defaults to TRUE.
+#'   If FALSE, the ACTIVE column can always be used to subset later.
+#' @param stdtimeperiodonly Logical. Include only surveys performed during the standard sampling
+#'   time period in HAULSTANDARD (exclude early April surveys). Defaults to TRUE.
 #' @return Tables are written to the global environment (and will overwrite any existing tables
 #'   with the same names). Diplays "Data loaded" if successful.
 #' @export
@@ -44,7 +46,7 @@
 #'   activestationsonly = F)
 #' }
 load_mdb=function(mdb_path,atsea_path=NULL,datasets="RREAS",krill_len_path=NULL,
-                  startyear=1983, activestationsonly=TRUE) {
+                  startyear=1983, activestationsonly=TRUE, stdtimeperiodonly=TRUE, devswitch=FALSE) {
 
   if(!file.exists(mdb_path)) {
     stop("Database not found. Check that the file path is correct.")
@@ -66,7 +68,7 @@ load_mdb=function(mdb_path,atsea_path=NULL,datasets="RREAS",krill_len_path=NULL,
   #RREAS standard stations
   standardstations<-RODBC::sqlQuery(channel, "SELECT * FROM dbo_STANDARD_STATIONS", stringsAsFactors = F)
   if(activestationsonly) {
-    standardstations<-dplyr::filter(standardstations,ACTIVE=="Y")
+    standardstations<-dplyr::filter(standardstations, ACTIVE=="Y")
   }
 
   on.exit(RODBC::odbcCloseAll()) #in case of errors
@@ -78,9 +80,11 @@ load_mdb=function(mdb_path,atsea_path=NULL,datasets="RREAS",krill_len_path=NULL,
     LENGTH <<- RODBC::sqlQuery(channel, "SELECT * FROM dbo_JUV_LENGTH", as.is=1, stringsAsFactors = F)
     #these tables only from RREAS main
     SPECIES_CODES <<- RODBC::sqlQuery(channel, "SELECT * FROM dbo_SPECIES_CODES", stringsAsFactors = F)
-    WEIGHT <<- RODBC::sqlQuery(channel, "SELECT * FROM dbo_JUV_WEIGHT", as.is=1, stringsAsFactors = F)
-    AGE <<- RODBC::sqlQuery(channel, "SELECT * FROM dbo_JUV_AGE", as.is=1, stringsAsFactors = F)
 
+    if(devswitch==FALSE) {
+      WEIGHT <<- RODBC::sqlQuery(channel, "SELECT * FROM dbo_JUV_WEIGHT", as.is=1, stringsAsFactors = F)
+      AGE <<- RODBC::sqlQuery(channel, "SELECT * FROM dbo_JUV_AGE", as.is=1, stringsAsFactors = F)
+    }
     #use DOORS_IN for missing NET_IN position, lag CRUISE 2001
     HAUL$NET_IN_LAT[is.na(HAUL$NET_IN_LAT)]<-HAUL$DOORS_IN_LAT[is.na(HAUL$NET_IN_LAT)]
     HAUL$NET_IN_LONG[is.na(HAUL$NET_IN_LONG)]<-HAUL$DOORS_IN_LONG[is.na(HAUL$NET_IN_LONG)]
@@ -100,10 +104,13 @@ load_mdb=function(mdb_path,atsea_path=NULL,datasets="RREAS",krill_len_path=NULL,
       dplyr::arrange(YEAR) %>%
       dplyr::filter(YEAR>=startyear) %>% #set start year
       dplyr::filter(STANDARD_STATION==1) %>%
-      dplyr::filter(!(CRUISE %in% c("8703","8804","9003"))) %>% #not real cruises
       dplyr::mutate(SURVEY="RREAS") %>%
       dplyr::select(SURVEY,CRUISE,HAUL_NO,YEAR,MONTH,JDAY,HAUL_DATE,STATION,NET_IN_LATDD,NET_IN_LONDD,
                     LATDD,LONDD,BOTTOM_DEPTH,STATION_BOTTOM_DEPTH,STRATA,AREA,ACTIVE)
+
+    if(stdtimeperiodonly) {
+      HAULSTANDARD<<-dplyr::filter(HAULSTANDARD, !(CRUISE %in% c("8703","8804","9003")))
+    }
   }
 
   if("ADAMS" %in% datasets) {
