@@ -62,6 +62,7 @@ SPECIES,MATURITY,NAME
 633,Y,YOY Rockfish
 2355,Y,YOY Rockfish
 84,U,Blacksmelt
+147,A,Adult Pacific sanddab
 147,Y,YOY Pacific sanddab
 148,Y,YOY Speckled sanddab
 147,Y,YOY Sanddabs
@@ -70,6 +71,7 @@ SPECIES,MATURITY,NAME
 209,A,Adult Anchovy
 209,Y,Total Anchovy
 209,A,Total Anchovy
+261,U,Goby
 345,U,California Smoothtongue
 382,Y,YOY Pacific Hake
 448,Y,YOY Lingcod

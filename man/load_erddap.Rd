@@ -2,7 +2,7 @@
 % Please edit documentation in R/load_data.R
 \name{load_erddap}
 \alias{load_erddap}
-\title{Load RREAS data from ERDDAP}
+\title{Load RREAS Trawl Data from ERDDAP}
 \usage{
 load_erddap()
 }
@@ -11,10 +11,10 @@ Tables are written to the global environment (and will overwrite any existing ta
 with the same names). Diplays "Data loaded" if successful.
 }
 \description{
-Loads the HAUL, CATCH, LENGTH, and SPECIES_CODES tables from the RREAS survey
+Loads the HAUL, CATCH, LENGTH, STATIONS, and SPECIES_CODES tables from the RREAS survey
 as currently stored in NOAA's ERDDAP database. These are reformatted as
 relational tables to match the format of the tables in the database. This
-dataset contains data from 1990 to 2018 and only from standard, active
+dataset contains data starting in 1990 and only from standard, active
 stations. The function also loads a HAULSTANDARD table with a standardized
 set of columns including YEAR, MONTH, JDAY, and lat/lon in decimal degrees.
 See \code{\link{RREAS_ERDDAP}} for metadata. This function has no arguments.
@@ -51,6 +51,6 @@ in the neritic waters of the California Current in spring 2015 during a
 period of extreme ocean conditions. CalCOFI Rep. 57:163-183
 }
 \seealso{
-\code{\link{load_mdb}}, \code{\link{RREAS_ERDDAP}}
+\code{\link{load_trawls}}, \code{\link{RREAS_ERDDAP}}
 }
 \keyword{functions}

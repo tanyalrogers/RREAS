@@ -99,17 +99,19 @@
 #' @keywords datasets
 "rflwgroups"
 
-#' RREAS data from ERDDAP
+#' RREAS data tables
 #'
-#' RREAS data tables pulled from ERDDAP. These are reformatted as relational tables
-#' matching the format of the table in the database. Data on ERDDAP begins
-#' in 1990 and ends about 2 years from the present.
+#' Meta-data for RREAS data tables. Additional details can be found in the data publication.
 #'
-#' @name RREAS_ERDDAP
-#' @aliases CATCH_ERDDAP HAUL_ERDDAP HAULSTANDARD_ERDDAP SPECIES_CODES_ERDDAP
+#' @name RREAS_TABLES
+#' @aliases STATIONS_RREAS SPECIES_CODES_RREAS CATCH_ERDDAP CATCH_RREAS HAUL_ERDDAP HAUL_RREAS
+#'   HAULSTANDARD_ERDDAP HAULSTANDARD_RREAS WEIGHT_RREAS CTD_HEADER CTD_CAST
 #'
-#' @details Contains additional SPECIES/MATURITY categories 1472/T (total krill)
-#'   and 1940/T (total rockfish).
+#' @details Data from ERDDAP are reformatted as relational tables matching the
+#'   format of the tables in the database. Data on ERDDAP begins in 1990 and
+#'   ends about 2 years from the present. The ERDDAP version contains additional
+#'   SPECIES/MATURITY categories 1472/T (total krill) and 1940/T (total
+#'   rockfish).
 #'
 #' @format Data frames with some combination of the following fields
 #' \describe{
@@ -145,13 +147,26 @@
 #' @keywords datasets
 NULL
 
-#' @rdname RREAS_ERDDAP
+#' @rdname RREAS_TABLES
+"STATIONS_RREAS"
+#' @rdname RREAS_TABLES
+"SPECIES_CODES_RREAS"
+#' @rdname RREAS_TABLES
 "HAUL_ERDDAP"
-#' @rdname RREAS_ERDDAP
+#' @rdname RREAS_TABLES
+"HAUL_RREAS"
+#' @rdname RREAS_TABLES
 "HAULSTANDARD_ERDDAP"
-#' @rdname RREAS_ERDDAP
+#' @rdname RREAS_TABLES
+"HAULSTANDARD_RREAS"
+#' @rdname RREAS_TABLES
 "CATCH_ERDDAP"
-#' @rdname RREAS_ERDDAP
+#' @rdname RREAS_TABLES
+"CATCH_RREAS"
+#' @rdname RREAS_TABLES
 "LENGTH_ERDDAP"
-#' @rdname RREAS_ERDDAP
-"SPECIES_CODES_ERDDAP"
+#' @rdname RREAS_TABLES
+"LENGTH_RREAS"
+#' @rdname RREAS_TABLES
+"WEIGHT_RREAS"
+

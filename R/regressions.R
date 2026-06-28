@@ -105,9 +105,8 @@ get_lw_regression=function(species, maturity, plot=F){
     len_to_wt<-function(length) {
       exp(predict(len_reg, newdata = data.frame(STD_LENGTH=length)))
     }
-  } else if(species==148) { #spec dab, use regression for pac dab
-    species=147
-    fwts<-subset(WEIGHT,SPECIES==species & MATURITY==maturity)
+  } else if(species %in% c(147,148)) { #use regression for pac dab for spec dab (combine A and Y lengths)
+    fwts<-subset(WEIGHT,SPECIES==147)
     len_reg<-lm(log(WEIGHT)~log(STD_LENGTH), data=fwts)
     len_to_wt<-function(length) {
       exp(predict(len_reg, newdata = data.frame(STD_LENGTH=length)))

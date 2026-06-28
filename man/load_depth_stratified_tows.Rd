@@ -13,7 +13,6 @@ with the same names). Diplays "HAULDEPTHSTRATIFED created." if successful.
 \description{
 Pulls out the subset of depth-stratified tows from the HAUL table. Creates the table
 HAULDEPTHSTRATIFED.
-\strong{This function requires a local copy of the RREAS MS Access Database.}
 }
 \details{
 RREAS standard tows are conducted at 30 m headrope depth (DEPTH_STRATA 2),

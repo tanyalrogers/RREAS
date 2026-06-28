@@ -2,7 +2,6 @@
 #'
 #' Pulls out the subset of depth-stratified tows from the HAUL table. Creates the table
 #' HAULDEPTHSTRATIFED.
-#' \strong{This function requires a local copy of the RREAS MS Access Database.}
 #'
 #' @details
 #'

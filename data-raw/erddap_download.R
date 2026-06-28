@@ -1,19 +1,11 @@
 #Download and save ERDDAP data to package
-#  Takes SPECIES_CODES table from database
+#  Takes SPECIES_CODES and STATIONS table from Dryad
 #  Formats data into relations tables, as in database
 
 library(dplyr)
 library(tidyr)
 library(lubridate)
 library(RREAS)
-
-load_mdb(mdb_path = "C:/Users/trogers/Documents/Rockfish/RREAS/Survey data/juv_cruise_backup02APR25.mdb",
-         datasets = "RREAS",
-         activestationsonly = T)
-
-#save species codes table
-SPECIES_CODES_ERDDAP <- SPECIES_CODES
-usethis::use_data(SPECIES_CODES_ERDDAP, overwrite = TRUE)
 
 #haul and catch data
 
