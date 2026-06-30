@@ -106,6 +106,7 @@ get_lw_regression=function(species, maturity, plot=F){
       exp(predict(len_reg, newdata = data.frame(STD_LENGTH=length)))
     }
   } else if(species %in% c(147,148)) { #use regression for pac dab for spec dab (combine A and Y lengths)
+    #can add 149 to above once we have at least some length measurements
     fwts<-subset(WEIGHT,SPECIES==147)
     len_reg<-lm(log(WEIGHT)~log(STD_LENGTH), data=fwts)
     len_to_wt<-function(length) {

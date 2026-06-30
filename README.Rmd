@@ -38,7 +38,7 @@ Juvenile cowcod illustration in our logo by Sophie Webb.
 To install the latest version of the package:
 
 ``` r
-install.packages("devtools") #if required
+#install.packages("devtools") #if required
 devtools::install_github("tanyalrogers/RREAS")
 ```
 ## Package overview
@@ -55,7 +55,7 @@ The package also contains a copy of the trawl-associated data (`HAUL`, `CATCH`, 
 
 For internal users at NOAA, there are functions to load data from a local copy of the RREAS MS Access Database, which also contains the NWFSC, PWCC, and ADAMS datasets, as well as the `AGE` table for age-at-length regressions. Abundance indices for stock assessments and other ecosystem reports can thus be produced. The trawl-associated data can be loaded using `load_mdb()`.
 
-Metadata for all data tables can be found under `help(RREAS)`.
+Metadata for all data tables can be found under `help("RREAS_TABLES")`.
 
 ## Loading trawl data
 
@@ -70,15 +70,15 @@ The data tables will be loaded to your global environment:
 ls(name = .GlobalEnv) #list objects in your workspace
 ```
 
-The `load_trawls()` function also creates a HAULSTANDARD table containing only standard stations (STANDARD_STATION=1) and with a reduced, standardized set of columns including YEAR, MONTH, JDAY, and lat/lon in decimal degrees. The support functions described below pull data for the hauls listed in HAULSTANDARD (unless otherwise specified). By default, HAULSTANDARD contains only hauls from active stations (omitting inactive stations) and from the standard survey time period (omitting early surveys, CRUISE 8703, 8804, and 9003). If you would like to include the inactive stations in HAULSTANDARD, set `activestationsonly=FALSE` in `load_trawls()`. If you would like to include the early surveys in HAULSTANDARD, set `stdtimeperiodonly=FALSE` in `load_trawls()`. A `startyear` can also be specified (defaults to 1983). Subsetting HAULSTANDARD after loading is also an acceptable approach.
+In addition to loading the main tables, `load_trawls()` also creates a HAULSTANDARD table containing only standard stations (STANDARD_STATION=1) and with a reduced, standardized set of columns including YEAR, MONTH, JDAY, and lat/lon in decimal degrees. The support functions described below pull data for the hauls listed in HAULSTANDARD (unless otherwise specified). By default, HAULSTANDARD contains only hauls from active stations (omitting inactive stations) and from the standard survey time period (omitting early surveys, CRUISE 8703, 8804, and 9003). If you would like to include the inactive stations in HAULSTANDARD, set `activestationsonly=FALSE` in `load_trawls()`. If you would like to include the early surveys in HAULSTANDARD, set `stdtimeperiodonly=FALSE` in `load_trawls()`. A `startyear` can also be specified (defaults to 1983). Subsetting HAULSTANDARD after loading is also an acceptable approach.
 
-The ERDDAP data can be loaded in the same way using `load_erddap()`. This dataset does not include data from the inactive stations or the early suveys. 
+The ERDDAP data can be loaded in the same way using `load_erddap()`. This function has no arguments (the dataset does not include data from the inactive stations or the early suveys).
 
-Note that using any of the `load` functions will overwrite whatever tables currently exist in your global environment. 
+Note that using any of the `load_xxx()` functions will overwrite whatever tables currently exist in your global environment. 
 
 ## Extracting data for species
 
-There are two main data extraction functions: `get_totals` and `get_distributions`. The function `get_totals` can be used to obtain total haul-level abundance or (for select species) biomass. The function `get_distributions` can be used to obtain size or (for select species) mass distribution data.
+There are two main data extraction functions: `get_totals` and `get_distributions`. The function `get_totals` can be used to obtain total haul-level abundance or biomass. The function `get_distributions` can be used to obtain size or mass distribution data. Biomass and mass distribution data are only available for select species.
 
 ### Formatting the species table
 
@@ -141,7 +141,9 @@ If a station was sampled, but the requested species was *not counted* at the tim
 
 Biomass is only available for species with length-weight regressions. The table `sptable_lw` lists the species for which length-weight regressions are avaiable. See `help(get_lw_regression)` for more info on how the regressions are done. (The function `get_lw_regression` is used internally, but can be run independently if desired.)
 
-If you ask for `"biomass"`, the output will also include TOTAL_NO (abundance) and NMEAS (number of fish measured). If you include length constraints, the output table will include additional columns NMEAS_SIZE (number measured in the size range) and NSIZE (total number in the size range, which is probably what you want, not TOTAL_NO). 
+If you ask for `"biomass"`, the output table will also include TOTAL_NO (abundance) and NMEAS (number of fish measured). 
+
+If you include length constraints, the output table will include additional columns NMEAS (number of fish measured), NMEAS_SIZE (number measured in the size range), and NSIZE (total number in the size range, which is probably what you want for abundance, not TOTAL_NO). 
 
 Examples:
 
@@ -152,7 +154,7 @@ head(anchabund)
 
 #Biomass for different anchovy size classes
 anchbiomass_len <- get_totals(anchtable_len, what = "biomass")
-tail(anchbiomass_len)
+head(anchbiomass_len)
 
 #Total YOY rockfish
 yoyrockfish <- subset(sptable, NAME=="YOY Rockfish")
@@ -164,9 +166,9 @@ head(yoyrockfishabund)
 
 The function `get_distributions` has the same 5 inputs, except `what` should be either `"size"` or `"mass"`. As with `get_totals`, lenght-weight regressions must exist in order to obtain mass distributions.
 
-If a haul had no fish, it will appear in the output dataset (with TOTAL_NO=0). If a haul had fish, but no fish were measured, there will be a TOTAL_NO>0, NMEAS will be 0, and there will be a single length/mass entry for that haul, which will be the average values used as a substitute.
+If a haul had no fish, it will appear in the output dataset (with TOTAL_NO=0). If a haul had fish, but no fish were measured, there will be a TOTAL_NO>0, NMEAS will be 0, and there will be a single length/mass entry for that haul, which will be the average value used as a substitute.
 
-The output table will include TOTAL_NO, NMEAS (number measured), EXP (expansion factor), SP_NO (specimen number) and values for the requested distribution. If `"size"` is requested, it will include column STD_LENGTH. If `"mass"` is requested, it will include columns STD_LENGTH and WEIGHT. If size limits are specified, it will include additional columns NMEAS_SIZE (number measured in the size range), PSIZE (proportion of measured fish in the size range), and NSIZE (total number in the size range, which is probably what you want, not TOTAL_NO).
+The output table will include TOTAL_NO, NMEAS (number measured), EXP (expansion factor, TOTAL_NO/NMEAS), SP_NO (specimen number) and values for the requested distribution. If `"size"` is requested, it will include column STD_LENGTH. If `"mass"` is requested, it will include columns STD_LENGTH and WEIGHT. If size limits are specified, it will include additional columns NMEAS_SIZE (number measured in the size range), PSIZE (proportion of measured fish in the size range), and NSIZE (total number in the size range, which is probably what you want, not TOTAL_NO).
 
 ```{r distributions}
 #Size distribution for anchovy

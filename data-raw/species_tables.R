@@ -1,5 +1,8 @@
 ## code to prepare pre-made species tables
 
+#to load species codes table
+load_mdb(mdb_path="C:/Rogers/Documents/Rockfish/RREAS/Survey data/juv_cruise_backup22APR26.mdb")
+
 #rockfish for 100 day index
 sptable_rockfish100 <- data.frame(SPECIES = c(582,597,599,601,603,604,606,609,612,616,618,627),
                                   MATURITY = "Y",
@@ -11,16 +14,16 @@ sptable_rockfish100 <- data.frame(SPECIES = c(582,597,599,601,603,604,606,609,61
 usethis::use_data(sptable_rockfish100, overwrite = TRUE)
 
 #species groups for CCIEA index
-rockfishes=data.frame(SPECIES=c(579:636,1940,2355,2437,2375,2381,2805),
+rockfishes=data.frame(SPECIES=subset(SPECIES_CODES, SPECIES_GROUP=="Rockfish")$SPECIES,
                       MATURITY="Y",
                       NAME="YOY Rockfish")
-sanddabs=data.frame(SPECIES=c(147,148,150),
+sanddabs=data.frame(SPECIES=c(147,148,149,150),
                     MATURITY="Y",
                     NAME="YOY Sanddabs")
-myctophids=data.frame(SPECIES=c(192,331,407,510,661,669,685,712,2808,2814,2847),
+myctophids=data.frame(SPECIES=subset(SPECIES_CODES, SPECIES_GROUP=="Myctophid")$SPECIES,
                       MATURITY="U",
                       NAME="Total Myctophids")
-krill=data.frame(SPECIES=c(791,1472,1473,1759,1791,1816,1846,1847,2060,2829,2830,2835,2836,2849),
+krill=data.frame(SPECIES=subset(SPECIES_CODES, SPECIES_GROUP=="Euphausiid")$SPECIES,
                  MATURITY="U",
                  NAME="Total Krill")
 octopus=data.frame(SPECIES=c(2026,2844,2855),
@@ -34,7 +37,7 @@ sptable=rbind(rockfishes, otherspecies, sanddabs, myctophids, octopus, krill)
 #write.csv(speciestable,"data-raw/species_table.csv",row.names = F)
 usethis::use_data(sptable, overwrite = TRUE)
 
-#species in sptable, but never caught
+#species in sptable, but never caught (fixed)
 setdiff(sptable$SPECIES, SPECIES_CODES$SPECIES)
 # krill 791 1759 2060 2836 (not in sptable_lw)
 # myctophids 331 510 2808 (not in sptable_lw)
@@ -50,12 +53,13 @@ usethis::use_data(sptable_lw, overwrite = TRUE)
 
 #species in sptable, but not in sptable_lw
 setdiff(sptable$SPECIES, sptable_lw$SPECIES)
-# krill 791 1759 2060 2836 (not in sptable_lw)
-# myctophids 331 510 2808 2847 (not in sptable_lw)
+# myctophids 2847 (sunbeam)
 # octopus  2844 2855
-# sanddabs 150
+# sanddabs 149 150
 # salps 2393
-# rockfishes 632 634
+
+#species in sptable_lw, but never caught (fixed)
+setdiff(sptable_lw$SPECIES, SPECIES_CODES$SPECIES)
 
 #in lw regression table, but:
 #never caught

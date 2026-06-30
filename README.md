@@ -35,7 +35,7 @@ Juvenile cowcod illustration in our logo by Sophie Webb.
 To install the latest version of the package:
 
 ``` r
-install.packages("devtools") #if required
+#install.packages("devtools") #if required
 devtools::install_github("tanyalrogers/RREAS")
 ```
 
@@ -61,7 +61,7 @@ The package also contains a copy of the trawl-associated data (`HAUL`,
 `CATCH`, `LENGTH`) posted on
 [ERDDAP](https://oceanview.pfeg.noaa.gov/erddap/index.html), which
 contain only a subset of the data posted on Dryad. The ERDDAP dataset
-contains data from 1990 to 2023 and for standard, active stations only.
+contains data from 1990 to 2025 and for standard, active stations only.
 The trawl-associated data can be loaded using `load_erddap()`. Note that
 the `WEIGHT` table is not included in this dataset, and there are some
 differences in how the krill and young-of-the-year rockfish are coded.
@@ -77,7 +77,7 @@ age-at-length regressions. Abundance indices for stock assessments and
 other ecosystem reports can thus be produced. The trawl-associated data
 can be loaded using `load_mdb()`.
 
-Metadata for all data tables can be found under `help(RREAS)`.
+Metadata for all data tables can be found under `help("RREAS_TABLES")`.
 
 ## Loading trawl data
 
@@ -96,35 +96,35 @@ ls(name = .GlobalEnv) #list objects in your workspace
 #> [5] "SPECIES_CODES" "STATIONS"      "WEIGHT"
 ```
 
-The `load_trawls()` function also creates a HAULSTANDARD table
-containing only standard stations (STANDARD_STATION=1) and with a
-reduced, standardized set of columns including YEAR, MONTH, JDAY, and
-lat/lon in decimal degrees. The support functions described below pull
-data for the hauls listed in HAULSTANDARD (unless otherwise specified).
-By default, HAULSTANDARD contains only hauls from active stations
-(omitting inactive stations) and from the standard survey time period
-(omitting early surveys, CRUISE 8703, 8804, and 9003). If you would like
-to include the inactive stations in HAULSTANDARD, set
-`activestationsonly=FALSE` in `load_trawls()`. If you would like to
-include the early surveys in HAULSTANDARD, set `stdtimeperiodonly=FALSE`
-in `load_trawls()`. A `startyear` can also be specified (defaults to
-1983). Subsetting HAULSTANDARD after loading is also an acceptable
-approach.
+In addition to loading the main tables, `load_trawls()` also creates a
+HAULSTANDARD table containing only standard stations
+(STANDARD_STATION=1) and with a reduced, standardized set of columns
+including YEAR, MONTH, JDAY, and lat/lon in decimal degrees. The support
+functions described below pull data for the hauls listed in HAULSTANDARD
+(unless otherwise specified). By default, HAULSTANDARD contains only
+hauls from active stations (omitting inactive stations) and from the
+standard survey time period (omitting early surveys, CRUISE 8703, 8804,
+and 9003). If you would like to include the inactive stations in
+HAULSTANDARD, set `activestationsonly=FALSE` in `load_trawls()`. If you
+would like to include the early surveys in HAULSTANDARD, set
+`stdtimeperiodonly=FALSE` in `load_trawls()`. A `startyear` can also be
+specified (defaults to 1983). Subsetting HAULSTANDARD after loading is
+also an acceptable approach.
 
 The ERDDAP data can be loaded in the same way using `load_erddap()`.
-This dataset does not include data from the inactive stations or the
-early suveys.
+This function has no arguments (the dataset does not include data from
+the inactive stations or the early suveys).
 
-Note that using any of the `load` functions will overwrite whatever
-tables currently exist in your global environment.
+Note that using any of the `load_xxx()` functions will overwrite
+whatever tables currently exist in your global environment.
 
 ## Extracting data for species
 
 There are two main data extraction functions: `get_totals` and
 `get_distributions`. The function `get_totals` can be used to obtain
-total haul-level abundance or (for select species) biomass. The function
-`get_distributions` can be used to obtain size or (for select species)
-mass distribution data.
+total haul-level abundance or biomass. The function `get_distributions`
+can be used to obtain size or mass distribution data. Biomass and mass
+distribution data are only available for select species.
 
 ### Formatting the species table
 
@@ -190,12 +190,12 @@ unique(sptable$NAME) #available species and species groups
 #> [13] "Octopus"          "Total Krill"
 head(sptable)
 #>   SPECIES MATURITY         NAME
-#> 1     579        Y YOY Rockfish
-#> 2     580        Y YOY Rockfish
-#> 3     581        Y YOY Rockfish
-#> 4     582        Y YOY Rockfish
-#> 5     583        Y YOY Rockfish
-#> 6     584        Y YOY Rockfish
+#> 1     580        Y YOY Rockfish
+#> 2     582        Y YOY Rockfish
+#> 3     583        Y YOY Rockfish
+#> 4     584        Y YOY Rockfish
+#> 5     592        Y YOY Rockfish
+#> 6     593        Y YOY Rockfish
 ```
 
 ``` r
@@ -203,22 +203,23 @@ head(sptable)
 data("sptable_lw")
 unique(sptable_lw$NAME) #available species and species groups
 #>  [1] "YOY Rockfish"             "Blacksmelt"              
-#>  [3] "YOY Pacific sanddab"      "YOY Speckled sanddab"    
-#>  [5] "YOY Sanddabs"             "YOY Anchovy"             
-#>  [7] "Adult Anchovy"            "Total Anchovy"           
-#>  [9] "California Smoothtongue"  "YOY Pacific Hake"        
-#> [11] "YOY Lingcod"              "YOY Sardine"             
-#> [13] "Adult Sardine"            "Total Sardine"           
-#> [15] "Market Squid"             "Sea nettle"              
-#> [17] "Octopus"                  "Pyrosome"                
-#> [19] "Armhook squid"            "Thetys salp"             
-#> [21] "Blacktip squid"           "Moon jelly"              
-#> [23] "Boreal clubhook squid"    "Blue lanternfish"        
-#> [25] "California headlightfish" "California lanternfish"  
-#> [27] "Nannobrachium spp."       "Mexican lampfish"        
-#> [29] "Northern lampfish"        "Total Myctophids"        
-#> [31] "Total Krill"              "Carinaria"               
-#> [33] "Medusafish"               "King-of-the-salmon"
+#>  [3] "Adult Pacific sanddab"    "YOY Pacific sanddab"     
+#>  [5] "YOY Speckled sanddab"     "YOY Sanddabs"            
+#>  [7] "YOY Anchovy"              "Adult Anchovy"           
+#>  [9] "Total Anchovy"            "Goby"                    
+#> [11] "California Smoothtongue"  "YOY Pacific Hake"        
+#> [13] "YOY Lingcod"              "YOY Sardine"             
+#> [15] "Adult Sardine"            "Total Sardine"           
+#> [17] "Market Squid"             "Sea nettle"              
+#> [19] "Octopus"                  "Pyrosome"                
+#> [21] "Armhook squid"            "Thetys salp"             
+#> [23] "Blacktip squid"           "Moon jelly"              
+#> [25] "Boreal clubhook squid"    "Blue lanternfish"        
+#> [27] "California headlightfish" "California lanternfish"  
+#> [29] "Nannobrachium spp."       "Mexican lampfish"        
+#> [31] "Northern lampfish"        "Total Myctophids"        
+#> [33] "Total Krill"              "Carinaria"               
+#> [35] "Medusafish"               "King-of-the-salmon"
 ```
 
 ### Getting totals
@@ -254,11 +255,13 @@ regressions are avaiable. See `help(get_lw_regression)` for more info on
 how the regressions are done. (The function `get_lw_regression` is used
 internally, but can be run independently if desired.)
 
-If you ask for `"biomass"`, the output will also include TOTAL_NO
-(abundance) and NMEAS (number of fish measured). If you include length
-constraints, the output table will include additional columns NMEAS_SIZE
-(number measured in the size range) and NSIZE (total number in the size
-range, which is probably what you want, not TOTAL_NO).
+If you ask for `"biomass"`, the output table will also include TOTAL_NO
+(abundance) and NMEAS (number of fish measured).
+
+If you include length constraints, the output table will include
+additional columns NMEAS (number of fish measured), NMEAS_SIZE (number
+measured in the size range), and NSIZE (total number in the size range,
+which is probably what you want for abundance, not TOTAL_NO).
 
 Examples:
 
@@ -290,35 +293,35 @@ head(anchabund)
 
 #Biomass for different anchovy size classes
 anchbiomass_len <- get_totals(anchtable_len, what = "biomass")
-tail(anchbiomass_len)
-#>      SURVEY CRUISE HAUL_NO YEAR MONTH JDAY  HAUL_DATE STATION NET_IN_LATDD
-#> 7841  RREAS   2502     152 2025     6  168 2025-06-17     473     39.83307
-#> 7842  RREAS   2502     153 2025     6  169 2025-06-18     474     39.82084
-#> 7843  RREAS   2502     154 2025     6  169 2025-06-18     475     39.82567
-#> 7844  RREAS   2502     155 2025     6  169 2025-06-18     139     37.77747
-#> 7845  RREAS   2502     156 2025     6  170 2025-06-19     138     37.69225
-#> 7846  RREAS   2502     157 2025     6  170 2025-06-19     237     37.59151
-#>      NET_IN_LONDD    LATDD     LONDD BOTTOM_DEPTH STATION_BOTTOM_DEPTH STRATA
-#> 7841    -124.0958 39.83333 -124.1083          289                  236     NC
-#> 7842    -124.3966 39.83333 -124.4000         1659                 1600     NC
-#> 7843    -124.7095 39.83333 -124.7167         1350                 1344     NC
-#> 7844    -122.8630 37.79167 -122.8667           60                   55      C
-#> 7845    -122.9077 37.70000 -122.9083           56                   55      C
-#> 7846    -122.8371 37.59667 -122.8317           71                   74      C
-#>                        AREA ACTIVE                NAME TOTAL_NO NMEAS
-#> 7841                Delgada      Y Small adult anchovy        0     0
-#> 7842                Delgada      Y Small adult anchovy        0     0
-#> 7843                Delgada      Y Small adult anchovy        0     0
-#> 7844 Gulf of the Farallones      Y Small adult anchovy        0     0
-#> 7845 Gulf of the Farallones      Y Small adult anchovy        0     0
-#> 7846 Gulf of the Farallones      Y Small adult anchovy        0     0
-#>      NMEAS_SIZE NSIZE BIOMASS
-#> 7841          0     0       0
-#> 7842          0     0       0
-#> 7843          0     0       0
-#> 7844          0     0       0
-#> 7845          0     0       0
-#> 7846          0     0       0
+head(anchbiomass_len)
+#>   SURVEY CRUISE HAUL_NO YEAR MONTH JDAY  HAUL_DATE STATION NET_IN_LATDD
+#> 1  RREAS   8303       7 1983     6  161 1983-06-10     104           NA
+#> 2  RREAS   8303      15 1983     6  163 1983-06-12     119           NA
+#> 3  RREAS   8303      17 1983     6  164 1983-06-13     114           NA
+#> 4  RREAS   8303      18 1983     6  164 1983-06-13     116           NA
+#> 5  RREAS   8303      24 1983     6  165 1983-06-14     117           NA
+#> 6  RREAS   8303      25 1983     6  165 1983-06-14     113           NA
+#>   NET_IN_LONDD    LATDD     LONDD BOTTOM_DEPTH STATION_BOTTOM_DEPTH STRATA
+#> 1           NA 36.30000 -122.0900          438                  354     SC
+#> 2           NA 36.84667 -121.9833           80                   91      C
+#> 3           NA 36.76667 -121.8667           82                   73      C
+#> 4           NA 36.74000 -121.9767          444                  287      C
+#> 5           NA 36.70000 -122.1083         1828                 1920      C
+#> 6           NA 36.64667 -122.0500         1097                  900      C
+#>                   AREA ACTIVE                NAME TOTAL_NO NMEAS NMEAS_SIZE
+#> 1            Point Sur      Y Large adult anchovy        0     0          0
+#> 2  Monterey Bay Inside      Y Large adult anchovy      268     0          0
+#> 3  Monterey Bay Inside      Y Large adult anchovy       40     0          0
+#> 4  Monterey Bay Inside      Y Large adult anchovy       14     0          0
+#> 5 Monterey Bay Outside      Y Large adult anchovy        0     0          0
+#> 6 Monterey Bay Outside      Y Large adult anchovy        0     0          0
+#>        NSIZE   BIOMASS
+#> 1   0.000000    0.0000
+#> 2 147.678631 3741.2328
+#> 3  22.041587  558.3930
+#> 4   7.714555  195.4375
+#> 5   0.000000    0.0000
+#> 6   0.000000    0.0000
 
 #Total YOY rockfish
 yoyrockfish <- subset(sptable, NAME=="YOY Rockfish")
@@ -357,17 +360,18 @@ distributions.
 If a haul had no fish, it will appear in the output dataset (with
 TOTAL_NO=0). If a haul had fish, but no fish were measured, there will
 be a TOTAL_NO\>0, NMEAS will be 0, and there will be a single
-length/mass entry for that haul, which will be the average values used
-as a substitute.
+length/mass entry for that haul, which will be the average value used as
+a substitute.
 
 The output table will include TOTAL_NO, NMEAS (number measured), EXP
-(expansion factor), SP_NO (specimen number) and values for the requested
-distribution. If `"size"` is requested, it will include column
-STD_LENGTH. If `"mass"` is requested, it will include columns STD_LENGTH
-and WEIGHT. If size limits are specified, it will include additional
-columns NMEAS_SIZE (number measured in the size range), PSIZE
-(proportion of measured fish in the size range), and NSIZE (total number
-in the size range, which is probably what you want, not TOTAL_NO).
+(expansion factor, TOTAL_NO/NMEAS), SP_NO (specimen number) and values
+for the requested distribution. If `"size"` is requested, it will
+include column STD_LENGTH. If `"mass"` is requested, it will include
+columns STD_LENGTH and WEIGHT. If size limits are specified, it will
+include additional columns NMEAS_SIZE (number measured in the size
+range), PSIZE (proportion of measured fish in the size range), and NSIZE
+(total number in the size range, which is probably what you want, not
+TOTAL_NO).
 
 ``` r
 #Size distribution for anchovy
