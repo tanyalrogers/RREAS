@@ -42,10 +42,10 @@ succession at more than one depth strata. These are cataloged in the internal ta
 \code{ds_tows}.
 }
 \examples{
-\dontrun{
+load_trawls()
 load_depth_stratified_tows()
 anchovytable <- data.frame(SPECIES=209, MATURITY="A",NAME="Adult Anchovy")
 anchovyabund <- get_totals(anchovytable, what = "abundance", haultable = HAULDEPTHSTRATIFIED)
-}
+
 }
 \keyword{functions}

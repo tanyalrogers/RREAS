@@ -41,6 +41,18 @@ averaged first, and then all stations means in a given year are averaged.
 NAs will be filled in for years with no hauls in a given grouping.
 }
 \examples{
+load_trawls()
+least_fav_orgs=data.frame(SPECIES=c(2058,2842),
+  MATURITY=c("U","U"),
+  NAME=c("Pyrosomes","Egg jellies"))
+least_fav_orgs_abund=get_totals(speciestable=least_fav_orgs, what="abundance")
+least_fav_orgs_index <- get_logcpueindex(least_fav_orgs_abund, var = "TOTAL_NO", group="STRATA")
+
+anchovytable <- data.frame(SPECIES=209, MATURITY="A", NAME="Adult Anchovy")
+anchbiomass <- get_totals(anchovytable, what = "biomass")
+anchindex_abund <- get_logcpueindex(anchbiomass, var = "TOTAL_NO", group="STRATA")
+anchindex_biomass <- get_logcpueindex(anchbiomass, var = "BIOMASS", group="STRATA")
+
 \dontrun{
 rockfish100equiv <- get_totals(sptable_rockfish100, what = "100day")
 rockfish100index <- get_logcpueindex(rockfish100equiv, var="N100", group="STRATA")

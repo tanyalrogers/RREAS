@@ -14,6 +14,7 @@
 \alias{WEIGHT_RREAS}
 \alias{CTD_HEADER}
 \alias{CTD_CAST}
+\alias{NET_MENSURATION}
 \alias{LENGTH_ERDDAP}
 \alias{LENGTH_RREAS}
 \title{RREAS data tables}
@@ -24,7 +25,18 @@ Data frames with some combination of the following fields
 \item{HAUL_NO}{Haul number}
 \item{VESSEL}{Survey vessel code}
 \item{STATION}{Station code}
-\item{HAUL_DATE}{Haul date and time}
+\item{HAUL_DATE}{Haul date}
+\item{NET_IN_LAT/LON/TIME}{Codend in water}
+\item{DOORS_IN_LAT/LON/TIME}{Doors in water}
+\item{NET_FISHING_LAT/LON/TIME}{Begin fishing at target depth}
+\item{NET_BACK_LAT/LON/TIME}{End fishing at target depth}
+\item{DOORS_OUT_LAT/LON/TIME}{Doors out of water}
+\item{NET_OUT_LAT/LON/TIME}{Codend out of water}
+\item{STRATA}{Target fishing depth:1=10m, 2=30m, 3=90m}
+\item{PROBLEM}{Problem code: 0=no problem, 2=rockfish subsampled,
+3=aborted trawl due to scyphozoans, 9=aborted trawl due to pelagic tunicates}
+\item{STANDARD_STATION}{Was the trawl done at station, at the target fishing depth,
+and for the target fishing time with no problems affecting data quality: 1=standard trawl, 0=non-standard trawl}
 \item{YEAR}{Survey year}
 \item{MONTH}{Haul month}
 \item{JDAY}{Haul julian day}
@@ -40,34 +52,45 @@ Data frames with some combination of the following fields
 \item{MATURITY}{Maturity code}
 \item{COMMON_NAME}{Common name}
 \item{SCI_NAME}{Scientific name}
-\item{TOTAL_NO}{Number of individuals caught}
-\item{STD_LENGTH}{Standard length (mm)}
+\item{RAW_NO}{Number of individuals caught, unadjusted}
+\item{TOTAL_NO}{Number of individuals caught, adjusted (all tows standardized to 15 minute)}
+\item{STD_LENGTH}{Organism size (mm): Standard length for fishes, mantle length for squids,
+carapace length for crustaceans, bell diameter for jellies, total length for other invertebrates}
+\item{WEIGHT}{Organism wet weight (g)}
+\item{CTD_INDEX}{CTD cast number}
+
 }
 
 An object of class \code{data.frame} with 291 rows and 8 columns.
 
 An object of class \code{data.frame} with 213 rows and 6 columns.
 
-An object of class \code{data.frame} with 3274 rows and 14 columns.
+An object of class \code{data.frame} with 3544 rows and 14 columns.
 
 An object of class \code{data.frame} with 5129 rows and 35 columns.
 
-An object of class \code{data.frame} with 3274 rows and 17 columns.
+An object of class \code{data.frame} with 3544 rows and 17 columns.
 
 An object of class \code{data.frame} with 4560 rows and 17 columns.
 
-An object of class \code{data.frame} with 52604 rows and 5 columns.
+An object of class \code{data.frame} with 60420 rows and 5 columns.
 
 An object of class \code{data.frame} with 75959 rows and 6 columns.
 
-An object of class \code{data.frame} with 231494 rows and 5 columns.
+An object of class \code{data.frame} with 276131 rows and 5 columns.
 
 An object of class \code{data.frame} with 335125 rows and 6 columns.
 
 An object of class \code{data.frame} with 1015 rows and 6 columns.
+
+An object of class \code{data.frame} with 201042 rows and 11 columns.
+
+An object of class \code{data.frame} with 9722 rows and 12 columns.
+
+An object of class \code{data.frame} with 1558890 rows and 13 columns.
 }
 \source{
-\url{https://oceanview.pfeg.noaa.gov/erddap/tabledap/FED_Rockfish_Catch.html}
+Dryad data from: URL. ERDDAP data from: \url{https://oceanview.pfeg.noaa.gov/erddap/tabledap/FED_Rockfish_Catch.html}
 \url{https://oceanview.pfeg.noaa.gov/erddap/tabledap/FED_Rockfish_Length.html}
 }
 \usage{
@@ -92,16 +115,26 @@ LENGTH_ERDDAP
 LENGTH_RREAS
 
 WEIGHT_RREAS
+
+NET_MENSURATION
+
+CTD_HEADER
+
+CTD_CAST
 }
 \description{
 Meta-data for RREAS data tables. Additional details can be found in the data publication.
 }
 \details{
-Data from ERDDAP are reformatted as relational tables matching the
-format of the tables in the database. Data on ERDDAP begins in 1990 and
-ends about 2 years from the present. The ERDDAP version contains additional
-SPECIES/MATURITY categories 1472/T (total krill) and 1940/T (total
-rockfish).
+All latitudes and longitudes in the Dryad and ERDDAP datasets are in
+decimal degrees. Latitudes and longitudes in the Access Database are in
+a different format, but are converted to decimal degrees in HAULSTANDARD.
+All times are local time (Pacific Daylight Time).
+
+The data from ERDDAP are reformatted as relational tables matching
+the format of the tables in the database. Data on ERDDAP begins in 1990.
+The ERDDAP version contains additional SPECIES/MATURITY categories 1472/T
+(total krill) and 1940/T (total rockfish).
 }
 \references{
 Sakuma, K.M., Field, J.C., Mantua, N.J., Ralston, S., Marinovic,

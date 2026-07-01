@@ -15,7 +15,7 @@ Runs length-age regressions using data in the AGE table and outputs a
 function to convert lengths into ages. This function (and the outputed
 function) are used internally in \code{\link{get_totals}} and \code{\link{get_distributions}} but
 it can be called independently, e.g. if you want to see what the
-regressions look like.
+regressions look like or use them for independent conversions.
 }
 \details{
 This fits standard linear regressions. Calling this functions runs the

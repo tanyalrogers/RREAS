@@ -117,7 +117,7 @@
 #' least_fav_orgs_abund <- get_totals(speciestable=least_fav_orgs, what="abundance")
 #'
 #' anchovytable <- data.frame(SPECIES=209, MATURITY="A", NAME="Adult Anchovy")
-#' anchabund <- get_totals(anchovytable, datasets = c("RREAS","NWFSC"), what = "biomass")
+#' anchabund <- get_totals(anchovytable, what = "biomass")
 #'
 #' \dontrun{
 #' rockfish100day <- get_totals(speciestable=sptable_rockfish100, what="100day",

@@ -17,7 +17,7 @@ relational tables to match the format of the tables in the database. This
 dataset contains data starting in 1990 and only from standard, active
 stations. The function also loads a HAULSTANDARD table with a standardized
 set of columns including YEAR, MONTH, JDAY, and lat/lon in decimal degrees.
-See \code{\link{RREAS_ERDDAP}} for metadata. This function has no arguments.
+See \code{\link{RREAS_TABLES}} for metadata. This function has no arguments.
 }
 \details{
 The data tables are stored internally in the package (internet
@@ -51,6 +51,6 @@ in the neritic waters of the California Current in spring 2015 during a
 period of extreme ocean conditions. CalCOFI Rep. 57:163-183
 }
 \seealso{
-\code{\link{load_trawls}}, \code{\link{RREAS_ERDDAP}}
+\code{\link{load_trawls}}, \code{\link{RREAS_TABLES}}
 }
 \keyword{functions}

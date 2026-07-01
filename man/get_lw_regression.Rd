@@ -20,10 +20,10 @@ a vector of masses (g).
 }
 \description{
 Runs a length-weight regression using data in the WEIGHT table and outputs a
-function to convert lengths into weights. This function (and the outputed
+function to convert lengths (mm) into weights (g). This function (and the outputed
 function) are used internally in \code{\link{get_totals}} and \code{\link{get_distributions}} but
 it can be called independently, e.g. if you want to see what the regressions
-look like.
+look like or use them for independent conversions.
 }
 \details{
 This fits a linear regression to log-log data. The outputed conversion
@@ -41,8 +41,8 @@ and the regression is used for all species in that group, including those
 without length-weight data. Thus the species with data act as proxies for
 species without data.
 
-For anchovy (209), adults (A) and juveniles (Y) are pooled for the
-regression.
+For anchovy (209) and Pacific sanddabs (147), adults (A) and juveniles (Y)
+are pooled for the regression.
 
 For northern lampfish (661) and California lanternfish (669), data from both
 species are pooled for the regression. Unknown myctophids (407) will use
@@ -64,11 +64,29 @@ warning will be displayed and the resulting function will return NA for any
 length input.
 }
 \examples{
-print(rflwgroups)
-\dontrun{
-get_lw_regression(species = 209, maturity = "A", plot=T)
-get_lw_regression(species = 562, maturity = "A")
+load_trawls()
+anchreg <- get_lw_regression(species = 209, maturity = "A", plot=TRUE)
+anchreg(c(120,110,100)) #weights of fish 120, 110, 100 mm
+
+sardreg <- get_lw_regression(species = 562, maturity = "A")
+print(sardreg) #this uses a published regression
+
 }
+\references{
+Sardine regression (OLS) from: Palance, D. G., Macewicz, B. J.,
+Stierhoff, K., Demer, D. A., & Zwolinski, J. P. (2019). Length conversions
+and mass–length relationships of five forage‐fish species in the California
+current ecosystem. Journal of fish biology, 95(4), 1116-1124.
+
+Krill length-dry weight regressions from: Fisher, J.L., Menkel,
+J., Copeman, L., Shaw, C.T., Feinberg, L.R. and Peterson, W.T., 2020.
+Comparison of condition metrics and lipid content between Euphausia
+pacifica and Thysanoessa spinifera in the northern California Current, USA.
+Progress in Oceanography, 188, p.102417.
+
+Krill dry-wet weight conversion factor from Williamson, S.W., Favuzzi, J.
+and Cox, J.L., 1986. Patchiness and nutritional condition of zooplankton in
+the California Current. Fishery Bulletin, 84(1), pp.157-176.
 }
 \seealso{
 \code{\link{sptable_lw}}, \code{\link{rflwgroups}}

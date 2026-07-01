@@ -51,3 +51,8 @@ HAULSTANDARD_RREAS<-dplyr::inner_join(HAUL_RREAS, STATIONS_RREAS, by="STATION") 
                 LATDD,LONDD,BOTTOM_DEPTH,STATION_BOTTOM_DEPTH,STRATA,AREA,ACTIVE)
 
 usethis::use_data(HAULSTANDARD_RREAS, overwrite = TRUE)
+
+#check compression useage
+tools::checkRdaFiles(paths = "data")
+#optimizes compression
+tools::resaveRdaFiles(paths = "data")

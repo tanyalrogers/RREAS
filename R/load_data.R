@@ -360,7 +360,7 @@ load_mdb=function(mdb_path,atsea_path=NULL,datasets="RREAS",krill_len_path=NULL,
 #' dataset contains data starting in 1990 and only from standard, active
 #' stations. The function also loads a HAULSTANDARD table with a standardized
 #' set of columns including YEAR, MONTH, JDAY, and lat/lon in decimal degrees.
-#' See [`RREAS_ERDDAP`] for metadata. This function has no arguments.
+#' See [`RREAS_TABLES`] for metadata. This function has no arguments.
 #'
 #' @details
 #' The data tables are stored internally in the package (internet
@@ -391,7 +391,7 @@ load_mdb=function(mdb_path,atsea_path=NULL,datasets="RREAS",krill_len_path=NULL,
 #'   B.B. and Carrion, C.N. (2016) Anomalous epipelagic micronekton assemblage patterns
 #'   in the neritic waters of the California Current in spring 2015 during a
 #'   period of extreme ocean conditions. CalCOFI Rep. 57:163-183
-#' @seealso [`load_trawls`], [`RREAS_ERDDAP`]
+#' @seealso [`load_trawls`], [`RREAS_TABLES`]
 #' @keywords functions
 #' @examples
 #' load_erddap()

@@ -63,19 +63,20 @@ The package also contains a copy of the trawl-associated data (`HAUL`,
 contain only a subset of the data posted on Dryad. The ERDDAP dataset
 contains data from 1990 to 2025 and for standard, active stations only.
 The trawl-associated data can be loaded using `load_erddap()`. Note that
-the `WEIGHT` table is not included in this dataset, and there are some
-differences in how the krill and young-of-the-year rockfish are coded.
-The catch table on ERDDAP is reformatted into relational `HAUL` and
-`CATCH` tables to match the format of the other data sources. The
-`SPECIES_CODES` and `STATIONS` tables that are loaded come from Dryad
-dataset.
+the `WEIGHT` table is not included in this dataset, and there are
+differences in how the krill and young-of-the-year rockfish MATURITY is
+coded: The ERDDAP dataset contains additional SPECIES/MATURITY
+categories 1472/T (total krill) and 1940/T (total rockfish). The catch
+table on ERDDAP is reformatted into relational `HAUL` and `CATCH` tables
+to match the format of the other data sources. The `SPECIES_CODES` and
+`STATIONS` tables that are loaded come from Dryad dataset.
 
 For internal users at NOAA, there are functions to load data from a
 local copy of the RREAS MS Access Database, which also contains the
 NWFSC, PWCC, and ADAMS datasets, as well as the `AGE` table for
-age-at-length regressions. Abundance indices for stock assessments and
-other ecosystem reports can thus be produced. The trawl-associated data
-can be loaded using `load_mdb()`.
+age-at-length regressions, and the speciated krill data. Abundance
+indices for stock assessments and other ecosystem reports can thus be
+produced. The trawl-associated data can be loaded using `load_mdb()`.
 
 Metadata for all data tables can be found under `help("RREAS_TABLES")`.
 
@@ -113,7 +114,7 @@ also an acceptable approach.
 
 The ERDDAP data can be loaded in the same way using `load_erddap()`.
 This function has no arguments (the dataset does not include data from
-the inactive stations or the early suveys).
+the inactive stations or the early surveys).
 
 Note that using any of the `load_xxx()` functions will overwrite
 whatever tables currently exist in your global environment.
@@ -177,8 +178,9 @@ anchtable_len
 
 The package contains some pre-made species tables with common species
 and species groupings, which can be subsetted if desired. You can
-explicitly load them using `data()`, or call them directly. You can also
-construct your own custom species table as in the above examples.
+explicitly load them to global environment using `data()`, or call them
+directly. You can also construct your own custom species table as in the
+above examples.
 
 ``` r
 #Some common species and species groups used in ecosystem reports.
@@ -249,194 +251,307 @@ be found in the `sptable` documentation and in the SPECIES_CODES table.
 **It your responsibility to know when your focal species were or were
 not being recorded.**
 
-Biomass is only available for species with length-weight regressions.
-The table `sptable_lw` lists the species for which length-weight
-regressions are avaiable. See `help(get_lw_regression)` for more info on
-how the regressions are done. (The function `get_lw_regression` is used
-internally, but can be run independently if desired.)
+If “abundance” is requested, the output table will include column
+TOTAL_NO. If “biomass” is requested, the output table will include
+columns TOTAL_NO, NMEAS (number measured), and BIOMASS (g). If you
+included length constraints, the output table will include additional
+columns NMEAS_SIZE (number measured in the size range), and NSIZE (total
+number in the size range, which is probably what you want for abundance,
+not TOTAL_NO). BIOMASS with size constraints will be the biomass within
+the size range.
 
-If you ask for `"biomass"`, the output table will also include TOTAL_NO
-(abundance) and NMEAS (number of fish measured).
+Biomass is only available for species with lengths and length-weight
+regressions. The table `sptable_lw` lists the species for which lengths
+and length-weight regressions are available. See
+`help(get_lw_regression)` for more info on how the regressions are done.
+(The function `get_lw_regression` is used internally, but can be run
+independently if desired.)
 
-If you include length constraints, the output table will include
-additional columns NMEAS (number of fish measured), NMEAS_SIZE (number
-measured in the size range), and NSIZE (total number in the size range,
-which is probably what you want for abundance, not TOTAL_NO).
+If length data are available for a species, but not available for a
+particular haul where the species was present, mean length values will
+be used. If available, the mean for the same CRUISE and REGION will be
+used, followed by CRUISE and STRATA, then CRUISE, then the global mean.
+In the output table, if TOTAL_NO\>0 but NMEAS=0, this indicates that
+length data were unavailable and means were used. If size limits are
+specified, the mean proportion of fish in the length range will also be
+used for hauls missing length data, with the same rank ordering of
+available mean values.
 
 Examples:
 
 ``` r
 #YOY, Adult, Total anchovy abundances
 anchabund <- get_totals(anchtable, what = "abundance")
-head(anchabund)
-#>   SURVEY CRUISE HAUL_NO YEAR MONTH JDAY  HAUL_DATE STATION NET_IN_LATDD
-#> 1  RREAS   8303       7 1983     6  161 1983-06-10     104           NA
-#> 2  RREAS   8303      15 1983     6  163 1983-06-12     119           NA
-#> 3  RREAS   8303      17 1983     6  164 1983-06-13     114           NA
-#> 4  RREAS   8303      18 1983     6  164 1983-06-13     116           NA
-#> 5  RREAS   8303      24 1983     6  165 1983-06-14     117           NA
-#> 6  RREAS   8303      25 1983     6  165 1983-06-14     113           NA
-#>   NET_IN_LONDD    LATDD     LONDD BOTTOM_DEPTH STATION_BOTTOM_DEPTH STRATA
-#> 1           NA 36.30000 -122.0900          438                  354     SC
-#> 2           NA 36.84667 -121.9833           80                   91      C
-#> 3           NA 36.76667 -121.8667           82                   73      C
-#> 4           NA 36.74000 -121.9767          444                  287      C
-#> 5           NA 36.70000 -122.1083         1828                 1920      C
-#> 6           NA 36.64667 -122.0500         1097                  900      C
-#>                   AREA ACTIVE          NAME TOTAL_NO
-#> 1            Point Sur      Y Adult Anchovy        0
-#> 2  Monterey Bay Inside      Y Adult Anchovy      268
-#> 3  Monterey Bay Inside      Y Adult Anchovy       40
-#> 4  Monterey Bay Inside      Y Adult Anchovy       14
-#> 5 Monterey Bay Outside      Y Adult Anchovy        0
-#> 6 Monterey Bay Outside      Y Adult Anchovy        0
+tail(anchabund)
+#>       SURVEY CRUISE HAUL_NO YEAR MONTH JDAY  HAUL_DATE STATION NET_IN_LATDD
+#> 11764  RREAS   2502      93 2025     6  154 2025-06-03     445     35.69450
+#> 11765  RREAS   2502      94 2025     6  154 2025-06-03     425     33.91455
+#> 11766  RREAS   2502      95 2025     6  154 2025-06-03     424     34.06567
+#> 11767  RREAS   2502      97 2025     6  155 2025-06-04     423     34.18832
+#> 11768  RREAS   2502      98 2025     6  155 2025-06-04     404     32.72155
+#> 11769  RREAS   2502      99 2025     6  155 2025-06-04     403     32.72077
+#>       NET_IN_LONDD    LATDD     LONDD BOTTOM_DEPTH STATION_BOTTOM_DEPTH STRATA
+#> 11764    -121.8517 35.70333 -121.8667         1051                 1050     SC
+#> 11765    -120.6962 33.91833 -120.7117         1831                 1848      S
+#> 11766    -120.5621 34.07000 -120.5783          161                  190      S
+#> 11767    -120.4504 34.17667 -120.4717          151                  122      S
+#> 11768    -119.0345 32.71667 -119.0167          682                  777      S
+#> 11769    -118.7646 32.71667 -118.7483         1506                 1253      S
+#>                  AREA ACTIVE        NAME TOTAL_NO
+#> 11764 Piedras Blancas      Y YOY Anchovy       81
+#> 11765      San Miguel      Y YOY Anchovy        0
+#> 11766      San Miguel      Y YOY Anchovy        1
+#> 11767      San Miguel      Y YOY Anchovy       67
+#> 11768    San Clemente      Y YOY Anchovy        0
+#> 11769    San Clemente      Y YOY Anchovy        0
 
 #Biomass for different anchovy size classes
 anchbiomass_len <- get_totals(anchtable_len, what = "biomass")
+#early years use mean lengths and proportion in size class
 head(anchbiomass_len)
 #>   SURVEY CRUISE HAUL_NO YEAR MONTH JDAY  HAUL_DATE STATION NET_IN_LATDD
-#> 1  RREAS   8303       7 1983     6  161 1983-06-10     104           NA
-#> 2  RREAS   8303      15 1983     6  163 1983-06-12     119           NA
-#> 3  RREAS   8303      17 1983     6  164 1983-06-13     114           NA
-#> 4  RREAS   8303      18 1983     6  164 1983-06-13     116           NA
-#> 5  RREAS   8303      24 1983     6  165 1983-06-14     117           NA
-#> 6  RREAS   8303      25 1983     6  165 1983-06-14     113           NA
+#> 1  RREAS   8303      15 1983     6  163 1983-06-12     119           NA
+#> 2  RREAS   8303      17 1983     6  164 1983-06-13     114           NA
+#> 3  RREAS   8303      18 1983     6  164 1983-06-13     116           NA
+#> 4  RREAS   8303      24 1983     6  165 1983-06-14     117           NA
+#> 5  RREAS   8303      25 1983     6  165 1983-06-14     113           NA
+#> 6  RREAS   8303      29 1983     6  165 1983-06-14     123           NA
 #>   NET_IN_LONDD    LATDD     LONDD BOTTOM_DEPTH STATION_BOTTOM_DEPTH STRATA
-#> 1           NA 36.30000 -122.0900          438                  354     SC
-#> 2           NA 36.84667 -121.9833           80                   91      C
-#> 3           NA 36.76667 -121.8667           82                   73      C
-#> 4           NA 36.74000 -121.9767          444                  287      C
-#> 5           NA 36.70000 -122.1083         1828                 1920      C
-#> 6           NA 36.64667 -122.0500         1097                  900      C
+#> 1           NA 36.84667 -121.9833           80                   91      C
+#> 2           NA 36.76667 -121.8667           82                   73      C
+#> 3           NA 36.74000 -121.9767          444                  287      C
+#> 4           NA 36.70000 -122.1083         1828                 1920      C
+#> 5           NA 36.64667 -122.0500         1097                  900      C
+#> 6           NA 36.98333 -122.2917           82                   82      C
 #>                   AREA ACTIVE                NAME TOTAL_NO NMEAS NMEAS_SIZE
-#> 1            Point Sur      Y Large adult anchovy        0     0          0
-#> 2  Monterey Bay Inside      Y Large adult anchovy      268     0          0
-#> 3  Monterey Bay Inside      Y Large adult anchovy       40     0          0
-#> 4  Monterey Bay Inside      Y Large adult anchovy       14     0          0
+#> 1  Monterey Bay Inside      Y Large adult anchovy      268     0          0
+#> 2  Monterey Bay Inside      Y Large adult anchovy       40     0          0
+#> 3  Monterey Bay Inside      Y Large adult anchovy       14     0          0
+#> 4 Monterey Bay Outside      Y Large adult anchovy        0     0          0
 #> 5 Monterey Bay Outside      Y Large adult anchovy        0     0          0
-#> 6 Monterey Bay Outside      Y Large adult anchovy        0     0          0
+#> 6            Davenport      Y Large adult anchovy      450     0          0
 #>        NSIZE   BIOMASS
-#> 1   0.000000    0.0000
-#> 2 147.678631 3741.2328
-#> 3  22.041587  558.3930
-#> 4   7.714555  195.4375
+#> 1 147.678631 3741.2328
+#> 2  22.041587  558.3930
+#> 3   7.714555  195.4375
+#> 4   0.000000    0.0000
 #> 5   0.000000    0.0000
-#> 6   0.000000    0.0000
+#> 6 247.967851 6281.9207
+#later years use actual values
+tail(anchbiomass_len)
+#>      SURVEY CRUISE HAUL_NO YEAR MONTH JDAY  HAUL_DATE STATION NET_IN_LATDD
+#> 7841  RREAS   2502      93 2025     6  154 2025-06-03     445     35.69450
+#> 7842  RREAS   2502      94 2025     6  154 2025-06-03     425     33.91455
+#> 7843  RREAS   2502      95 2025     6  154 2025-06-03     424     34.06567
+#> 7844  RREAS   2502      97 2025     6  155 2025-06-04     423     34.18832
+#> 7845  RREAS   2502      98 2025     6  155 2025-06-04     404     32.72155
+#> 7846  RREAS   2502      99 2025     6  155 2025-06-04     403     32.72077
+#>      NET_IN_LONDD    LATDD     LONDD BOTTOM_DEPTH STATION_BOTTOM_DEPTH STRATA
+#> 7841    -121.8517 35.70333 -121.8667         1051                 1050     SC
+#> 7842    -120.6962 33.91833 -120.7117         1831                 1848      S
+#> 7843    -120.5621 34.07000 -120.5783          161                  190      S
+#> 7844    -120.4504 34.17667 -120.4717          151                  122      S
+#> 7845    -119.0345 32.71667 -119.0167          682                  777      S
+#> 7846    -118.7646 32.71667 -118.7483         1506                 1253      S
+#>                 AREA ACTIVE                NAME TOTAL_NO NMEAS NMEAS_SIZE NSIZE
+#> 7841 Piedras Blancas      Y Small adult anchovy        0     0          0   0.0
+#> 7842      San Miguel      Y Small adult anchovy       27    18          3   4.5
+#> 7843      San Miguel      Y Small adult anchovy       98    20         16  78.4
+#> 7844      San Miguel      Y Small adult anchovy       88    20         20  88.0
+#> 7845    San Clemente      Y Small adult anchovy        0     0          0   0.0
+#> 7846    San Clemente      Y Small adult anchovy        0     0          0   0.0
+#>         BIOMASS
+#> 7841    0.00000
+#> 7842   81.15633
+#> 7843 1309.26418
+#> 7844 1142.07881
+#> 7845    0.00000
+#> 7846    0.00000
 
 #Total YOY rockfish
 yoyrockfish <- subset(sptable, NAME=="YOY Rockfish")
 yoyrockfishabund <- get_totals(yoyrockfish, what = "abundance")
 head(yoyrockfishabund)
 #>   SURVEY CRUISE HAUL_NO YEAR MONTH JDAY  HAUL_DATE STATION NET_IN_LATDD
-#> 1  RREAS   8303       7 1983     6  161 1983-06-10     104           NA
-#> 2  RREAS   8303      15 1983     6  163 1983-06-12     119           NA
-#> 3  RREAS   8303      17 1983     6  164 1983-06-13     114           NA
-#> 4  RREAS   8303      18 1983     6  164 1983-06-13     116           NA
-#> 5  RREAS   8303      24 1983     6  165 1983-06-14     117           NA
-#> 6  RREAS   8303      25 1983     6  165 1983-06-14     113           NA
+#> 1  RREAS   8303      15 1983     6  163 1983-06-12     119           NA
+#> 2  RREAS   8303      17 1983     6  164 1983-06-13     114           NA
+#> 3  RREAS   8303      18 1983     6  164 1983-06-13     116           NA
+#> 4  RREAS   8303      24 1983     6  165 1983-06-14     117           NA
+#> 5  RREAS   8303      25 1983     6  165 1983-06-14     113           NA
+#> 6  RREAS   8303      29 1983     6  165 1983-06-14     123           NA
 #>   NET_IN_LONDD    LATDD     LONDD BOTTOM_DEPTH STATION_BOTTOM_DEPTH STRATA
-#> 1           NA 36.30000 -122.0900          438                  354     SC
-#> 2           NA 36.84667 -121.9833           80                   91      C
-#> 3           NA 36.76667 -121.8667           82                   73      C
-#> 4           NA 36.74000 -121.9767          444                  287      C
-#> 5           NA 36.70000 -122.1083         1828                 1920      C
-#> 6           NA 36.64667 -122.0500         1097                  900      C
+#> 1           NA 36.84667 -121.9833           80                   91      C
+#> 2           NA 36.76667 -121.8667           82                   73      C
+#> 3           NA 36.74000 -121.9767          444                  287      C
+#> 4           NA 36.70000 -122.1083         1828                 1920      C
+#> 5           NA 36.64667 -122.0500         1097                  900      C
+#> 6           NA 36.98333 -122.2917           82                   82      C
 #>                   AREA ACTIVE         NAME TOTAL_NO
-#> 1            Point Sur      Y YOY Rockfish       56
+#> 1  Monterey Bay Inside      Y YOY Rockfish        0
 #> 2  Monterey Bay Inside      Y YOY Rockfish        0
-#> 3  Monterey Bay Inside      Y YOY Rockfish        0
-#> 4  Monterey Bay Inside      Y YOY Rockfish        1
-#> 5 Monterey Bay Outside      Y YOY Rockfish        1
-#> 6 Monterey Bay Outside      Y YOY Rockfish        2
+#> 3  Monterey Bay Inside      Y YOY Rockfish        1
+#> 4 Monterey Bay Outside      Y YOY Rockfish        1
+#> 5 Monterey Bay Outside      Y YOY Rockfish        2
+#> 6            Davenport      Y YOY Rockfish        0
 ```
 
 ### Getting distributions
 
 The function `get_distributions` has the same 5 inputs, except `what`
-should be either `"size"` or `"mass"`. As with `get_totals`,
-lenght-weight regressions must exist in order to obtain mass
-distributions.
+should be either `"size"` or `"mass"`. Distributions will be generated
+for each unique NAME in `speciestable` for each haul in HAULSTANDARD
+(unless another table is specified under `haultable`). If multiple NAME
+values are present, the results will be stacked in long format. As with
+`get_totals`, length-weight regressions must exist in order to obtain
+mass distributions.
 
 If a haul had no fish, it will appear in the output dataset (with
 TOTAL_NO=0). If a haul had fish, but no fish were measured, there will
 be a TOTAL_NO\>0, NMEAS will be 0, and there will be a single
-length/mass entry for that haul, which will be the average value used as
-a substitute.
+length/mass entry for that haul, which will be the average value. *For
+calculating distributions, you will probably want to exclude any tows
+with NMEAS=0.*
 
 The output table will include TOTAL_NO, NMEAS (number measured), EXP
 (expansion factor, TOTAL_NO/NMEAS), SP_NO (specimen number) and values
 for the requested distribution. If `"size"` is requested, it will
 include column STD_LENGTH. If `"mass"` is requested, it will include
-columns STD_LENGTH and WEIGHT. If size limits are specified, it will
+columns STD_LENGTH and WEIGHT (g). If size limits are specified, it will
 include additional columns NMEAS_SIZE (number measured in the size
 range), PSIZE (proportion of measured fish in the size range), and NSIZE
-(total number in the size range, which is probably what you want, not
-TOTAL_NO).
+(total number in the size range, which is probably what you want for
+abundance, not TOTAL_NO).
 
 ``` r
 #Size distribution for anchovy
 anchsizedist <- get_distributions(anchtable, what = "size")
+
+#note how the early hauls have no measured fish and use an avg length
+#the expansion factor in this case is the total number of fish
 head(anchsizedist)
 #>   SURVEY CRUISE HAUL_NO YEAR MONTH JDAY  HAUL_DATE STATION NET_IN_LATDD
-#> 1  RREAS   8303       7 1983     6  161 1983-06-10     104           NA
-#> 2  RREAS   8303      15 1983     6  163 1983-06-12     119           NA
-#> 3  RREAS   8303      17 1983     6  164 1983-06-13     114           NA
-#> 4  RREAS   8303      18 1983     6  164 1983-06-13     116           NA
-#> 5  RREAS   8303      24 1983     6  165 1983-06-14     117           NA
-#> 6  RREAS   8303      25 1983     6  165 1983-06-14     113           NA
+#> 1  RREAS   8303      15 1983     6  163 1983-06-12     119           NA
+#> 2  RREAS   8303      17 1983     6  164 1983-06-13     114           NA
+#> 3  RREAS   8303      18 1983     6  164 1983-06-13     116           NA
+#> 4  RREAS   8303      24 1983     6  165 1983-06-14     117           NA
+#> 5  RREAS   8303      25 1983     6  165 1983-06-14     113           NA
+#> 6  RREAS   8303      29 1983     6  165 1983-06-14     123           NA
 #>   NET_IN_LONDD    LATDD     LONDD BOTTOM_DEPTH STATION_BOTTOM_DEPTH STRATA
-#> 1           NA 36.30000 -122.0900          438                  354     SC
-#> 2           NA 36.84667 -121.9833           80                   91      C
-#> 3           NA 36.76667 -121.8667           82                   73      C
-#> 4           NA 36.74000 -121.9767          444                  287      C
-#> 5           NA 36.70000 -122.1083         1828                 1920      C
-#> 6           NA 36.64667 -122.0500         1097                  900      C
+#> 1           NA 36.84667 -121.9833           80                   91      C
+#> 2           NA 36.76667 -121.8667           82                   73      C
+#> 3           NA 36.74000 -121.9767          444                  287      C
+#> 4           NA 36.70000 -122.1083         1828                 1920      C
+#> 5           NA 36.64667 -122.0500         1097                  900      C
+#> 6           NA 36.98333 -122.2917           82                   82      C
 #>                   AREA ACTIVE SPECIES MATURITY          NAME TOTAL_NO NMEAS EXP
-#> 1            Point Sur      Y     209        A Adult Anchovy        0     0  NA
-#> 2  Monterey Bay Inside      Y     209        A Adult Anchovy      268     0 268
-#> 3  Monterey Bay Inside      Y     209        A Adult Anchovy       40     0  40
-#> 4  Monterey Bay Inside      Y     209        A Adult Anchovy       14     0  14
+#> 1  Monterey Bay Inside      Y     209        A Adult Anchovy      268     0 268
+#> 2  Monterey Bay Inside      Y     209        A Adult Anchovy       40     0  40
+#> 3  Monterey Bay Inside      Y     209        A Adult Anchovy       14     0  14
+#> 4 Monterey Bay Outside      Y     209        A Adult Anchovy        0     0  NA
 #> 5 Monterey Bay Outside      Y     209        A Adult Anchovy        0     0  NA
-#> 6 Monterey Bay Outside      Y     209        A Adult Anchovy        0     0  NA
+#> 6            Davenport      Y     209        A Adult Anchovy      450     0 450
 #>   STD_LENGTH SP_NO
-#> 1         NA    NA
+#> 1   120.3036    NA
 #> 2   120.3036    NA
 #> 3   120.3036    NA
-#> 4   120.3036    NA
+#> 4         NA    NA
 #> 5         NA    NA
-#> 6         NA    NA
+#> 6   120.3036    NA
+
+#in later years, actual lengths are provided
+tail(anchsizedist, 10)
+#>       SURVEY CRUISE HAUL_NO YEAR MONTH JDAY  HAUL_DATE STATION NET_IN_LATDD
+#> 46351  RREAS   2502      97 2025     6  155 2025-06-04     423     34.18832
+#> 46352  RREAS   2502      97 2025     6  155 2025-06-04     423     34.18832
+#> 46353  RREAS   2502      97 2025     6  155 2025-06-04     423     34.18832
+#> 46354  RREAS   2502      97 2025     6  155 2025-06-04     423     34.18832
+#> 46355  RREAS   2502      97 2025     6  155 2025-06-04     423     34.18832
+#> 46356  RREAS   2502      97 2025     6  155 2025-06-04     423     34.18832
+#> 46357  RREAS   2502      97 2025     6  155 2025-06-04     423     34.18832
+#> 46358  RREAS   2502      97 2025     6  155 2025-06-04     423     34.18832
+#> 46359  RREAS   2502      98 2025     6  155 2025-06-04     404     32.72155
+#> 46360  RREAS   2502      99 2025     6  155 2025-06-04     403     32.72077
+#>       NET_IN_LONDD    LATDD     LONDD BOTTOM_DEPTH STATION_BOTTOM_DEPTH STRATA
+#> 46351    -120.4504 34.17667 -120.4717          151                  122      S
+#> 46352    -120.4504 34.17667 -120.4717          151                  122      S
+#> 46353    -120.4504 34.17667 -120.4717          151                  122      S
+#> 46354    -120.4504 34.17667 -120.4717          151                  122      S
+#> 46355    -120.4504 34.17667 -120.4717          151                  122      S
+#> 46356    -120.4504 34.17667 -120.4717          151                  122      S
+#> 46357    -120.4504 34.17667 -120.4717          151                  122      S
+#> 46358    -120.4504 34.17667 -120.4717          151                  122      S
+#> 46359    -119.0345 32.71667 -119.0167          682                  777      S
+#> 46360    -118.7646 32.71667 -118.7483         1506                 1253      S
+#>               AREA ACTIVE SPECIES MATURITY        NAME TOTAL_NO NMEAS  EXP
+#> 46351   San Miguel      Y     209        Y YOY Anchovy       67    20 3.35
+#> 46352   San Miguel      Y     209        Y YOY Anchovy       67    20 3.35
+#> 46353   San Miguel      Y     209        Y YOY Anchovy       67    20 3.35
+#> 46354   San Miguel      Y     209        Y YOY Anchovy       67    20 3.35
+#> 46355   San Miguel      Y     209        Y YOY Anchovy       67    20 3.35
+#> 46356   San Miguel      Y     209        Y YOY Anchovy       67    20 3.35
+#> 46357   San Miguel      Y     209        Y YOY Anchovy       67    20 3.35
+#> 46358   San Miguel      Y     209        Y YOY Anchovy       67    20 3.35
+#> 46359 San Clemente      Y     209        Y YOY Anchovy        0     0   NA
+#> 46360 San Clemente      Y     209        Y YOY Anchovy        0     0   NA
+#>       STD_LENGTH SP_NO
+#> 46351         85 16378
+#> 46352         76 16379
+#> 46353         78 16380
+#> 46354         86 16381
+#> 46355         85 16382
+#> 46356         82 16383
+#> 46357         80 16384
+#> 46358         79 16385
+#> 46359         NA    NA
+#> 46360         NA    NA
 
 #Mass distribution for different anchovy size classes
 anchmassdist <- get_distributions(anchtable_len, what = "mass")
-tail(anchmassdist)
+tail(anchmassdist, 10)
 #>       SURVEY CRUISE HAUL_NO YEAR MONTH JDAY  HAUL_DATE STATION NET_IN_LATDD
-#> 17518  RREAS   2502     152 2025     6  168 2025-06-17     473     39.83307
-#> 17519  RREAS   2502     153 2025     6  169 2025-06-18     474     39.82084
-#> 17520  RREAS   2502     154 2025     6  169 2025-06-18     475     39.82567
-#> 17521  RREAS   2502     155 2025     6  169 2025-06-18     139     37.77747
-#> 17522  RREAS   2502     156 2025     6  170 2025-06-19     138     37.69225
-#> 17523  RREAS   2502     157 2025     6  170 2025-06-19     237     37.59151
+#> 17514  RREAS   2502      97 2025     6  155 2025-06-04     423     34.18832
+#> 17515  RREAS   2502      97 2025     6  155 2025-06-04     423     34.18832
+#> 17516  RREAS   2502      97 2025     6  155 2025-06-04     423     34.18832
+#> 17517  RREAS   2502      97 2025     6  155 2025-06-04     423     34.18832
+#> 17518  RREAS   2502      97 2025     6  155 2025-06-04     423     34.18832
+#> 17519  RREAS   2502      97 2025     6  155 2025-06-04     423     34.18832
+#> 17520  RREAS   2502      97 2025     6  155 2025-06-04     423     34.18832
+#> 17521  RREAS   2502      97 2025     6  155 2025-06-04     423     34.18832
+#> 17522  RREAS   2502      98 2025     6  155 2025-06-04     404     32.72155
+#> 17523  RREAS   2502      99 2025     6  155 2025-06-04     403     32.72077
 #>       NET_IN_LONDD    LATDD     LONDD BOTTOM_DEPTH STATION_BOTTOM_DEPTH STRATA
-#> 17518    -124.0958 39.83333 -124.1083          289                  236     NC
-#> 17519    -124.3966 39.83333 -124.4000         1659                 1600     NC
-#> 17520    -124.7095 39.83333 -124.7167         1350                 1344     NC
-#> 17521    -122.8630 37.79167 -122.8667           60                   55      C
-#> 17522    -122.9077 37.70000 -122.9083           56                   55      C
-#> 17523    -122.8371 37.59667 -122.8317           71                   74      C
-#>                         AREA ACTIVE SPECIES MATURITY                NAME
-#> 17518                Delgada      Y     209        A Small adult anchovy
-#> 17519                Delgada      Y     209        A Small adult anchovy
-#> 17520                Delgada      Y     209        A Small adult anchovy
-#> 17521 Gulf of the Farallones      Y     209        A Small adult anchovy
-#> 17522 Gulf of the Farallones      Y     209        A Small adult anchovy
-#> 17523 Gulf of the Farallones      Y     209        A Small adult anchovy
-#>       TOTAL_NO NMEAS NMEAS_SIZE EXP PSIZE NSIZE STD_LENGTH SP_NO WEIGHT
-#> 17518        0     0          0  NA    NA     0         NA    NA     NA
-#> 17519        0     0          0  NA    NA     0         NA    NA     NA
-#> 17520        0     0          0  NA    NA     0         NA    NA     NA
-#> 17521        0     0          0  NA    NA     0         NA    NA     NA
-#> 17522        0     0          0  NA    NA     0         NA    NA     NA
-#> 17523        0     0          0  NA    NA     0         NA    NA     NA
+#> 17514    -120.4504 34.17667 -120.4717          151                  122      S
+#> 17515    -120.4504 34.17667 -120.4717          151                  122      S
+#> 17516    -120.4504 34.17667 -120.4717          151                  122      S
+#> 17517    -120.4504 34.17667 -120.4717          151                  122      S
+#> 17518    -120.4504 34.17667 -120.4717          151                  122      S
+#> 17519    -120.4504 34.17667 -120.4717          151                  122      S
+#> 17520    -120.4504 34.17667 -120.4717          151                  122      S
+#> 17521    -120.4504 34.17667 -120.4717          151                  122      S
+#> 17522    -119.0345 32.71667 -119.0167          682                  777      S
+#> 17523    -118.7646 32.71667 -118.7483         1506                 1253      S
+#>               AREA ACTIVE SPECIES MATURITY                NAME TOTAL_NO NMEAS
+#> 17514   San Miguel      Y     209        A Small adult anchovy       88    20
+#> 17515   San Miguel      Y     209        A Small adult anchovy       88    20
+#> 17516   San Miguel      Y     209        A Small adult anchovy       88    20
+#> 17517   San Miguel      Y     209        A Small adult anchovy       88    20
+#> 17518   San Miguel      Y     209        A Small adult anchovy       88    20
+#> 17519   San Miguel      Y     209        A Small adult anchovy       88    20
+#> 17520   San Miguel      Y     209        A Small adult anchovy       88    20
+#> 17521   San Miguel      Y     209        A Small adult anchovy       88    20
+#> 17522 San Clemente      Y     209        A Small adult anchovy        0     0
+#> 17523 San Clemente      Y     209        A Small adult anchovy        0     0
+#>       NMEAS_SIZE EXP PSIZE NSIZE STD_LENGTH SP_NO   WEIGHT
+#> 17514         20 4.4     1    88        101 16358 10.60760
+#> 17515         20 4.4     1    88        108 16359 13.33114
+#> 17516         20 4.4     1    88        106 16360 12.50784
+#> 17517         20 4.4     1    88        110 16361 14.19203
+#> 17518         20 4.4     1    88        105 16362 12.10997
+#> 17519         20 4.4     1    88        110 16363 14.19203
+#> 17520         20 4.4     1    88        106 16364 12.50784
+#> 17521         20 4.4     1    88        103 16365 11.34121
+#> 17522          0  NA    NA     0         NA    NA       NA
+#> 17523          0  NA    NA     0         NA    NA       NA
 ```
 
 Note that if you are combining distributions across tows, they will need
@@ -456,7 +571,7 @@ anchsizedist$bin=cut(anchsizedist$STD_LENGTH, breaks, labels = breaks[-1]-binwid
 anchsizedist_sum=anchsizedist %>% 
   filter(NAME %in% c("Adult Anchovy", "YOY Anchovy")) %>% 
   filter(YEAR %in% c(2024,2025)) %>% #for a simpler figure
-  filter(!is.na(EXP)) %>% #remove hauls with no fish caught
+  filter(NMEAS>0) %>% #remove hauls with no fish measured
   group_by(NAME, YEAR, bin) %>% 
   summarise(total=sum(EXP, na.rm=T)) %>% 
   group_by(NAME, YEAR) %>% 
@@ -482,9 +597,6 @@ also computed by default, but can be turned off by setting
 `standardized=FALSE`.
 
 ``` r
-library(ggplot2)
-library(dplyr)
-
 anchindex1 <- get_logcpueindex(anchabund, var = "TOTAL_NO", group="STRATA")
 head(anchindex1)
 #>          NAME STRATA YEAR TOTAL_NO_INDEX TOTAL_NO_INDEX_SC
@@ -541,7 +653,7 @@ the tows which appear in HAULSTANDARD.
 Historically, mostly before the coastwide expansion in 2004, multiple
 depth strata (DEPTH_STRATA 1: 10 m, DEPTH_STRATA 2: 30 m, DEPTH_STRATA
 3: 90 m) were sampled in succession at specific stations, mostly at
-stations 110, 125, 133, and 170, but occassionally others. The function
+stations 110, 125, 133, and 170, but occasionally others. The function
 `load_depth_stratified_tows` pulls out these depth-stratified tows into
 the table HAULDEPTHSTRATIFED. It has the same format as HAULSTANDARD,
 but with a few extra columns: DEPTH_STRATA, SWEEP (indicates which of
@@ -570,22 +682,22 @@ str(HAULDEPTHSTRATIFIED)
 #> 'data.frame':    669 obs. of  20 variables:
 #>  $ SURVEY              : chr  "RREAS" "RREAS" "RREAS" "RREAS" ...
 #>  $ CRUISE              : chr  "8303" "8303" "8303" "8303" ...
-#>  $ HAUL_NO             : int  22 23 31 32 38 40 41 5 6 30 ...
+#>  $ HAUL_NO             : int  22 23 31 32 38 40 41 30 31 33 ...
 #>  $ YEAR                : num  1983 1983 1983 1983 1983 ...
 #>  $ MONTH               : num  6 6 6 6 6 6 6 6 6 6 ...
-#>  $ JDAY                : num  165 165 166 166 166 167 167 165 165 166 ...
+#>  $ JDAY                : num  165 165 166 166 166 167 167 166 166 167 ...
 #>  $ HAUL_DATE           : POSIXct, format: "1983-06-14" "1983-06-14" ...
-#>  $ STATION             : int  118 118 125 125 132 132 132 125 125 103 ...
+#>  $ STATION             : int  118 118 125 125 132 132 132 103 103 106 ...
 #>  $ NET_IN_LATDD        : num  NA NA NA NA NA ...
 #>  $ NET_IN_LONDD        : num  NA NA NA NA NA ...
 #>  $ LATDD               : num  36.8 36.8 37 37 37.3 ...
 #>  $ LONDD               : num  -122 -122 -122 -122 -123 ...
-#>  $ BOTTOM_DEPTH        : int  841 822 505 170 98 100 100 201 177 102 ...
-#>  $ STATION_BOTTOM_DEPTH: int  966 966 272 272 95 95 95 272 272 102 ...
+#>  $ BOTTOM_DEPTH        : int  841 822 505 170 98 100 100 102 102 899 ...
+#>  $ STATION_BOTTOM_DEPTH: int  966 966 272 272 95 95 95 102 102 928 ...
 #>  $ STRATA              : chr  "C" "C" "C" "C" ...
 #>  $ AREA                : chr  "Monterey Bay Outside" "Monterey Bay Outside" "Davenport" "Davenport" ...
 #>  $ ACTIVE              : chr  "N" "N" "Y" "Y" ...
-#>  $ DEPTH_STRATA        : int  3 2 2 3 2 3 1 2 3 1 ...
+#>  $ DEPTH_STRATA        : int  3 2 2 3 2 3 1 1 2 2 ...
 #>  $ SWEEP               : int  1 1 1 1 1 1 1 1 1 1 ...
 #>  $ SWEEP_SEP           : num  1 1 1 1 1 1 1 1 1 1 ...
 
@@ -605,6 +717,51 @@ HAULDEPTHSTRATIFIED <- HAULDEPTHSTRATIFIED %>%
   left_join(HAUL %>% select(CRUISE, HAUL_NO, CTD_INDEX), by = c("CRUISE", "HAUL_NO"))
 ```
 
+## CTD data
+
+To load the CTD data, just call the names of the tables. You can
+explicitly load them to global environment using `data()`, or call them
+directly. The CTD_CAST table is quite large, so it intentionally not
+loaded automatically with the trawl data.
+
+``` r
+head(CTD_HEADER)
+#>   CRUISE CTD_INDEX CTD_NO STATION            CTD_DATE  CTD_LAT  CTD_LONG
+#> 1   0002         2      5     119 2000-05-11 20:42:00 36.84350 -121.9830
+#> 2   0002         3      5     114 2000-05-11 22:54:00 36.76667 -121.8678
+#> 3   0002         4      5     116 2000-05-11 23:50:00 36.73933 -121.9780
+#> 4   0002         5      5     115 2000-05-12 01:58:00 36.70650 -121.8947
+#> 5   0002         6      5     111 2000-05-12 02:40:00 36.64400 -121.8622
+#> 6   0002         7      5     112 2000-05-12 04:35:00 36.67933 -121.9445
+#>   CTD_BOTTOM_DEPTH BUCKET_TEMP BUCKET_SAL TS_TEMP TS_SAL
+#> 1               89        11.3       33.7   11.48  33.27
+#> 2               66        12.0       33.4   12.26  33.01
+#> 3              330        11.7       33.4   11.92  33.24
+#> 4               81        11.0       33.4   11.27  33.17
+#> 5               43        12.6       33.3   12.90  32.97
+#> 6               93        11.1       33.4   11.30  33.21
+example_cast <- subset(CTD_CAST, CRUISE=="2502" & CTD_INDEX==20)
+head(example_cast)
+#>         CRUISE CTD_INDEX CTD_DEPTH TEMPERATURE SALINITY DENSITY DYN_HGT IRRAD
+#> 1474562   2502        20         3     11.2426  33.3244 25.4275  0.0064    NA
+#> 1474563   2502        20         4     11.2149  33.3317 25.4381  0.0087    NA
+#> 1474564   2502        20         5     10.9738  33.3945 25.5299  0.0143    NA
+#> 1474565   2502        20         6     10.6090  33.4947 25.6724  0.0206    NA
+#> 1474566   2502        20         7     10.5629  33.5087 25.6914  0.0231    NA
+#> 1474567   2502        20         8     10.5484  33.5193 25.7022  0.0254    NA
+#>         FLUOR_VOLT TRANSMISSIVITY CHLOROPHYLL OXYGEN_VOLT OXYGEN
+#> 1474562     1.0572             NA    8.157230      4.0626 6.6338
+#> 1474563     1.1700             NA    8.934005      4.0337 6.4656
+#> 1474564     0.8520             NA    6.590277      3.9341 6.3376
+#> 1474565     0.6753             NA    5.279281      3.7971 6.0552
+#> 1474566     0.4549             NA    3.654961      3.7642 6.0621
+#> 1474567     0.4442             NA    3.557348      3.7440 6.0324
+ggplot(example_cast, aes(y=-CTD_DEPTH, x=TEMPERATURE)) +
+  geom_path() + theme_bw()
+```
+
+<img src="man/figures/README-ctd-1.png" width="100%" />
+
 ## Internal users
 
 The function `load_mdb` loads data from a local copy of the RREAS MS
@@ -620,7 +777,7 @@ MS Access Database.
 ``` r
 #replace the file paths with those for your machine
 #any previously loaded tables with the same name in your workspace will be overwritten
-rm(list = ls())
+rm(list = ls()) #clear workspace
 load_mdb(mdb_path="C:/Rogers/Documents/Rockfish/RREAS/Survey data/juv_cruise_backup22APR26.mdb",
          krill_len_path="C:/Rogers/Documents/Rockfish/Index generation/length weight/krill_lengths.csv")
 #> Data loaded.
@@ -813,3 +970,21 @@ tail(rockfish100agedist)
 #> 123402  NA    NA       NA
 #> 123403  NA    NA       NA
 ```
+
+------------------------------------------------------------------------
+
+## Disclaimer
+
+“This repository is a scientific product and is not official
+communication of the National Oceanic and Atmospheric Administration, or
+the United States Department of Commerce. All NOAA GitHub project code
+is provided on an ‘as is’ basis and the user assumes responsibility for
+its use. Any claims against the Department of Commerce or Department of
+Commerce bureaus stemming from the use of this GitHub project will be
+governed by all applicable Federal law. Any reference to specific
+commercial products, processes, or services by service mark, trademark,
+manufacturer, or otherwise, does not constitute or imply their
+endorsement, recommendation or favoring by the Department of Commerce.
+The Department of Commerce seal and logo, or the seal and logo of a DOC
+bureau, shall not be used in any manner to imply endorsement of any
+commercial product or activity by DOC or the United States Government.”

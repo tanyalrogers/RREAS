@@ -42,6 +42,7 @@ age distributions will be unsuccessful.
 }
 \examples{
 load_trawls()
+load_trawls(activestationsonly=FALSE, startyear=1990)
 
 }
 \references{

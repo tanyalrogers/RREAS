@@ -6,28 +6,28 @@
 \usage{
 get_distributions(
   speciestable,
-  datasets = "RREAS",
-  startyear = 1983,
   what = c("size", "mass", "age"),
-  haultable = HAULSTANDARD
+  startyear = 1983,
+  haultable = HAULSTANDARD,
+  datasets = "RREAS"
 )
 }
 \arguments{
 \item{speciestable}{Dataframe containing species information (see Details).}
 
-\item{datasets}{Character vector indicating which dataset(s) to use. Multiple
-dataset can be specified. Options are "RREAS", "ADAMS", "PWCC", "NWFSC". If
-unspecified, just uses "RREAS".}
-
-\item{startyear}{Start year (default is 1983).}
-
 \item{what}{What type of distribution you want, either "size", "mass", or
 "age".}
+
+\item{startyear}{Start year (default is 1983).}
 
 \item{haultable}{The table of hauls from which to obtain data. Defaults to
 HAULSTANDARD. If you do not want to use HAULSTANDARD, you
 can specify another table here, but it should have all of the same columns as
 HAULSTANDARD.}
+
+\item{datasets}{Character vector indicating which dataset(s) to use. Multiple
+dataset can be specified. Options are "RREAS", "ADAMS", "PWCC", "NWFSC". If
+unspecified, just uses "RREAS".}
 }
 \value{
 A dataframe with haul information, NAME, TOTAL_NO, NMEAS (number
@@ -39,7 +39,7 @@ WEIGHT (g). If "age" is requested, will include columns STD_LENGTH, AGE (days), 
 limits are specified, will include additional columns NMEAS_SIZE (number
 measured in the size range), PSIZE (proportion of measured fish in the size
 range), and NSIZE (total number in the size range, which is probably what
-you want, not TOTAL_NO). If multiple NAME values were present, the data
+you want for abundance, not TOTAL_NO). If multiple NAME values were present, the data
 will be in long format (stacked). If you request data from multiple
 datasets, they results will be combined (column SURVEY differentiates
 source). The NAME field is converted to a factor so names will plot in the
@@ -58,16 +58,23 @@ length-age regression. See \code{\link{get_totals}} for more details.
 If a haul had no fish, it will appear in the output dataset (with
 TOTAL_NO=0). If a haul had fish, but no fish were measured, there will be a
 TOTAL_NO>0, NMEAS will be 0, and there will be a single length/mass/age entry
-for that haul, which will be the average values used as a substitute. If a
+for that haul, which will be the average value used as a substitute. If a
 haul has length measurements, there will be multiple entries for that haul,
-and haul-level information will be repeated.
+and haul-level information will be repeated. \emph{For calculating distributions,
+you will probably want to exclude any tows with NMEAS=0.}
 
 The \code{speciestable} should be formatted in the same way as described in
 \code{\link{get_totals}}.
 }
 \examples{
+load_trawls()
+anchtabletotal <- data.frame(SPECIES=209, MATURITY=c("Y","A"),
+  NAME=c("Total Anchovy", "Total Anchovy"))
+anchsizedist <- get_distributions(anchtabletotal, what = "size")
+
 \dontrun{
-rockfish100agedist <- get_distributions(sptable_rockfish100, what = "age")
+shortbelly <- data.frame(SPECIES=604, MATURITY="Y", NAME="Shortbelly")
+shortbellyagedist <- get_distributions(shortbelly, what = "age")
 }
 }
 \seealso{

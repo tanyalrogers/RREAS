@@ -72,7 +72,7 @@ ls(name = .GlobalEnv) #list objects in your workspace
 
 In addition to loading the main tables, `load_trawls()` also creates a HAULSTANDARD table containing only standard stations (STANDARD_STATION=1) and with a reduced, standardized set of columns including YEAR, MONTH, JDAY, and lat/lon in decimal degrees. The support functions described below pull data for the hauls listed in HAULSTANDARD (unless otherwise specified). By default, HAULSTANDARD contains only hauls from active stations (omitting inactive stations) and from the standard survey time period (omitting early surveys, CRUISE 8703, 8804, and 9003). If you would like to include the inactive stations in HAULSTANDARD, set `activestationsonly=FALSE` in `load_trawls()`. If you would like to include the early surveys in HAULSTANDARD, set `stdtimeperiodonly=FALSE` in `load_trawls()`. A `startyear` can also be specified (defaults to 1983). Subsetting HAULSTANDARD after loading is also an acceptable approach.
 
-The ERDDAP data can be loaded in the same way using `load_erddap()`. This function has no arguments (the dataset does not include data from the inactive stations or the early suveys).
+The ERDDAP data can be loaded in the same way using `load_erddap()`. This function has no arguments (the dataset does not include data from the inactive stations or the early surveys).
 
 Note that using any of the `load_xxx()` functions will overwrite whatever tables currently exist in your global environment. 
 
@@ -223,9 +223,6 @@ ggplot(anchsizedist_sum, aes(x=as.numeric(as.character(bin)), y=Proportion)) +
 Given an output table from `get_totals`, there is a function `get_logcpueindex` which will compute `mean(log(x+1))` for an `x` of your choice, for each YEAR and NAME. It allows optional grouping variables (typically STRATA). A standardized index (within groups) is also computed by default, but can be turned off by setting `standardized=FALSE`.
 
 ```{r indices, warning=FALSE, message=FALSE}
-library(ggplot2)
-library(dplyr)
-
 anchindex1 <- get_logcpueindex(anchabund, var = "TOTAL_NO", group="STRATA")
 head(anchindex1)
 
@@ -255,7 +252,7 @@ ggplot(anchindex2plot,aes(y=BIOMASS_INDEX,x=YEAR)) +
 
 RREAS standard tows are conducted at 30 m headrope depth (DEPTH_STRATA 2), with the exception of stations with a bottom depth of less than 60 m, which are towed at 10 m headrope depth (DEPTH_STRATA 1). These are the tows which appear in HAULSTANDARD.
 
-Historically, mostly before the coastwide expansion in 2004, multiple depth strata (DEPTH_STRATA 1: 10 m, DEPTH_STRATA 2: 30 m, DEPTH_STRATA 3: 90 m) were sampled in succession at specific stations, mostly at stations 110, 125, 133, and 170, but occassionally others. The function `load_depth_stratified_tows` pulls out these depth-stratified tows into the table HAULDEPTHSTRATIFED. It has the same format as HAULSTANDARD, but with a few extra columns: DEPTH_STRATA, SWEEP (indicates which of the 3 passes the sampling is from; there is generally one set of depth-stratified tows per sweep, but not always), and SWEEP_SEP (separates cases in which there are multiple sets of depth stratified tows per sweep, and sets of depth stratified tows where SWEEP in NA, which occurs after 2004; otherwise equal to SWEEP). Each set of consecutive depth stratified tows will have a unique CRUISE/STATION/SWEEP_SEP value.
+Historically, mostly before the coastwide expansion in 2004, multiple depth strata (DEPTH_STRATA 1: 10 m, DEPTH_STRATA 2: 30 m, DEPTH_STRATA 3: 90 m) were sampled in succession at specific stations, mostly at stations 110, 125, 133, and 170, but occasionally others. The function `load_depth_stratified_tows` pulls out these depth-stratified tows into the table HAULDEPTHSTRATIFED. It has the same format as HAULSTANDARD, but with a few extra columns: DEPTH_STRATA, SWEEP (indicates which of the 3 passes the sampling is from; there is generally one set of depth-stratified tows per sweep, but not always), and SWEEP_SEP (separates cases in which there are multiple sets of depth stratified tows per sweep, and sets of depth stratified tows where SWEEP in NA, which occurs after 2004; otherwise equal to SWEEP). Each set of consecutive depth stratified tows will have a unique CRUISE/STATION/SWEEP_SEP value.
 
 HAULDEPTHSTRATIFED can be passed to `get_totals` or `get_distributions` to get catch data from these hauls instead of HAULSTANDARD by supplying it under `haultable`. Note that all of the depth-stratified tows are not present in the ERDDAP dataset.
 
@@ -366,4 +363,12 @@ If "age" is requested in `get_distributions`, the output will include columns ST
 #rockfish age distributions
 rockfish100agedist <- get_distributions(sptable_rockfish100, what = "age")
 tail(rockfish100agedist)
+```
+
+****
+
+```{r add-disclaimer, echo=FALSE, results='asis'}
+url <- "https://raw.githubusercontent.com/nmfs-fish-tools/Resources/master/Disclaimer.md"
+childtext <- readLines(url,encoding = "UTF-8")
+cat(childtext, sep="\n")
 ```

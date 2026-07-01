@@ -16,6 +16,7 @@ Description: Data and support functions for the NOAA SWFSC Rockfish Recruitment 
 License: file LICENSE
 Encoding: UTF-8
 LazyData: true
+LazyDataCompression: xz
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Imports: 

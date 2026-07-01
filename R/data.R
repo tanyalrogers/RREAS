@@ -107,11 +107,15 @@
 #' @aliases STATIONS_RREAS SPECIES_CODES_RREAS CATCH_ERDDAP CATCH_RREAS HAUL_ERDDAP HAUL_RREAS
 #'   HAULSTANDARD_ERDDAP HAULSTANDARD_RREAS WEIGHT_RREAS CTD_HEADER CTD_CAST NET_MENSURATION
 #'
-#' @details Data from ERDDAP are reformatted as relational tables matching the
-#'   format of the tables in the database. Data on ERDDAP begins in 1990 and
-#'   ends about 2 years from the present. The ERDDAP version contains additional
-#'   SPECIES/MATURITY categories 1472/T (total krill) and 1940/T (total
-#'   rockfish).
+#' @details All latitudes and longitudes in the Dryad and ERDDAP datasets are in
+#'   decimal degrees. Latitudes and longitudes in the Access Database are in
+#'   a different format, but are converted to decimal degrees in HAULSTANDARD.
+#'   All times are local time (Pacific Daylight Time).
+#'
+#'   The data from ERDDAP are reformatted as relational tables matching
+#'   the format of the tables in the database. Data on ERDDAP begins in 1990.
+#'   The ERDDAP version contains additional SPECIES/MATURITY categories 1472/T
+#'   (total krill) and 1940/T (total rockfish).
 #'
 #' @format Data frames with some combination of the following fields
 #' \describe{
@@ -119,7 +123,18 @@
 #'   \item{HAUL_NO}{Haul number}
 #'   \item{VESSEL}{Survey vessel code}
 #'   \item{STATION}{Station code}
-#'   \item{HAUL_DATE}{Haul date and time}
+#'   \item{HAUL_DATE}{Haul date}
+#'   \item{NET_IN_LAT/LON/TIME}{Codend in water}
+#'   \item{DOORS_IN_LAT/LON/TIME}{Doors in water}
+#'   \item{NET_FISHING_LAT/LON/TIME}{Begin fishing at target depth}
+#'   \item{NET_BACK_LAT/LON/TIME}{End fishing at target depth}
+#'   \item{DOORS_OUT_LAT/LON/TIME}{Doors out of water}
+#'   \item{NET_OUT_LAT/LON/TIME}{Codend out of water}
+#'   \item{STRATA}{Target fishing depth:1=10m, 2=30m, 3=90m}
+#'   \item{PROBLEM}{Problem code: 0=no problem, 2=rockfish subsampled,
+#'     3=aborted trawl due to scyphozoans, 9=aborted trawl due to pelagic tunicates}
+#'   \item{STANDARD_STATION}{Was the trawl done at station, at the target fishing depth,
+#'     and for the target fishing time with no problems affecting data quality: 1=standard trawl, 0=non-standard trawl}
 #'   \item{YEAR}{Survey year}
 #'   \item{MONTH}{Haul month}
 #'   \item{JDAY}{Haul julian day}
@@ -135,8 +150,13 @@
 #'   \item{MATURITY}{Maturity code}
 #'   \item{COMMON_NAME}{Common name}
 #'   \item{SCI_NAME}{Scientific name}
-#'   \item{TOTAL_NO}{Number of individuals caught}
-#'   \item{STD_LENGTH}{Standard length (mm)}
+#'   \item{RAW_NO}{Number of individuals caught, unadjusted}
+#'   \item{TOTAL_NO}{Number of individuals caught, adjusted (all tows standardized to 15 minute)}
+#'   \item{STD_LENGTH}{Organism size (mm): Standard length for fishes, mantle length for squids,
+#'     carapace length for crustaceans, bell diameter for jellies, total length for other invertebrates}
+#'   \item{WEIGHT}{Organism wet weight (g)}
+#'   \item{CTD_INDEX}{CTD cast number}
+#'
 #' }
 #' @references Sakuma, K.M., Field, J.C., Mantua, N.J., Ralston, S., Marinovic,
 #'   B.B. and Carrion, C.N. (2016) Anomalous epipelagic micronekton assemblage patterns

@@ -5,7 +5,7 @@
 \alias{sptable}
 \title{Species table for common RREAS species and species groups}
 \format{
-A data frame with 104 rows and 3 variables:
+A data frame with 73 rows and 3 variables:
 \describe{
 \item{SPECIES}{Species code}
 \item{MATURITY}{Maturity code}
