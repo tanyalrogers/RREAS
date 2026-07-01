@@ -81,46 +81,50 @@
 #' be included.
 #'
 #' @param speciestable Dataframe containing species information (see Details).
-#' @param datasets Character vector indicating which dataset(s) to use. Multiple dataset can
-#'   be specified. Options are "RREAS","ADAMS","PWCC","NWFSC". If unspecified, just uses RREAS.
-#' @param startyear Start year (default is 1983).
 #' @param what What totals you want, either "abundance","biomass", or "100day".
 #'   Defaults to "abundance".
+#' @param startyear Start year (default is 1983).
 #' @param haultable The table of hauls from which to obtain data. Defaults to
 #'   HAULSTANDARD. If you do not want to use HAULSTANDARD, you
 #'   can specify another table here, but it should have all of the same columns as
 #'   HAULSTANDARD.
+#' @param datasets Character vector indicating which dataset(s) to use. Multiple dataset can
+#'   be specified. Options are "RREAS","ADAMS","PWCC","NWFSC". If unspecified, just uses RREAS.
 #'
 #' @return A dataframe with haul information, NAME, and totals. If "abundance"
 #'   is requested, will include column TOTAL_NO. If "biomass" is requested, will
-#'   include columns TOTAL_NO, NMEAS (number measured), and BIOMASS (g). If "100day"
-#'   is requested, will include columns TOTAL_NO, NMEAS (number measured), and
-#'   N100. If size limits are specified, will include additional columns
-#'   NMEAS_SIZE (number measured in the size range), and NSIZE (total number in
-#'   the size range, which is probably what you want, not TOTAL_NO). If multiple
-#'   NAME values were present, the data will be in long format (stacked). If you
-#'   request data from multiple datasets, they results will be combined (column
-#'   SURVEY differentiates source). The NAME field is converted to a factor so
-#'   names will plot in the same order supplied in `speciestable`.
+#'   include columns TOTAL_NO, NMEAS (number measured), and BIOMASS (g). If
+#'   "100day" is requested, will include columns TOTAL_NO, NMEAS (number
+#'   measured), and N100. If size limits are specified, will include additional
+#'   columns NMEAS_SIZE (number measured in the size range), and NSIZE (total
+#'   number in the size range, which is probably what you want, not TOTAL_NO).
+#'   BIOMASS with size constraints will be the biomass within the size range.
+#'   If multiple NAME values were present, the data will be in long format
+#'   (stacked). If you request data from multiple datasets, they results will be
+#'   combined (column SURVEY differentiates source). The NAME field is converted
+#'   to a factor so names will plot in the same order supplied in
+#'   `speciestable`.
 #'
 #' @export
 #' @seealso [`get_distributions`], [`get_numbers`], [`get_lw_regression`], [`get_la_regression`],
 #'   [`age_to_100day`], [`sptable`], [`sptable_lw`], [`sptable_rockfish100`]
 #' @keywords functions
 #' @examples
+#' load_trawls()
+#' least_fav_orgs <- data.frame(SPECIES=c(2058,2842),
+#'                           MATURITY=c("U","U"),
+#'                           NAME=c("Pyrosomes","Egg jellies"))
+#' least_fav_orgs_abund <- get_totals(speciestable=least_fav_orgs, what="abundance")
+#'
+#' anchovytable <- data.frame(SPECIES=209, MATURITY="A", NAME="Adult Anchovy")
+#' anchabund <- get_totals(anchovytable, datasets = c("RREAS","NWFSC"), what = "biomass")
+#'
 #' \dontrun{
-#' krillsp=data.frame(SPECIES=c(1473,1816),
-#'   MATURITY=c("U","U"),
-#'   NAME=c("T. spinifera","E. pacifica"))
-#' krillabundance=get_totals(speciestable=krillsp, what="abundance")
-#'
-#' somebiomasses=get_totals(speciestable=sptable, what="biomass")
-#'
-#' rockfish100day=get_totals(speciestable=sptable_rockfish100, what="100day",
+#' rockfish100day <- get_totals(speciestable=sptable_rockfish100, what="100day",
 #'   datasets=c("RREAS","ADAMS","PWCC","NWFSC"))
 #' }
-get_totals=function(speciestable,datasets="RREAS",startyear=1983,
-                    what=c("abundance","biomass","100day"),haultable=HAULSTANDARD) {
+get_totals=function(speciestable, what=c("abundance","biomass","100day"), startyear=1983,
+                    haultable=HAULSTANDARD, datasets="RREAS") {
   what=match.arg(what)
   if(what=="abundance") {
     out=get_numbers(speciestable,datasets,startyear,what="abundance",haultable=haultable,aggregate=TRUE)
@@ -150,24 +154,25 @@ get_totals=function(speciestable,datasets="RREAS",startyear=1983,
 #' If a haul had no fish, it will appear in the output dataset (with
 #' TOTAL_NO=0). If a haul had fish, but no fish were measured, there will be a
 #' TOTAL_NO>0, NMEAS will be 0, and there will be a single length/mass/age entry
-#' for that haul, which will be the average values used as a substitute. If a
+#' for that haul, which will be the average value used as a substitute. If a
 #' haul has length measurements, there will be multiple entries for that haul,
-#' and haul-level information will be repeated.
+#' and haul-level information will be repeated. *For calculating distributions,
+#' you will probably want to exclude any tows with NMEAS=0.*
 #'
 #' The `speciestable` should be formatted in the same way as described in
 #' [`get_totals`].
 #'
 #' @param speciestable Dataframe containing species information (see Details).
-#' @param datasets Character vector indicating which dataset(s) to use. Multiple
-#'   dataset can be specified. Options are "RREAS", "ADAMS", "PWCC", "NWFSC". If
-#'   unspecified, just uses "RREAS".
-#' @param startyear Start year (default is 1983).
 #' @param what What type of distribution you want, either "size", "mass", or
 #'   "age".
+#' @param startyear Start year (default is 1983).
 #' @param haultable The table of hauls from which to obtain data. Defaults to
 #'   HAULSTANDARD. If you do not want to use HAULSTANDARD, you
 #'   can specify another table here, but it should have all of the same columns as
 #'   HAULSTANDARD.
+#' @param datasets Character vector indicating which dataset(s) to use. Multiple
+#'   dataset can be specified. Options are "RREAS", "ADAMS", "PWCC", "NWFSC". If
+#'   unspecified, just uses "RREAS".
 #'
 #' @return A dataframe with haul information, NAME, TOTAL_NO, NMEAS (number
 #'   measured), EXP (expansion factor), SP_NO (specimen number), and values for
@@ -178,7 +183,7 @@ get_totals=function(speciestable,datasets="RREAS",startyear=1983,
 #'   limits are specified, will include additional columns NMEAS_SIZE (number
 #'   measured in the size range), PSIZE (proportion of measured fish in the size
 #'   range), and NSIZE (total number in the size range, which is probably what
-#'   you want, not TOTAL_NO). If multiple NAME values were present, the data
+#'   you want for abundance, not TOTAL_NO). If multiple NAME values were present, the data
 #'   will be in long format (stacked). If you request data from multiple
 #'   datasets, they results will be combined (column SURVEY differentiates
 #'   source). The NAME field is converted to a factor so names will plot in the
@@ -189,11 +194,17 @@ get_totals=function(speciestable,datasets="RREAS",startyear=1983,
 #'   [`age_to_100day`], [`sptable`], [`sptable_lw`], [`sptable_rockfish100`]
 #' @keywords functions
 #' @examples
+#' load_trawls()
+#' anchtabletotal <- data.frame(SPECIES=209, MATURITY=c("Y","A"),
+#'   NAME=c("Total Anchovy", "Total Anchovy"))
+#' anchsizedist <- get_distributions(anchtabletotal, what = "size")
+#'
 #' \dontrun{
-#' rockfish100agedist <- get_distributions(sptable_rockfish100, what = "age")
+#' shortbelly <- data.frame(SPECIES=604, MATURITY="Y", NAME="Shortbelly")
+#' shortbellyagedist <- get_distributions(shortbelly, what = "age")
 #' }
-get_distributions=function(speciestable,datasets="RREAS",startyear=1983,
-                          what=c("size","mass","age"),haultable=HAULSTANDARD) {
+get_distributions=function(speciestable, what=c("size","mass","age"), startyear=1983,
+                          haultable=HAULSTANDARD, datasets="RREAS") {
   what=match.arg(what)
   if(what=="size") {
     out=get_numbers(speciestable,datasets,startyear,what="abundance",haultable=haultable,aggregate=FALSE)

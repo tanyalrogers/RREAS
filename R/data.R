@@ -59,7 +59,7 @@
 #' unknown dragonfish.
 #'
 #'
-#' @format A data frame with 104 rows and 3 variables:
+#' @format A data frame with 73 rows and 3 variables:
 #' \describe{
 #'   \item{SPECIES}{Species code}
 #'   \item{MATURITY}{Maturity code}
@@ -72,7 +72,7 @@
 #'
 #' Table of species and species groups for which biomass estimates can be obtained.
 #'
-#' @format A data frame with 113 rows and 3 variables:
+#' @format A data frame with 92 rows and 3 variables:
 #' \describe{
 #'   \item{SPECIES}{Species code}
 #'   \item{MATURITY}{Maturity code}
@@ -105,7 +105,7 @@
 #'
 #' @name RREAS_TABLES
 #' @aliases STATIONS_RREAS SPECIES_CODES_RREAS CATCH_ERDDAP CATCH_RREAS HAUL_ERDDAP HAUL_RREAS
-#'   HAULSTANDARD_ERDDAP HAULSTANDARD_RREAS WEIGHT_RREAS CTD_HEADER CTD_CAST
+#'   HAULSTANDARD_ERDDAP HAULSTANDARD_RREAS WEIGHT_RREAS CTD_HEADER CTD_CAST NET_MENSURATION
 #'
 #' @details Data from ERDDAP are reformatted as relational tables matching the
 #'   format of the tables in the database. Data on ERDDAP begins in 1990 and
@@ -142,7 +142,7 @@
 #'   B.B. and Carrion, C.N. (2016) Anomalous epipelagic micronekton assemblage patterns
 #'   in the neritic waters of the California Current in spring 2015 during a
 #'   period of extreme ocean conditions. CalCOFI Rep. 57:163-183
-#' @source \url{https://oceanview.pfeg.noaa.gov/erddap/tabledap/FED_Rockfish_Catch.html}
+#' @source Dryad data from: URL. ERDDAP data from: \url{https://oceanview.pfeg.noaa.gov/erddap/tabledap/FED_Rockfish_Catch.html}
 #'   \url{https://oceanview.pfeg.noaa.gov/erddap/tabledap/FED_Rockfish_Length.html}
 #' @keywords datasets
 NULL
@@ -169,4 +169,10 @@ NULL
 "LENGTH_RREAS"
 #' @rdname RREAS_TABLES
 "WEIGHT_RREAS"
+#' @rdname RREAS_TABLES
+"NET_MENSURATION"
+#' @rdname RREAS_TABLES
+"CTD_HEADER"
+#' @rdname RREAS_TABLES
+"CTD_CAST"
 

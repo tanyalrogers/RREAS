@@ -51,9 +51,9 @@ The package allows for the loading of data from one of several sources into a co
 
 The package contains a current copy of the RREAS data posted on Dryad (LINK WILL GO HERE ONCE ACTIVE). The data do not have to be separately downloaded. The data currently span `r min(HAULSTANDARD_RREAS$YEAR)` to `r max(HAULSTANDARD_RREAS$YEAR)`. The trawl-associated data (`HAUL`, `CATCH`, `LENGTH`, `WEIGHT`, `STATIONS`, `SPECIES_CODES`, and derived table `HAULSTANDARD`) can be loaded using `load_trawls()`. The other tables (`CTD_HEADER`, `CTD_CAST`, `NET_MENSURATION`) can be called directly for lazy loading.
 
-The package also contains a copy of the trawl-associated data (`HAUL`, `CATCH`, `LENGTH`) posted on [ERDDAP](https://oceanview.pfeg.noaa.gov/erddap/index.html), which contain only a subset of the data posted on Dryad. The ERDDAP dataset contains data from `r min(HAULSTANDARD_ERDDAP$YEAR)` to `r max(HAULSTANDARD_ERDDAP$YEAR)` and for standard, active stations only. The trawl-associated data can be loaded using `load_erddap()`. Note that the `WEIGHT` table is not included in this dataset, and there are some differences in how the krill and young-of-the-year rockfish are coded. The catch table on ERDDAP is reformatted into relational `HAUL` and `CATCH` tables to match the format of the other data sources. The `SPECIES_CODES` and `STATIONS` tables that are loaded come from Dryad dataset.
+The package also contains a copy of the trawl-associated data (`HAUL`, `CATCH`, `LENGTH`) posted on [ERDDAP](https://oceanview.pfeg.noaa.gov/erddap/index.html), which contain only a subset of the data posted on Dryad. The ERDDAP dataset contains data from `r min(HAULSTANDARD_ERDDAP$YEAR)` to `r max(HAULSTANDARD_ERDDAP$YEAR)` and for standard, active stations only. The trawl-associated data can be loaded using `load_erddap()`. Note that the `WEIGHT` table is not included in this dataset, and there are differences in how the krill and young-of-the-year rockfish MATURITY is coded: The ERDDAP dataset contains additional SPECIES/MATURITY categories 1472/T (total krill) and 1940/T (total rockfish). The catch table on ERDDAP is reformatted into relational `HAUL` and `CATCH` tables to match the format of the other data sources. The `SPECIES_CODES` and `STATIONS` tables that are loaded come from Dryad dataset.
 
-For internal users at NOAA, there are functions to load data from a local copy of the RREAS MS Access Database, which also contains the NWFSC, PWCC, and ADAMS datasets, as well as the `AGE` table for age-at-length regressions. Abundance indices for stock assessments and other ecosystem reports can thus be produced. The trawl-associated data can be loaded using `load_mdb()`.
+For internal users at NOAA, there are functions to load data from a local copy of the RREAS MS Access Database, which also contains the NWFSC, PWCC, and ADAMS datasets, as well as the `AGE` table for age-at-length regressions, and the speciated krill data. Abundance indices for stock assessments and other ecosystem reports can thus be produced. The trawl-associated data can be loaded using `load_mdb()`.
 
 Metadata for all data tables can be found under `help("RREAS_TABLES")`.
 
@@ -111,7 +111,7 @@ anchtable_len <- data.frame(SPECIES=209, MATURITY="A",
 anchtable_len
 ```
 
-The package contains some pre-made species tables with common species and species groupings, which can be subsetted if desired. You can explicitly load them using `data()`, or call them directly. You can also construct your own custom species table as in the above examples.
+The package contains some pre-made species tables with common species and species groupings, which can be subsetted if desired. You can explicitly load them to global environment using `data()`, or call them directly. You can also construct your own custom species table as in the above examples.
 
 ```{r}
 #Some common species and species groups used in ecosystem reports.
@@ -139,22 +139,25 @@ Values will be generated for each unique NAME in `speciestable` for each haul in
 
 If a station was sampled, but the requested species was *not counted* at the time, it will appear as an NA. If the species was counted but was *not present*, it will appear as 0. If the species was counted but the counts numbers are unreliable (the case for some species prior to 1990, presence/absence will still be reliable), a message will be displayed. Description of additional irregularities in species classification can be found in the `sptable` documentation and in the SPECIES_CODES table. **It your responsibility to know when your focal species were or were not being recorded.**
 
-Biomass is only available for species with length-weight regressions. The table `sptable_lw` lists the species for which length-weight regressions are avaiable. See `help(get_lw_regression)` for more info on how the regressions are done. (The function `get_lw_regression` is used internally, but can be run independently if desired.)
+If "abundance" is requested, the output table will include column TOTAL_NO. If "biomass" is requested, the output table will include columns TOTAL_NO, NMEAS (number measured), and BIOMASS (g). If you included length constraints, the output table will include additional columns NMEAS_SIZE (number measured in the size range), and NSIZE (total number in the size range, which is probably what you want for abundance, not TOTAL_NO). BIOMASS with size constraints will be the biomass within the size range. 
 
-If you ask for `"biomass"`, the output table will also include TOTAL_NO (abundance) and NMEAS (number of fish measured). 
+Biomass is only available for species with lengths and length-weight regressions. The table `sptable_lw` lists the species for which lengths and length-weight regressions are available. See `help(get_lw_regression)` for more info on how the regressions are done. (The function `get_lw_regression` is used internally, but can be run independently if desired.)
 
-If you include length constraints, the output table will include additional columns NMEAS (number of fish measured), NMEAS_SIZE (number measured in the size range), and NSIZE (total number in the size range, which is probably what you want for abundance, not TOTAL_NO). 
+If length data are available for a species, but not available for a particular haul where the species was present, mean length values will be used. If available, the mean for the same CRUISE and REGION will be used, followed by CRUISE and STRATA, then CRUISE, then the global mean. In the output table, if TOTAL_NO>0 but NMEAS=0, this indicates that length data were unavailable and means were used. If size limits are specified, the mean proportion of fish in the length range will also be used for hauls missing length data, with the same rank ordering of available mean values.
 
 Examples:
 
 ```{r totals}
 #YOY, Adult, Total anchovy abundances
 anchabund <- get_totals(anchtable, what = "abundance")
-head(anchabund)
+tail(anchabund)
 
 #Biomass for different anchovy size classes
 anchbiomass_len <- get_totals(anchtable_len, what = "biomass")
+#early years use mean lengths and proportion in size class
 head(anchbiomass_len)
+#later years use actual values
+tail(anchbiomass_len)
 
 #Total YOY rockfish
 yoyrockfish <- subset(sptable, NAME=="YOY Rockfish")
@@ -164,20 +167,26 @@ head(yoyrockfishabund)
 
 ### Getting distributions
 
-The function `get_distributions` has the same 5 inputs, except `what` should be either `"size"` or `"mass"`. As with `get_totals`, lenght-weight regressions must exist in order to obtain mass distributions.
+The function `get_distributions` has the same 5 inputs, except `what` should be either `"size"` or `"mass"`. Distributions will be generated for each unique NAME in `speciestable` for each haul in HAULSTANDARD (unless another table is specified under `haultable`). If multiple NAME values are present, the results will be stacked in long format. As with `get_totals`, length-weight regressions must exist in order to obtain mass distributions.
 
-If a haul had no fish, it will appear in the output dataset (with TOTAL_NO=0). If a haul had fish, but no fish were measured, there will be a TOTAL_NO>0, NMEAS will be 0, and there will be a single length/mass entry for that haul, which will be the average value used as a substitute.
+If a haul had no fish, it will appear in the output dataset (with TOTAL_NO=0). If a haul had fish, but no fish were measured, there will be a TOTAL_NO>0, NMEAS will be 0, and there will be a single length/mass entry for that haul, which will be the average value. *For calculating distributions, you will probably want to exclude any tows with NMEAS=0.*
 
-The output table will include TOTAL_NO, NMEAS (number measured), EXP (expansion factor, TOTAL_NO/NMEAS), SP_NO (specimen number) and values for the requested distribution. If `"size"` is requested, it will include column STD_LENGTH. If `"mass"` is requested, it will include columns STD_LENGTH and WEIGHT. If size limits are specified, it will include additional columns NMEAS_SIZE (number measured in the size range), PSIZE (proportion of measured fish in the size range), and NSIZE (total number in the size range, which is probably what you want, not TOTAL_NO).
+The output table will include TOTAL_NO, NMEAS (number measured), EXP (expansion factor, TOTAL_NO/NMEAS), SP_NO (specimen number) and values for the requested distribution. If `"size"` is requested, it will include column STD_LENGTH. If `"mass"` is requested, it will include columns STD_LENGTH and WEIGHT (g). If size limits are specified, it will include additional columns NMEAS_SIZE (number measured in the size range), PSIZE (proportion of measured fish in the size range), and NSIZE (total number in the size range, which is probably what you want for abundance, not TOTAL_NO).
 
 ```{r distributions}
 #Size distribution for anchovy
 anchsizedist <- get_distributions(anchtable, what = "size")
+
+#note how the early hauls have no measured fish and use an avg length
+#the expansion factor in this case is the total number of fish
 head(anchsizedist)
+
+#in later years, actual lengths are provided
+tail(anchsizedist, 10)
 
 #Mass distribution for different anchovy size classes
 anchmassdist <- get_distributions(anchtable_len, what = "mass")
-tail(anchmassdist)
+tail(anchmassdist, 10)
 ```
 
 Note that if you are combining distributions across tows, they will need to be weighted by the total number of individuals caught. This is most easily done by binning the lengths and summing the expansion factors. 
@@ -195,7 +204,7 @@ anchsizedist$bin=cut(anchsizedist$STD_LENGTH, breaks, labels = breaks[-1]-binwid
 anchsizedist_sum=anchsizedist %>% 
   filter(NAME %in% c("Adult Anchovy", "YOY Anchovy")) %>% 
   filter(YEAR %in% c(2024,2025)) %>% #for a simpler figure
-  filter(!is.na(EXP)) %>% #remove hauls with no fish caught
+  filter(NMEAS>0) %>% #remove hauls with no fish measured
   group_by(NAME, YEAR, bin) %>% 
   summarise(total=sum(EXP, na.rm=T)) %>% 
   group_by(NAME, YEAR) %>% 
@@ -271,6 +280,18 @@ HAULDEPTHSTRATIFIED <- HAULDEPTHSTRATIFIED %>%
   left_join(HAUL %>% select(CRUISE, HAUL_NO, CTD_INDEX), by = c("CRUISE", "HAUL_NO"))
 ```
 
+## CTD data
+
+To load the CTD data, just call the names of the tables. You can explicitly load them to global environment using `data()`, or call them directly. The CTD_CAST table is quite large, so it intentionally not loaded automatically with the trawl data.
+
+```{r ctd}
+head(CTD_HEADER)
+example_cast <- subset(CTD_CAST, CRUISE=="2502" & CTD_INDEX==20)
+head(example_cast)
+ggplot(example_cast, aes(y=-CTD_DEPTH, x=TEMPERATURE)) +
+  geom_path() + theme_bw()
+```
+
 ## Internal users
 
 The function `load_mdb` loads data from a local copy of the RREAS MS Access Database. It has the same arguments and defaults as `load_trawls` plus an additional `datasets` argument that can be used to load the additional datasets: NWFSC, PWCC, and ADAMS. The default behavior of `load_mdb` is to load just the RREAS data (`datasets = "RREAS"`). The AGE table will also be loaded.
@@ -280,7 +301,7 @@ To use `load_mdb`, you will need to specify the file path to the local MS Access
 ```{r dataload}
 #replace the file paths with those for your machine
 #any previously loaded tables with the same name in your workspace will be overwritten
-rm(list = ls())
+rm(list = ls()) #clear workspace
 load_mdb(mdb_path="C:/Rogers/Documents/Rockfish/RREAS/Survey data/juv_cruise_backup22APR26.mdb",
          krill_len_path="C:/Rogers/Documents/Rockfish/Index generation/length weight/krill_lengths.csv")
 ls(name = .GlobalEnv) #list objects in your workspace

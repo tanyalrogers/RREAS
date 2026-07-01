@@ -2,13 +2,15 @@
 
 library(dplyr)
 library(RODBC)
-dbpath <- "C:/Rogers/Documents/Rockfish/RREAS/Survey data/database paper/RREAS database MAR2026.accdb"
+dbpath <- "C:/Rogers/Documents/Rockfish/RREAS/Survey data/database paper/RREAS database JUN2026.accdb"
 channel <- RODBC::odbcConnectAccess2007(dbpath)
 CTD_HEADER<-RODBC::sqlQuery(channel, "SELECT * FROM dbo_CTD_HEADER", stringsAsFactors = F, as.is=1)
 CTD_CAST<-RODBC::sqlQuery(channel, "SELECT * FROM dbo_CTD_CAST", stringsAsFactors = F, as.is=1)
+NET_MENSURATION<-RODBC::sqlQuery(channel, "SELECT * FROM dbo_NET_MENSURATION", stringsAsFactors = F, as.is=1)
 
 usethis::use_data(CTD_CAST, overwrite = TRUE)
 usethis::use_data(CTD_HEADER, overwrite = TRUE)
+usethis::use_data(NET_MENSURATION, overwrite = TRUE)
 
 STATIONS_RREAS <- RODBC::sqlQuery(channel, "SELECT * FROM dbo_STANDARD_STATIONS", stringsAsFactors = F)
 SPECIES_CODES_RREAS <- RODBC::sqlQuery(channel, "SELECT * FROM dbo_SPECIES_CODES", stringsAsFactors = F)

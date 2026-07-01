@@ -441,6 +441,7 @@ load_erddap=function() {
 #' @keywords functions
 #' @examples
 #' load_trawls()
+#' load_trawls(activestationsonly=FALSE, startyear=1990)
 #'
 load_trawls=function(activestationsonly=TRUE, stdtimeperiodonly=TRUE, startyear=1983) {
   SPECIES_CODES <<- SPECIES_CODES_RREAS

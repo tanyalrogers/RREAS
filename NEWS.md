@@ -1,3 +1,12 @@
+# RREAS 0.2.0
+* Add Dryad data to package, including CTD data, through 2025
+* Add `load_trawls` function to load Dryad version of data
+* Update documentation to gear toward Dryad data users rather than internal users
+* Update ERDAPP data through 2025
+* Update `sptable` to remove species not present
+* Update uncounted and unreliable species information
+* Add citations for published len-weight regressions
+
 # RREAS 0.1.5
 * Update ERDAPP data through 2023
 * Add more messages to prevent inadvertent mistakes

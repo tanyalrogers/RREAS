@@ -37,11 +37,11 @@
 #' @export
 #' @keywords functions
 #' @examples
-#' \dontrun{
+#' load_trawls()
 #' load_depth_stratified_tows()
 #' anchovytable <- data.frame(SPECIES=209, MATURITY="A",NAME="Adult Anchovy")
 #' anchovyabund <- get_totals(anchovytable, what = "abundance", haultable = HAULDEPTHSTRATIFIED)
-#' }
+#'
 load_depth_stratified_tows=function() {
 
   #convert positions to decimal degrees
