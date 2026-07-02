@@ -30,8 +30,8 @@
 #'
 #' **Myctophids:** Blue lanternfish (685) and California headlightfish (192) have
 #' always been identified to species and separated from unknown myctophids
-#' (407). Over time, more myctophids (e.g. Northern lampfish (661), California
-#' lanternfish (669)) have been identified to species and no longer classified
+#' (407). Over time, more myctophids (e.g. Northern lampfish (661), Mexican
+#' lampfish (712)) have been identified to species and no longer classified
 #' as 407. Thus, depending on the survey year, 407 encompasses different
 #' species.
 #'

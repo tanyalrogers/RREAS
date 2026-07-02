@@ -12,7 +12,7 @@ Authors@R:
              family = "Sakuma",
              role = c("aut"),
              email = "keith.sakuma@noaa.gov"))
-Description: Data and support functions for the NOAA SWFSC Rockfish Recruitment and Ecosystem Assessment Survey.
+Description: Data and support functions for the NOAA NMFS SWFSC Rockfish Recruitment and Ecosystem Assessment Survey.
 License: file LICENSE
 Encoding: UTF-8
 LazyData: true

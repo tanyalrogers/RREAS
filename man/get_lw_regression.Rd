@@ -44,7 +44,7 @@ species without data.
 For anchovy (209) and Pacific sanddabs (147), adults (A) and juveniles (Y)
 are pooled for the regression.
 
-For northern lampfish (661) and California lanternfish (669), data from both
+For northern lampfish (661) and bigfin lanternfish (669), data from both
 species are pooled for the regression. Unknown myctophids (407) will use
 this regression.
 

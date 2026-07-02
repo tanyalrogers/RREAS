@@ -49,7 +49,7 @@ usethis::use_data(rflwgroups, overwrite = TRUE)
 
 #lw regression species
 sptable_lw<-read.csv("data-raw/lw species table.csv", stringsAsFactors = F)
-usethis::use_data(sptable_lw, overwrite = TRUE)
+usethis::use_data(sptable_lw, overwrite = TRUE, compress = "gzip")
 
 #species in sptable, but not in sptable_lw
 setdiff(sptable$SPECIES, sptable_lw$SPECIES)

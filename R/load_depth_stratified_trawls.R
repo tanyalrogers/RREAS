@@ -1,33 +1,33 @@
-#' Extract RREAS depth-stratified tows
+#' Extract RREAS depth-stratified trawls
 #'
-#' Pulls out the subset of depth-stratified tows from the HAUL table. Creates the table
+#' Pulls out the subset of depth-stratified trawls from the HAUL table. Creates the table
 #' HAULDEPTHSTRATIFED.
 #'
 #' @details
 #'
-#' RREAS standard tows are conducted at 30 m headrope depth (DEPTH_STRATA 2),
+#' RREAS standard trawls are conducted at 30 m headrope depth (DEPTH_STRATA 2),
 #' with the exception of stations with a bottom depth of less than 60 m, which
-#' are towed at 10 m headrope depth (DEPTH_STRATA 1). These are the tows which
+#' are towed at 10 m headrope depth (DEPTH_STRATA 1). These are the hauls which
 #' appear in HAULSTANDARD.
 #'
 #' Historically, mostly before the coastwide expansion in 2004, multiple depth
 #' strata (DEPTH_STRATA 1: 10 m, DEPTH_STRATA 2: 30 m, DEPTH_STRATA 3: 90 m)
 #' were sampled in succession at specific stations, mostly at stations 110, 125,
 #' 133, and 170, but occassionally others. This function pulls out these
-#' depth-stratified tows into the table HAULDEPTHSTRATIFED. It has the same
+#' depth-stratified trawls into the table HAULDEPTHSTRATIFED. It has the same
 #' format as HAULSTANDARD, but with a few extra columns: DEPTH_STRATA, SWEEP (indicates
 #' which of the 3 passes the sampling is from; there is generally one set of
-#' depth-stratified tows per sweep, but not always), and SWEEP_SEP (separates cases
-#' in which there are multiple sets of depth stratified tows per sweep, and sets
-#' of depth stratified tows where SWEEP in NA, which occurs after 2004;
-#' otherwise equal to SWEEP). Each set of consecutive depth stratified tows will
+#' depth-stratified trawls per sweep, but not always), and SWEEP_SEP (separates cases
+#' in which there are multiple sets of depth stratified trawls per sweep, and sets
+#' of depth stratified trawls where SWEEP in NA, which occurs after 2004;
+#' otherwise equal to SWEEP). Each set of consecutive depth stratified trawls will
 #' have a unique CRUISE/STATION/SWEEP_SEP value.
 #'
 #' HAULDEPTHSTRATIFED can be passed to `get_totals` or `get_distributions` to
 #' get catch data from these hauls instead of HAULSTANDARD by supplying it under
 #' `haultable`.
 #'
-#' Depth-stratified tows are defined as valid tows at the same station done in
+#' Depth-stratified trawls are defined as valid trawls at the same station done in
 #' succession at more than one depth strata. These are cataloged in the internal table
 #' `ds_tows`.
 #'
@@ -38,11 +38,11 @@
 #' @keywords functions
 #' @examples
 #' load_trawls()
-#' load_depth_stratified_tows()
+#' load_depth_stratified_trawls()
 #' anchovytable <- data.frame(SPECIES=209, MATURITY="A",NAME="Adult Anchovy")
 #' anchovyabund <- get_totals(anchovytable, what = "abundance", haultable = HAULDEPTHSTRATIFIED)
 #'
-load_depth_stratified_tows=function() {
+load_depth_stratified_trawls=function() {
 
   #convert positions to decimal degrees
   convertdd <- function(x) {
@@ -79,7 +79,7 @@ load_depth_stratified_tows=function() {
     dplyr::arrange(YEAR)
 
   if(any(is.na(HAULDEPTHSTRATIFIED$SURVEY))) {
-    message("Note: ", sum(is.na(HAULDEPTHSTRATIFIED$SURVEY)), " tows at inactive stations omitted. To include, load data with activestationsonly=FALSE.")
+    message("Note: ", sum(is.na(HAULDEPTHSTRATIFIED$SURVEY)), " trawls at inactive stations omitted. To include, load data with activestationsonly=FALSE.")
   }
   HAULDEPTHSTRATIFIED<<-subset(HAULDEPTHSTRATIFIED, !is.na(SURVEY))
 

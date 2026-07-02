@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-This package contains data and support functions for the NOAA SWFSC Rockfish Recruitment and Ecosystem Assessment Survey (RREAS). 
+This package contains data and support functions for the NOAA NMFS SWFSC Rockfish Recruitment and Ecosystem Assessment Survey (RREAS). 
 
 This is version `r packageVersion("RREAS")`. Please report any problems! 
 
@@ -40,6 +40,8 @@ To install the latest version of the package:
 ``` r
 #install.packages("devtools") #if required
 devtools::install_github("tanyalrogers/RREAS")
+#if that doesn't work, try
+pak::pak("tanyalrogers/RREAS")
 ```
 ## Package overview
 
@@ -51,7 +53,7 @@ The package allows for the loading of data from one of several sources into a co
 
 The package contains a current copy of the RREAS data posted on Dryad (LINK WILL GO HERE ONCE ACTIVE). The data do not have to be separately downloaded. The data currently span `r min(HAULSTANDARD_RREAS$YEAR)` to `r max(HAULSTANDARD_RREAS$YEAR)`. The trawl-associated data (`HAUL`, `CATCH`, `LENGTH`, `WEIGHT`, `STATIONS`, `SPECIES_CODES`, and derived table `HAULSTANDARD`) can be loaded using `load_trawls()`. The other tables (`CTD_HEADER`, `CTD_CAST`, `NET_MENSURATION`) can be called directly for lazy loading.
 
-The package also contains a copy of the trawl-associated data (`HAUL`, `CATCH`, `LENGTH`) posted on [ERDDAP](https://oceanview.pfeg.noaa.gov/erddap/index.html), which contain only a subset of the data posted on Dryad. The ERDDAP dataset contains data from `r min(HAULSTANDARD_ERDDAP$YEAR)` to `r max(HAULSTANDARD_ERDDAP$YEAR)` and for standard, active stations only. The trawl-associated data can be loaded using `load_erddap()`. Note that the `WEIGHT` table is not included in this dataset, and there are differences in how the krill and young-of-the-year rockfish MATURITY is coded: The ERDDAP dataset contains additional SPECIES/MATURITY categories 1472/T (total krill) and 1940/T (total rockfish). The catch table on ERDDAP is reformatted into relational `HAUL` and `CATCH` tables to match the format of the other data sources. The `SPECIES_CODES` and `STATIONS` tables that are loaded come from Dryad dataset.
+The package also contains a copy of the trawl-associated data (`HAUL`, `CATCH`, `LENGTH`) posted on [ERDDAP](https://oceanview.pfeg.noaa.gov/erddap/index.html), which contain only a subset of the data posted on Dryad. The ERDDAP dataset contains data from `r min(HAULSTANDARD_ERDDAP$YEAR)` to `r max(HAULSTANDARD_ERDDAP$YEAR)` and for standard, active trawl stations only. The trawl-associated data can be loaded using `load_erddap()`. Note that the `WEIGHT` table is not included in this dataset, and there are differences in how the krill and young-of-the-year rockfish MATURITY is coded: The ERDDAP dataset contains additional SPECIES/MATURITY categories 1472/T (total krill) and 1940/T (total rockfish). The catch table on ERDDAP is reformatted into relational `HAUL` and `CATCH` tables to match the format of the other data sources. The `SPECIES_CODES` and `STATIONS` tables that are loaded come from Dryad dataset.
 
 For internal users at NOAA, there are functions to load data from a local copy of the RREAS MS Access Database, which also contains the NWFSC, PWCC, and ADAMS datasets, as well as the `AGE` table for age-at-length regressions, and the speciated krill data. Abundance indices for stock assessments and other ecosystem reports can thus be produced. The trawl-associated data can be loaded using `load_mdb()`.
 
@@ -169,7 +171,7 @@ head(yoyrockfishabund)
 
 The function `get_distributions` has the same 5 inputs, except `what` should be either `"size"` or `"mass"`. Distributions will be generated for each unique NAME in `speciestable` for each haul in HAULSTANDARD (unless another table is specified under `haultable`). If multiple NAME values are present, the results will be stacked in long format. As with `get_totals`, length-weight regressions must exist in order to obtain mass distributions.
 
-If a haul had no fish, it will appear in the output dataset (with TOTAL_NO=0). If a haul had fish, but no fish were measured, there will be a TOTAL_NO>0, NMEAS will be 0, and there will be a single length/mass entry for that haul, which will be the average value. *For calculating distributions, you will probably want to exclude any tows with NMEAS=0.*
+If a haul had no fish, it will appear in the output dataset (with TOTAL_NO=0). If a haul had fish, but no fish were measured, there will be a TOTAL_NO>0, NMEAS will be 0, and there will be a single length/mass entry for that haul, which will be the average value. *For calculating distributions, you will probably want to exclude any hauls with NMEAS=0.*
 
 The output table will include TOTAL_NO, NMEAS (number measured), EXP (expansion factor, TOTAL_NO/NMEAS), SP_NO (specimen number) and values for the requested distribution. If `"size"` is requested, it will include column STD_LENGTH. If `"mass"` is requested, it will include columns STD_LENGTH and WEIGHT (g). If size limits are specified, it will include additional columns NMEAS_SIZE (number measured in the size range), PSIZE (proportion of measured fish in the size range), and NSIZE (total number in the size range, which is probably what you want for abundance, not TOTAL_NO).
 
@@ -189,7 +191,7 @@ anchmassdist <- get_distributions(anchtable_len, what = "mass")
 tail(anchmassdist, 10)
 ```
 
-Note that if you are combining distributions across tows, they will need to be weighted by the total number of individuals caught. This is most easily done by binning the lengths and summing the expansion factors. 
+Note that if you are combining distributions across hauls, they will need to be weighted by the total number of individuals caught. This is most easily done by binning the lengths and summing the expansion factors. 
 
 ```{r combdist, warning=FALSE, message=FALSE}
 library(ggplot2)
@@ -197,7 +199,7 @@ library(dplyr)
 
 binwidth <- 6
 breaks <- seq(min(anchsizedist$STD_LENGTH, na.rm = T),
-           max(anchsizedist$STD_LENGTH, na.rm = T), by = binwidth)
+              max(anchsizedist$STD_LENGTH, na.rm = T), by = binwidth)
 
 anchsizedist$bin=cut(anchsizedist$STD_LENGTH, breaks, labels = breaks[-1]-binwidth/2)
 
@@ -248,33 +250,47 @@ ggplot(anchindex2plot,aes(y=BIOMASS_INDEX,x=YEAR)) +
   labs(x="Year", y="log Biomass")
 ```
 
-## Depth-stratified tows
+## Depth-stratified trawls
 
-RREAS standard tows are conducted at 30 m headrope depth (DEPTH_STRATA 2), with the exception of stations with a bottom depth of less than 60 m, which are towed at 10 m headrope depth (DEPTH_STRATA 1). These are the tows which appear in HAULSTANDARD.
+RREAS standard trawls are conducted at 30 m headrope depth (DEPTH_STRATA 2), with the exception of stations with a bottom depth of less than 60 m, which are towed at 10 m headrope depth (DEPTH_STRATA 1). These are the hauls which appear in HAULSTANDARD.
 
-Historically, mostly before the coastwide expansion in 2004, multiple depth strata (DEPTH_STRATA 1: 10 m, DEPTH_STRATA 2: 30 m, DEPTH_STRATA 3: 90 m) were sampled in succession at specific stations, mostly at stations 110, 125, 133, and 170, but occasionally others. The function `load_depth_stratified_tows` pulls out these depth-stratified tows into the table HAULDEPTHSTRATIFED. It has the same format as HAULSTANDARD, but with a few extra columns: DEPTH_STRATA, SWEEP (indicates which of the 3 passes the sampling is from; there is generally one set of depth-stratified tows per sweep, but not always), and SWEEP_SEP (separates cases in which there are multiple sets of depth stratified tows per sweep, and sets of depth stratified tows where SWEEP in NA, which occurs after 2004; otherwise equal to SWEEP). Each set of consecutive depth stratified tows will have a unique CRUISE/STATION/SWEEP_SEP value.
+Historically, mostly before the coastwide expansion in 2004, multiple depth strata (DEPTH_STRATA 1: 10 m, DEPTH_STRATA 2: 30 m, DEPTH_STRATA 3: 90 m) were sampled in succession at specific stations, mostly at stations 110, 125, 133, and 170, but occasionally others. The function `load_depth_stratified_trawls` pulls out these depth-stratified trawls into the table HAULDEPTHSTRATIFED. It has the same format as HAULSTANDARD, but with a few extra columns: DEPTH_STRATA, SWEEP (indicates which of the 3 passes the sampling is from; there is generally one set of depth-stratified trawls per sweep, but not always), and SWEEP_SEP (separates cases in which there are multiple sets of depth stratified trawls per sweep, and sets of depth stratified trawls where SWEEP in NA, which occurs after 2004; otherwise equal to SWEEP). Each set of consecutive depth stratified trawls will have a unique CRUISE/STATION/SWEEP_SEP value.
 
-HAULDEPTHSTRATIFED can be passed to `get_totals` or `get_distributions` to get catch data from these hauls instead of HAULSTANDARD by supplying it under `haultable`. Note that all of the depth-stratified tows are not present in the ERDDAP dataset.
+HAULDEPTHSTRATIFED can be passed to `get_totals` or `get_distributions` to get catch data from these hauls instead of HAULSTANDARD by supplying it under `haultable`. Note that all of the depth-stratified trawls are not present in the ERDDAP dataset.
 
-Note that to get *all* of the depth-stratified tows, you have to include the non-active stations (`activestationsonly = FALSE`).
+Note that to get *all* of the depth-stratified trawls, you have to include the non-active stations (`activestationsonly = FALSE`).
 
 ```{r}
 load_trawls(activestationsonly = FALSE)
-load_depth_stratified_tows()
+load_depth_stratified_trawls()
 str(HAULDEPTHSTRATIFIED)
 
 anchabund_ds <- get_totals(anchtable, what = "abundance", haultable = HAULDEPTHSTRATIFIED)
 
-#to get depth stratified tows with all 3 strata sampled
+#to get depth stratified trawls with all 3 strata sampled
 HAULDEPTHSTRATIFIED <- HAULDEPTHSTRATIFIED %>% 
   group_by(CRUISE,STATION,SWEEP_SEP) %>%
   mutate(ustrata=length(unique(DEPTH_STRATA)))
 filter(HAULDEPTHSTRATIFIED, ustrata==3) %>% nrow()
 filter(HAULDEPTHSTRATIFIED, ustrata==3 & YEAR>=1990) %>% nrow()
 
-#see which tows have CTDs
+#see which hauls have CTDs
 HAULDEPTHSTRATIFIED <- HAULDEPTHSTRATIFIED %>%
   left_join(HAUL %>% select(CRUISE, HAUL_NO, CTD_INDEX), by = c("CRUISE", "HAUL_NO"))
+```
+
+## Trawls aborted due to gelatinous organisms
+
+For calculations involving jellies (specifically SPECIES 2840 moon jelly, 1766 sea nettle, and 2842 egg jelly) and/and pelagic tunicates (SPECIES 2393 salps, 2058 pyrosomes), users should consider using trawls with PROBLEM=3 for jellies and/or PROBLEM=9 for pelagic tunicates. These were trawls where those organisms were so abundant that a valid trawl was not possible and catch data are missing or inaccurate. The NOTES column will indicate the specific species involved, if it was recorded. Some of these hauls have accurate values in the CATCH table for the gelatinous organisms only, but not any other species. These problem codes include hauls with HAUL_NO ≥ 900, which are hauls skipped due to high abundance of gelatinous organisms. For catch numbers in the case of missing data, the maximum valid catch (or average of the five largest valid catches) for those organisms could be used as a substitute, as has been done in prior studies. 
+
+At present, requesting totals or distributions for these species does not account for the aborted trawls. A way to do this more easily within the package architecture is something we plan to incorporate into future versions of the package.
+
+```{r}
+jellytrawls <- subset(HAUL, PROBLEM==3)
+head(jellytrawls[,c("CRUISE","HAUL_NO","STATION","PROBLEM","NOTES")])
+
+tunicatetrawls <- subset(HAUL, PROBLEM==9)
+head(tunicatetrawls[,c("CRUISE","HAUL_NO","STATION","PROBLEM","NOTES")])
 ```
 
 ## CTD data
@@ -283,7 +299,7 @@ To load the CTD data, just call the names of the tables. You can explicitly load
 
 ```{r ctd}
 head(CTD_HEADER)
-example_cast <- subset(CTD_CAST, CRUISE=="2502" & CTD_INDEX==20)
+example_cast <- subset(CTD_CAST, CRUISE=="2502" & CTD_INDEX==100)
 head(example_cast)
 ggplot(example_cast, aes(y=-CTD_DEPTH, x=TEMPERATURE)) +
   geom_path() + theme_bw()
@@ -321,12 +337,12 @@ ls(name = .GlobalEnv) #list objects in your workspace
 
 There is another, optional argument to load `atsea.mdb` and append the current year's data if it is not in the primary database. See `help(load_mdb)` for more information.
 
-The data extraction functions `get_totals` and `get_distributions` are used in the same way as decribed above, but you can specify which `datasets` to pull data from (if they have been loaded). Only one table is outputted, so if you request data from multiple datasets, they results will be combined (column SURVEY differentiates source). 
+The data extraction functions `get_totals` and `get_distributions` are used in the same way as described above, but you can specify which `datasets` to pull data from (if they have been loaded). Only one table is outputted, so if you request data from multiple datasets, they results will be combined (column SURVEY differentiates source). 
 
 ```{r}
 #Anchovy from RREAS and NWFSC surveys
 anchtabletotal <- data.frame(SPECIES=209, MATURITY=c("Y","A"),
-                        NAME=c("Total Anchovy", "Total Anchovy"))
+                             NAME=c("Total Anchovy", "Total Anchovy"))
 anchabund <- get_totals(anchtabletotal, datasets = c("RREAS","NWFSC"), what = "abundance")
 table(anchabund$SURVEY)
 ```
