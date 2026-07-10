@@ -351,7 +351,7 @@ In addition, `get_totals` can be used to obtain total haul-level 100-day standar
 
 100-day standardized abundance and age distribution are only available for species with length-age regressions. This includes the rockfish species listed in `sptable_rockfish100`, hake (382), and lingcod (448). See `help(get_la_regression)` and `help(age_to_100day)` for more details on how the regressions are done. (These functions are also used internally, but can be run independently if desired.)
 
-```{r}
+```{r rockfish100}
 #Rockfish species used in the 100 day standardized abundance index
 data("sptable_rockfish100")
 sptable_rockfish100

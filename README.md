@@ -6,7 +6,7 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-This package contains data and support functions for the NOAA SWFSC
+This package contains data and support functions for the NOAA NMFS SWFSC
 Rockfish Recruitment and Ecosystem Assessment Survey (RREAS).
 
 This is version 0.2.0. Please report any problems!
@@ -37,6 +37,8 @@ To install the latest version of the package:
 ``` r
 #install.packages("devtools") #if required
 devtools::install_github("tanyalrogers/RREAS")
+#if that doesn't work, try
+pak::pak("tanyalrogers/RREAS")
 ```
 
 ## Package overview
@@ -61,11 +63,11 @@ The package also contains a copy of the trawl-associated data (`HAUL`,
 `CATCH`, `LENGTH`) posted on
 [ERDDAP](https://oceanview.pfeg.noaa.gov/erddap/index.html), which
 contain only a subset of the data posted on Dryad. The ERDDAP dataset
-contains data from 1990 to 2025 and for standard, active stations only.
-The trawl-associated data can be loaded using `load_erddap()`. Note that
-the `WEIGHT` table is not included in this dataset, and there are
-differences in how the krill and young-of-the-year rockfish MATURITY is
-coded: The ERDDAP dataset contains additional SPECIES/MATURITY
+contains data from 1990 to 2025 and for standard, active trawl stations
+only. The trawl-associated data can be loaded using `load_erddap()`.
+Note that the `WEIGHT` table is not included in this dataset, and there
+are differences in how the krill and young-of-the-year rockfish MATURITY
+is coded: The ERDDAP dataset contains additional SPECIES/MATURITY
 categories 1472/T (total krill) and 1940/T (total rockfish). The catch
 table on ERDDAP is reformatted into relational `HAUL` and `CATCH` tables
 to match the format of the other data sources. The `SPECIES_CODES` and
@@ -217,7 +219,7 @@ unique(sptable_lw$NAME) #available species and species groups
 #> [21] "Armhook squid"            "Thetys salp"             
 #> [23] "Blacktip squid"           "Moon jelly"              
 #> [25] "Boreal clubhook squid"    "Blue lanternfish"        
-#> [27] "California headlightfish" "California lanternfish"  
+#> [27] "California headlightfish" "Bigfin lanternfish"      
 #> [29] "Nannobrachium spp."       "Mexican lampfish"        
 #> [31] "Northern lampfish"        "Total Myctophids"        
 #> [33] "Total Krill"              "Carinaria"               
@@ -409,7 +411,7 @@ If a haul had no fish, it will appear in the output dataset (with
 TOTAL_NO=0). If a haul had fish, but no fish were measured, there will
 be a TOTAL_NO\>0, NMEAS will be 0, and there will be a single
 length/mass entry for that haul, which will be the average value. *For
-calculating distributions, you will probably want to exclude any tows
+calculating distributions, you will probably want to exclude any hauls
 with NMEAS=0.*
 
 The output table will include TOTAL_NO, NMEAS (number measured), EXP
@@ -554,9 +556,10 @@ tail(anchmassdist, 10)
 #> 17523          0  NA    NA     0         NA    NA       NA
 ```
 
-Note that if you are combining distributions across tows, they will need
-to be weighted by the total number of individuals caught. This is most
-easily done by binning the lengths and summing the expansion factors.
+Note that if you are combining distributions across hauls, they will
+need to be weighted by the total number of individuals caught. This is
+most easily done by binning the lengths and summing the expansion
+factors.
 
 ``` r
 library(ggplot2)
@@ -564,7 +567,7 @@ library(dplyr)
 
 binwidth <- 6
 breaks <- seq(min(anchsizedist$STD_LENGTH, na.rm = T),
-           max(anchsizedist$STD_LENGTH, na.rm = T), by = binwidth)
+              max(anchsizedist$STD_LENGTH, na.rm = T), by = binwidth)
 
 anchsizedist$bin=cut(anchsizedist$STD_LENGTH, breaks, labels = breaks[-1]-binwidth/2)
 
@@ -643,40 +646,40 @@ ggplot(anchindex2plot,aes(y=BIOMASS_INDEX,x=YEAR)) +
 
 <img src="man/figures/README-indices-2.png" width="100%" />
 
-## Depth-stratified tows
+## Depth-stratified trawls
 
-RREAS standard tows are conducted at 30 m headrope depth (DEPTH_STRATA
+RREAS standard trawls are conducted at 30 m headrope depth (DEPTH_STRATA
 2), with the exception of stations with a bottom depth of less than 60
 m, which are towed at 10 m headrope depth (DEPTH_STRATA 1). These are
-the tows which appear in HAULSTANDARD.
+the hauls which appear in HAULSTANDARD.
 
 Historically, mostly before the coastwide expansion in 2004, multiple
 depth strata (DEPTH_STRATA 1: 10 m, DEPTH_STRATA 2: 30 m, DEPTH_STRATA
 3: 90 m) were sampled in succession at specific stations, mostly at
 stations 110, 125, 133, and 170, but occasionally others. The function
-`load_depth_stratified_tows` pulls out these depth-stratified tows into
-the table HAULDEPTHSTRATIFED. It has the same format as HAULSTANDARD,
-but with a few extra columns: DEPTH_STRATA, SWEEP (indicates which of
-the 3 passes the sampling is from; there is generally one set of
-depth-stratified tows per sweep, but not always), and SWEEP_SEP
-(separates cases in which there are multiple sets of depth stratified
-tows per sweep, and sets of depth stratified tows where SWEEP in NA,
-which occurs after 2004; otherwise equal to SWEEP). Each set of
-consecutive depth stratified tows will have a unique
+`load_depth_stratified_trawls` pulls out these depth-stratified trawls
+into the table HAULDEPTHSTRATIFED. It has the same format as
+HAULSTANDARD, but with a few extra columns: DEPTH_STRATA, SWEEP
+(indicates which of the 3 passes the sampling is from; there is
+generally one set of depth-stratified trawls per sweep, but not always),
+and SWEEP_SEP (separates cases in which there are multiple sets of depth
+stratified trawls per sweep, and sets of depth stratified trawls where
+SWEEP in NA, which occurs after 2004; otherwise equal to SWEEP). Each
+set of consecutive depth stratified trawls will have a unique
 CRUISE/STATION/SWEEP_SEP value.
 
 HAULDEPTHSTRATIFED can be passed to `get_totals` or `get_distributions`
 to get catch data from these hauls instead of HAULSTANDARD by supplying
-it under `haultable`. Note that all of the depth-stratified tows are not
-present in the ERDDAP dataset.
+it under `haultable`. Note that all of the depth-stratified trawls are
+not present in the ERDDAP dataset.
 
-Note that to get *all* of the depth-stratified tows, you have to include
-the non-active stations (`activestationsonly = FALSE`).
+Note that to get *all* of the depth-stratified trawls, you have to
+include the non-active stations (`activestationsonly = FALSE`).
 
 ``` r
 load_trawls(activestationsonly = FALSE)
 #> Data loaded.
-load_depth_stratified_tows()
+load_depth_stratified_trawls()
 #> HAULDEPTHSTRATIFED created.
 str(HAULDEPTHSTRATIFIED)
 #> 'data.frame':    669 obs. of  20 variables:
@@ -703,7 +706,7 @@ str(HAULDEPTHSTRATIFIED)
 
 anchabund_ds <- get_totals(anchtable, what = "abundance", haultable = HAULDEPTHSTRATIFIED)
 
-#to get depth stratified tows with all 3 strata sampled
+#to get depth stratified trawls with all 3 strata sampled
 HAULDEPTHSTRATIFIED <- HAULDEPTHSTRATIFIED %>% 
   group_by(CRUISE,STATION,SWEEP_SEP) %>%
   mutate(ustrata=length(unique(DEPTH_STRATA)))
@@ -712,9 +715,60 @@ filter(HAULDEPTHSTRATIFIED, ustrata==3) %>% nrow()
 filter(HAULDEPTHSTRATIFIED, ustrata==3 & YEAR>=1990) %>% nrow()
 #> [1] 288
 
-#see which tows have CTDs
+#see which hauls have CTDs
 HAULDEPTHSTRATIFIED <- HAULDEPTHSTRATIFIED %>%
   left_join(HAUL %>% select(CRUISE, HAUL_NO, CTD_INDEX), by = c("CRUISE", "HAUL_NO"))
+```
+
+## Trawls aborted due to gelatinous organisms
+
+For calculations involving jellies (specifically SPECIES 2840 moon
+jelly, 1766 sea nettle, and 2842 egg jelly) and/and pelagic tunicates
+(SPECIES 2393 salps, 2058 pyrosomes), users should consider using trawls
+with PROBLEM=3 for jellies and/or PROBLEM=9 for pelagic tunicates. These
+were trawls where those organisms were so abundant that a valid trawl
+was not possible and catch data are missing or inaccurate. The NOTES
+column will indicate the specific species involved, if it was recorded.
+Some of these hauls have accurate values in the CATCH table for the
+gelatinous organisms only, but not any other species. These problem
+codes include hauls with HAUL_NO ≥ 900, which are hauls skipped due to
+high abundance of gelatinous organisms. For catch numbers in the case of
+missing data, the maximum valid catch (or average of the five largest
+valid catches) for those organisms could be used as a substitute, as has
+been done in prior studies.
+
+At present, requesting totals or distributions for these species does
+not account for the aborted trawls. A way to do this more easily within
+the package architecture is something we plan to incorporate into future
+versions of the package.
+
+``` r
+jellytrawls <- subset(HAUL, PROBLEM==3)
+head(jellytrawls[,c("CRUISE","HAUL_NO","STATION","PROBLEM","NOTES")])
+#>     CRUISE HAUL_NO STATION PROBLEM
+#> 30    0002     127     138       3
+#> 100   0002      77     139       3
+#> 111   0002      87     137       3
+#> 112   0002      88     119       3
+#> 116   0002     900     119       3
+#> 144   0103     116     165       3
+#>                                                  NOTES
+#> 30       Mostly Aurelia spp. Some Chrysaora fuscescens
+#> 100                                               <NA>
+#> 111                               Chrysaora fuscescens
+#> 112                                       Aurelia spp.
+#> 116      No trawl due to large numbers of Aurelia spp.
+#> 144 Blew out net with Aurelia and Chrysaora fuscescens
+
+tunicatetrawls <- subset(HAUL, PROBLEM==9)
+head(tunicatetrawls[,c("CRUISE","HAUL_NO","STATION","PROBLEM","NOTES")])
+#>      CRUISE HAUL_NO STATION PROBLEM                   NOTES
+#> 1579   1203     900     110       9 Too many salps in bongo
+#> 1580   1203     901     109       9 Too many salps in bongo
+#> 1581   1203     902     401       9 Too many salps in bongo
+#> 1582   1203     903     444       9 Too many salps in bongo
+#> 1583   1203     904     445       9 Too many salps in bongo
+#> 1584   1203     905     134       9 Too many salps in bongo
 ```
 
 ## CTD data
@@ -740,22 +794,22 @@ head(CTD_HEADER)
 #> 4               81        11.0       33.4   11.27  33.17
 #> 5               43        12.6       33.3   12.90  32.97
 #> 6               93        11.1       33.4   11.30  33.21
-example_cast <- subset(CTD_CAST, CRUISE=="2502" & CTD_INDEX==20)
+example_cast <- subset(CTD_CAST, CRUISE=="2502" & CTD_INDEX==100)
 head(example_cast)
 #>         CRUISE CTD_INDEX CTD_DEPTH TEMPERATURE SALINITY DENSITY DYN_HGT IRRAD
-#> 1474562   2502        20         3     11.2426  33.3244 25.4275  0.0064    NA
-#> 1474563   2502        20         4     11.2149  33.3317 25.4381  0.0087    NA
-#> 1474564   2502        20         5     10.9738  33.3945 25.5299  0.0143    NA
-#> 1474565   2502        20         6     10.6090  33.4947 25.6724  0.0206    NA
-#> 1474566   2502        20         7     10.5629  33.5087 25.6914  0.0231    NA
-#> 1474567   2502        20         8     10.5484  33.5193 25.7022  0.0254    NA
+#> 1497874   2502       100         5     13.9108  33.6993 25.2006  0.0115    NA
+#> 1497875   2502       100         6     13.8775  33.6962 25.2052  0.0143    NA
+#> 1497876   2502       100         7     13.7692  33.6965 25.2278  0.0170    NA
+#> 1497877   2502       100         8     13.7109  33.6911 25.2357  0.0198    NA
+#> 1497878   2502       100         9     13.4723  33.6863 25.2806  0.0225    NA
+#> 1497879   2502       100        10     13.3262  33.6858 25.3099  0.0252    NA
 #>         FLUOR_VOLT TRANSMISSIVITY CHLOROPHYLL OXYGEN_VOLT OXYGEN
-#> 1474562     1.0572             NA    8.157230      4.0626 6.6338
-#> 1474563     1.1700             NA    8.934005      4.0337 6.4656
-#> 1474564     0.8520             NA    6.590277      3.9341 6.3376
-#> 1474565     0.6753             NA    5.279281      3.7971 6.0552
-#> 1474566     0.4549             NA    3.654961      3.7642 6.0621
-#> 1474567     0.4442             NA    3.557348      3.7440 6.0324
+#> 1497874     0.6474             NA    5.103695      4.5617 7.1594
+#> 1497875     0.6487             NA    5.086010      4.5227 7.0425
+#> 1497876     0.6632             NA    5.168427      4.4790 6.8909
+#> 1497877     0.6768             NA    5.247373      4.3626 6.3654
+#> 1497878     0.6058             NA    4.713974      4.1799 5.9748
+#> 1497879     0.4047             NA    3.237145      4.0232 5.9272
 ggplot(example_cast, aes(y=-CTD_DEPTH, x=TEMPERATURE)) +
   geom_path() + theme_bw()
 ```
@@ -827,7 +881,7 @@ current year’s data if it is not in the primary database. See
 `help(load_mdb)` for more information.
 
 The data extraction functions `get_totals` and `get_distributions` are
-used in the same way as decribed above, but you can specify which
+used in the same way as described above, but you can specify which
 `datasets` to pull data from (if they have been loaded). Only one table
 is outputted, so if you request data from multiple datasets, they
 results will be combined (column SURVEY differentiates source).
@@ -835,7 +889,7 @@ results will be combined (column SURVEY differentiates source).
 ``` r
 #Anchovy from RREAS and NWFSC surveys
 anchtabletotal <- data.frame(SPECIES=209, MATURITY=c("Y","A"),
-                        NAME=c("Total Anchovy", "Total Anchovy"))
+                             NAME=c("Total Anchovy", "Total Anchovy"))
 anchabund <- get_totals(anchtabletotal, datasets = c("RREAS","NWFSC"), what = "abundance")
 table(anchabund$SURVEY)
 #> 
@@ -924,7 +978,7 @@ ggplot(rf100plot,aes(y=N100_INDEX_SC,x=YEAR, group=COMMON, color=COMMON)) +
   labs(x="Year", y="log 100-day standardized abundance", color="Rockfish species")
 ```
 
-<img src="man/figures/README-unnamed-chunk-11-1.png" width="100%" />
+<img src="man/figures/README-rockfish100-1.png" width="100%" />
 
 If “age” is requested in `get_distributions`, the output will include
 columns STD_LENGTH, AGE, N100i (number of 100 day equivalents), and
