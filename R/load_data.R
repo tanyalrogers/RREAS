@@ -1,7 +1,7 @@
-#' Load Data from MS Access Database
+#' Load RREAS Trawl Data from MS Access Database
 #'
 #' Loads the HAUL, CATCH, and LENGTH tables from one or more surveys in the RREAS database,
-#' along with the AGE, WEIGHT, and SPECIES_CODES tables from RREAS. Also creates and loads a
+#' along with the AGE, WEIGHT, STATIONS, and SPECIES_CODES tables from RREAS. Also creates and loads a
 #' HAULSTANDARD table for each survey containing only standard stations and with a standardized set of
 #' columns including YEAR, MONTH, JDAY, and lat/lon in decimal degrees. HAULSTANDARD tables all have
 #' the same format and can be stacked with \code{rbind}.
@@ -25,9 +25,12 @@
 #' @param krill_len_path File path to "krill_lengths.csv" (optional, unless you later want
 #'   to get krill biomass).
 #'   \emph{This argument will be removed once the krill lengths are added to the database.}
+#' @param activestationsonly Logical. Include only active stations in HAULSTANDARD. Defaults to TRUE.
+#'   If FALSE, the ACTIVE column can always be used to subset later.
+#' @param stdtimeperiodonly Logical. Include only surveys performed during the standard sampling
+#'   time period in HAULSTANDARD (exclude early surveys). Defaults to TRUE.
 #' @param startyear Start year (default is 1983).
-#' @param activestationsonly Logical. Include only active stations in the resulting tables.
-#'   ACTIVE is a column in HAULSTANDARD and can always be used to subset later.
+#' @param devswitch Patch for developer use only.
 #' @return Tables are written to the global environment (and will overwrite any existing tables
 #'   with the same names). Diplays "Data loaded" if successful.
 #' @export
@@ -44,7 +47,7 @@
 #'   activestationsonly = F)
 #' }
 load_mdb=function(mdb_path,atsea_path=NULL,datasets="RREAS",krill_len_path=NULL,
-                  startyear=1983, activestationsonly=TRUE) {
+                  activestationsonly=TRUE, stdtimeperiodonly=TRUE, startyear=1983, devswitch=FALSE) {
 
   if(!file.exists(mdb_path)) {
     stop("Database not found. Check that the file path is correct.")
@@ -64,9 +67,9 @@ load_mdb=function(mdb_path,atsea_path=NULL,datasets="RREAS",krill_len_path=NULL,
 
   channel <- RODBC::odbcConnectAccess2007(mdb_path)
   #RREAS standard stations
-  standardstations<-RODBC::sqlQuery(channel, "SELECT * FROM dbo_STANDARD_STATIONS", stringsAsFactors = F)
+  STATIONS<<-RODBC::sqlQuery(channel, "SELECT * FROM dbo_STANDARD_STATIONS", stringsAsFactors = F)
   if(activestationsonly) {
-    standardstations<-dplyr::filter(standardstations,ACTIVE=="Y")
+    standardstations<-dplyr::filter(STATIONS, ACTIVE=="Y")
   }
 
   on.exit(RODBC::odbcCloseAll()) #in case of errors
@@ -79,8 +82,10 @@ load_mdb=function(mdb_path,atsea_path=NULL,datasets="RREAS",krill_len_path=NULL,
     #these tables only from RREAS main
     SPECIES_CODES <<- RODBC::sqlQuery(channel, "SELECT * FROM dbo_SPECIES_CODES", stringsAsFactors = F)
     WEIGHT <<- RODBC::sqlQuery(channel, "SELECT * FROM dbo_JUV_WEIGHT", as.is=1, stringsAsFactors = F)
-    AGE <<- RODBC::sqlQuery(channel, "SELECT * FROM dbo_JUV_AGE", as.is=1, stringsAsFactors = F)
 
+    if(devswitch==FALSE) {
+      AGE <<- RODBC::sqlQuery(channel, "SELECT * FROM dbo_JUV_AGE", as.is=1, stringsAsFactors = F)
+    }
     #use DOORS_IN for missing NET_IN position, lag CRUISE 2001
     HAUL$NET_IN_LAT[is.na(HAUL$NET_IN_LAT)]<-HAUL$DOORS_IN_LAT[is.na(HAUL$NET_IN_LAT)]
     HAUL$NET_IN_LONG[is.na(HAUL$NET_IN_LONG)]<-HAUL$DOORS_IN_LONG[is.na(HAUL$NET_IN_LONG)]
@@ -100,10 +105,13 @@ load_mdb=function(mdb_path,atsea_path=NULL,datasets="RREAS",krill_len_path=NULL,
       dplyr::arrange(YEAR) %>%
       dplyr::filter(YEAR>=startyear) %>% #set start year
       dplyr::filter(STANDARD_STATION==1) %>%
-      dplyr::filter(!(CRUISE %in% c("8703","8804","9003"))) %>% #not real cruises
       dplyr::mutate(SURVEY="RREAS") %>%
       dplyr::select(SURVEY,CRUISE,HAUL_NO,YEAR,MONTH,JDAY,HAUL_DATE,STATION,NET_IN_LATDD,NET_IN_LONDD,
                     LATDD,LONDD,BOTTOM_DEPTH,STATION_BOTTOM_DEPTH,STRATA,AREA,ACTIVE)
+
+    if(stdtimeperiodonly) {
+      HAULSTANDARD<<-dplyr::filter(HAULSTANDARD, !(CRUISE %in% c("8703","8804","9003")))
+    }
   }
 
   if("ADAMS" %in% datasets) {
@@ -187,9 +195,9 @@ load_mdb=function(mdb_path,atsea_path=NULL,datasets="RREAS",krill_len_path=NULL,
     CATCH_NWFSC <<- RODBC::sqlQuery(channel, "SELECT * FROM dbo_NWFSC_JUV_CATCH", as.is=1, stringsAsFactors = F)
     LENGTH_NWFSC <<- RODBC::sqlQuery(channel, "SELECT * FROM dbo_NWFSC_JUV_LENGTH", as.is=1, stringsAsFactors = F)
     #NWFSC standard stations
-    standardstations_NWFSC<-RODBC::sqlQuery(channel, "SELECT * FROM dbo_NWFSC_STANDARD_STATIONS", stringsAsFactors = F)
+    STATIONS_NWFSC<<-RODBC::sqlQuery(channel, "SELECT * FROM dbo_NWFSC_STANDARD_STATIONS", stringsAsFactors = F)
     if(activestationsonly) {
-      standardstations_NWFSC<-dplyr::filter(standardstations_NWFSC,ACTIVE=="Y")
+      standardstations_NWFSC<-dplyr::filter(STATIONS_NWFSC,ACTIVE=="Y")
     }
 
     #use NET_FISHING for missing NET_IN position
@@ -249,6 +257,7 @@ load_mdb=function(mdb_path,atsea_path=NULL,datasets="RREAS",krill_len_path=NULL,
     HAUL_ATSEA <- RODBC::sqlQuery(channel, "SELECT * FROM JUV_HAUL", as.is=1, stringsAsFactors = F)
     CATCH_ATSEA <- RODBC::sqlQuery(channel, "SELECT * FROM JUV_CATCH", as.is=1, stringsAsFactors = F)
     LENGTH_ATSEA <- RODBC::sqlQuery(channel, "SELECT * FROM JUV_LENGTH", as.is=1, stringsAsFactors = F)
+    WEIGHT_ATSEA <- RODBC::sqlQuery(channel, "SELECT * FROM JUV_WEIGHT", as.is=1, stringsAsFactors = F)
     RODBC::odbcCloseAll()
     rm(channel)
 
@@ -273,8 +282,9 @@ load_mdb=function(mdb_path,atsea_path=NULL,datasets="RREAS",krill_len_path=NULL,
     #append to existing tables
     HAULSTANDARD<<-rbind(HAULSTANDARD,HAULSTANDARD_ATSEA)
     HAUL<<-rbind(HAUL,HAUL_ATSEA)
-    CATCH<<-rbind(CATCH,CATCH_ATSEA[,1:5])
+    CATCH<<-rbind(CATCH,CATCH_ATSEA[,-ncol(CATCH_ATSEA)])
     LENGTH<<-rbind(LENGTH,LENGTH_ATSEA)
+    WEIGHT<<-rbind(WEIGHT,WEIGHT_ATSEA)
 
     if("NWFSC" %in% datasets) {
 
@@ -342,15 +352,15 @@ load_mdb=function(mdb_path,atsea_path=NULL,datasets="RREAS",krill_len_path=NULL,
   return(cat("Data loaded."))
 }
 
-#' Load RREAS data from ERDDAP
+#' Load RREAS Trawl Data from ERDDAP
 #'
-#' Loads the HAUL, CATCH, LENGTH, and SPECIES_CODES tables from the RREAS survey
+#' Loads the HAUL, CATCH, LENGTH, STATIONS, and SPECIES_CODES tables from the RREAS survey
 #' as currently stored in NOAA's ERDDAP database. These are reformatted as
 #' relational tables to match the format of the tables in the database. This
-#' dataset contains data from 1990 to 2018 and only from standard, active
+#' dataset contains data starting in 1990 and only from standard, active
 #' stations. The function also loads a HAULSTANDARD table with a standardized
 #' set of columns including YEAR, MONTH, JDAY, and lat/lon in decimal degrees.
-#' See [`RREAS_ERDDAP`] for metadata. This function has no arguments.
+#' See [`RREAS_TABLES`] for metadata. This function has no arguments.
 #'
 #' @details
 #' The data tables are stored internally in the package (internet
@@ -381,16 +391,71 @@ load_mdb=function(mdb_path,atsea_path=NULL,datasets="RREAS",krill_len_path=NULL,
 #'   B.B. and Carrion, C.N. (2016) Anomalous epipelagic micronekton assemblage patterns
 #'   in the neritic waters of the California Current in spring 2015 during a
 #'   period of extreme ocean conditions. CalCOFI Rep. 57:163-183
-#' @seealso [`load_mdb`], [`RREAS_ERDDAP`]
+#' @seealso [`load_trawls`], [`RREAS_TABLES`]
 #' @keywords functions
 #' @examples
 #' load_erddap()
 #'
 load_erddap=function() {
+  SPECIES_CODES <<- SPECIES_CODES_RREAS
+  STATIONS <<- STATIONS_RREAS
   HAUL <<- HAUL_ERDDAP
   HAULSTANDARD <<- HAULSTANDARD_ERDDAP
   CATCH <<- CATCH_ERDDAP
   LENGTH <<- LENGTH_ERDDAP
-  SPECIES_CODES <<- SPECIES_CODES_ERDDAP
+  return(cat("Data loaded."))
+}
+
+#' Load RREAS Trawl Data
+#'
+#' Loads the HAUL, CATCH, LENGTH, WEIGHT, STATIONS, and SPECIES_CODES tables
+#' from the RREAS survey as currently stored on Dryad. The function also loads a
+#' HAULSTANDARD table with a standardized set of columns including YEAR, MONTH,
+#' JDAY, and lat/lon in decimal degrees. See [`RREAS_TABLES`] for metadata.
+#'
+#' @details The data tables are stored internally in the package (internet
+#' connection is not required). The maintainers will update the package data
+#' whenever the data on Dryad is updated.
+#'
+#' Abundance (including abundance with size limits) and size distributions can
+#' be obtained from this dataset using [`get_totals`] and [`get_distributions`].
+#'
+#' The AGE table is not included, so requests for age standardized abundance or
+#' age distributions will be unsuccessful.
+#'
+#' @param activestationsonly Logical. Include only active stations in HAULSTANDARD. Defaults to TRUE.
+#'   If FALSE, the ACTIVE column can always be used to subset later.
+#' @param stdtimeperiodonly Logical. Include only surveys performed during the standard sampling
+#'   time period in HAULSTANDARD (exclude early surveys). Defaults to TRUE.
+#' @param startyear Start year (default is 1983).
+#'
+#' @return Tables are written to the global environment (and will overwrite any existing tables
+#'   with the same names). Diplays "Data loaded" if successful.
+#' @export
+#' @keywords functions
+#' @references Sakuma, K.M., Field, J.C., Mantua, N.J., Ralston, S., Marinovic,
+#'   B.B. and Carrion, C.N. (2016) Anomalous epipelagic micronekton assemblage patterns
+#'   in the neritic waters of the California Current in spring 2015 during a
+#'   period of extreme ocean conditions. CalCOFI Rep. 57:163-183
+#' @seealso [`load_erddap`], [`RREAS_TABLES`]
+#' @keywords functions
+#' @examples
+#' load_trawls()
+#' load_trawls(activestationsonly=FALSE, startyear=1990)
+#'
+load_trawls=function(activestationsonly=TRUE, stdtimeperiodonly=TRUE, startyear=1983) {
+  SPECIES_CODES <<- SPECIES_CODES_RREAS
+  STATIONS <<- STATIONS_RREAS
+  HAUL <<- HAUL_RREAS
+  CATCH <<- CATCH_RREAS
+  LENGTH <<- LENGTH_RREAS
+  WEIGHT <<- WEIGHT_RREAS
+  HAULSTANDARD <<- HAULSTANDARD_RREAS %>% dplyr::filter(YEAR>=startyear)
+  if(activestationsonly) {
+    HAULSTANDARD<<-dplyr::filter(HAULSTANDARD, ACTIVE=="Y")
+  }
+  if(stdtimeperiodonly) {
+    HAULSTANDARD<<-dplyr::filter(HAULSTANDARD, !(CRUISE %in% c("8703","8804","9003")))
+  }
   return(cat("Data loaded."))
 }

@@ -6,40 +6,42 @@
 \usage{
 get_totals(
   speciestable,
-  datasets = "RREAS",
-  startyear = 1983,
   what = c("abundance", "biomass", "100day"),
-  haultable = HAULSTANDARD
+  startyear = 1983,
+  haultable = HAULSTANDARD,
+  datasets = "RREAS"
 )
 }
 \arguments{
 \item{speciestable}{Dataframe containing species information (see Details).}
 
-\item{datasets}{Character vector indicating which dataset(s) to use. Multiple dataset can
-be specified. Options are "RREAS","ADAMS","PWCC","NWFSC". If unspecified, just uses RREAS.}
-
-\item{startyear}{Start year (default is 1983).}
-
 \item{what}{What totals you want, either "abundance","biomass", or "100day".
 Defaults to "abundance".}
+
+\item{startyear}{Start year (default is 1983).}
 
 \item{haultable}{The table of hauls from which to obtain data. Defaults to
 HAULSTANDARD. If you do not want to use HAULSTANDARD, you
 can specify another table here, but it should have all of the same columns as
 HAULSTANDARD.}
+
+\item{datasets}{Character vector indicating which dataset(s) to use. Multiple dataset can
+be specified. Options are "RREAS","ADAMS","PWCC","NWFSC". If unspecified, just uses RREAS.}
 }
 \value{
 A dataframe with haul information, NAME, and totals. If "abundance"
 is requested, will include column TOTAL_NO. If "biomass" is requested, will
-include columns TOTAL_NO, NMEAS (number measured), and BIOMASS (g). If "100day"
-is requested, will include columns TOTAL_NO, NMEAS (number measured), and
-N100. If size limits are specified, will include additional columns
-NMEAS_SIZE (number measured in the size range), and NSIZE (total number in
-the size range, which is probably what you want, not TOTAL_NO). If multiple
-NAME values were present, the data will be in long format (stacked). If you
-request data from multiple datasets, they results will be combined (column
-SURVEY differentiates source). The NAME field is converted to a factor so
-names will plot in the same order supplied in \code{speciestable}.
+include columns TOTAL_NO, NMEAS (number measured), and BIOMASS (g). If
+"100day" is requested, will include columns TOTAL_NO, NMEAS (number
+measured), and N100. If size limits are specified, will include additional
+columns NMEAS_SIZE (number measured in the size range), and NSIZE (total
+number in the size range, which is probably what you want, not TOTAL_NO).
+BIOMASS with size constraints will be the biomass within the size range.
+If multiple NAME values were present, the data will be in long format
+(stacked). If you request data from multiple datasets, they results will be
+combined (column SURVEY differentiates source). The NAME field is converted
+to a factor so names will plot in the same order supplied in
+\code{speciestable}.
 }
 \description{
 Obtains total haul-level abundance, biomass, or 100-day standardized
@@ -121,15 +123,17 @@ in the SURVEY column of the alternate \code{haultable}. So, it is ok for multipl
 be included.
 }
 \examples{
+load_trawls()
+least_fav_orgs <- data.frame(SPECIES=c(2058,2842),
+                          MATURITY=c("U","U"),
+                          NAME=c("Pyrosomes","Egg jellies"))
+least_fav_orgs_abund <- get_totals(speciestable=least_fav_orgs, what="abundance")
+
+anchovytable <- data.frame(SPECIES=209, MATURITY="A", NAME="Adult Anchovy")
+anchabund <- get_totals(anchovytable, what = "biomass")
+
 \dontrun{
-krillsp=data.frame(SPECIES=c(1473,1816),
-  MATURITY=c("U","U"),
-  NAME=c("T. spinifera","E. pacifica"))
-krillabundance=get_totals(speciestable=krillsp, what="abundance")
-
-somebiomasses=get_totals(speciestable=sptable, what="biomass")
-
-rockfish100day=get_totals(speciestable=sptable_rockfish100, what="100day",
+rockfish100day <- get_totals(speciestable=sptable_rockfish100, what="100day",
   datasets=c("RREAS","ADAMS","PWCC","NWFSC"))
 }
 }

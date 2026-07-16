@@ -2,15 +2,17 @@
 % Please edit documentation in R/load_data.R
 \name{load_mdb}
 \alias{load_mdb}
-\title{Load Data from MS Access Database}
+\title{Load RREAS Trawl Data from MS Access Database}
 \usage{
 load_mdb(
   mdb_path,
   atsea_path = NULL,
   datasets = "RREAS",
   krill_len_path = NULL,
+  activestationsonly = TRUE,
+  stdtimeperiodonly = TRUE,
   startyear = 1983,
-  activestationsonly = TRUE
+  devswitch = FALSE
 )
 }
 \arguments{
@@ -26,10 +28,15 @@ be specified. Options are "RREAS", "ADAMS", "PWCC", "NWFSC". If unspecified, loa
 to get krill biomass).
 \emph{This argument will be removed once the krill lengths are added to the database.}}
 
+\item{activestationsonly}{Logical. Include only active stations in HAULSTANDARD. Defaults to TRUE.
+If FALSE, the ACTIVE column can always be used to subset later.}
+
+\item{stdtimeperiodonly}{Logical. Include only surveys performed during the standard sampling
+time period in HAULSTANDARD (exclude early surveys). Defaults to TRUE.}
+
 \item{startyear}{Start year (default is 1983).}
 
-\item{activestationsonly}{Logical. Include only active stations in the resulting tables.
-ACTIVE is a column in HAULSTANDARD and can always be used to subset later.}
+\item{devswitch}{Patch for developer use only.}
 }
 \value{
 Tables are written to the global environment (and will overwrite any existing tables
@@ -37,7 +44,7 @@ with the same names). Diplays "Data loaded" if successful.
 }
 \description{
 Loads the HAUL, CATCH, and LENGTH tables from one or more surveys in the RREAS database,
-along with the AGE, WEIGHT, and SPECIES_CODES tables from RREAS. Also creates and loads a
+along with the AGE, WEIGHT, STATIONS, and SPECIES_CODES tables from RREAS. Also creates and loads a
 HAULSTANDARD table for each survey containing only standard stations and with a standardized set of
 columns including YEAR, MONTH, JDAY, and lat/lon in decimal degrees. HAULSTANDARD tables all have
 the same format and can be stacked with \code{rbind}.

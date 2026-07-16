@@ -5,7 +5,7 @@
 \alias{sptable}
 \title{Species table for common RREAS species and species groups}
 \format{
-A data frame with 12 rows and 3 variables:
+A data frame with 73 rows and 3 variables:
 \describe{
 \item{SPECIES}{Species code}
 \item{MATURITY}{Maturity code}
@@ -29,8 +29,8 @@ Information can also be found in the SPECIES_CODES table.
 
 \strong{Myctophids:} Blue lanternfish (685) and California headlightfish (192) have
 always been identified to species and separated from unknown myctophids
-(407). Over time, more myctophids (e.g. Northern lampfish (661), California
-lanternfish (669)) have been identified to species and no longer classified
+(407). Over time, more myctophids (e.g. Northern lampfish (661), Mexican
+lampfish (712)) have been identified to species and no longer classified
 as 407. Thus, depending on the survey year, 407 encompasses different
 species.
 

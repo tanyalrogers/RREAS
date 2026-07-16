@@ -1,10 +1,10 @@
 #' Get length-weight regression
 #'
 #' Runs a length-weight regression using data in the WEIGHT table and outputs a
-#' function to convert lengths into weights. This function (and the outputed
+#' function to convert lengths (mm) into weights (g). This function (and the outputed
 #' function) are used internally in [`get_totals`] and [`get_distributions`] but
 #' it can be called independently, e.g. if you want to see what the regressions
-#' look like.
+#' look like or use them for independent conversions.
 #'
 #' @details
 #'
@@ -23,10 +23,10 @@
 #' without length-weight data. Thus the species with data act as proxies for
 #' species without data.
 #'
-#' For anchovy (209), adults (A) and juveniles (Y) are pooled for the
-#' regression.
+#' For anchovy (209) and Pacific sanddabs (147), adults (A) and juveniles (Y)
+#' are pooled for the regression.
 #'
-#' For northern lampfish (661) and California lanternfish (669), data from both
+#' For northern lampfish (661) and bigfin lanternfish (669), data from both
 #' species are pooled for the regression. Unknown myctophids (407) will use
 #' this regression.
 #'
@@ -52,16 +52,32 @@
 #'
 #' @return A function which takes a vector of lengths (mm) as input, and returns
 #'   a vector of masses (g).
+#' @references Sardine regression (OLS) from: Palance, D. G., Macewicz, B. J.,
+#'   Stierhoff, K., Demer, D. A., & Zwolinski, J. P. (2019). Length conversions
+#'   and mass–length relationships of five forage‐fish species in the California
+#'   current ecosystem. Journal of fish biology, 95(4), 1116-1124.
+#'
+#'   Krill length-dry weight regressions from: Fisher, J.L., Menkel,
+#'   J., Copeman, L., Shaw, C.T., Feinberg, L.R. and Peterson, W.T., 2020.
+#'   Comparison of condition metrics and lipid content between Euphausia
+#'   pacifica and Thysanoessa spinifera in the northern California Current, USA.
+#'   Progress in Oceanography, 188, p.102417.
+#'
+#'   Krill dry-wet weight conversion factor from Williamson, S.W., Favuzzi, J.
+#'   and Cox, J.L., 1986. Patchiness and nutritional condition of zooplankton in
+#'   the California Current. Fishery Bulletin, 84(1), pp.157-176.
 #'
 #' @seealso [`sptable_lw`], [`rflwgroups`]
 #' @export
 #' @keywords functions
 #' @examples
-#' print(rflwgroups)
-#' \dontrun{
-#' get_lw_regression(species = 209, maturity = "A", plot=T)
-#' get_lw_regression(species = 562, maturity = "A")
-#' }
+#' load_trawls()
+#' anchreg <- get_lw_regression(species = 209, maturity = "A", plot=TRUE)
+#' anchreg(c(120,110,100)) #weights of fish 120, 110, 100 mm
+#'
+#' sardreg <- get_lw_regression(species = 562, maturity = "A")
+#' print(sardreg) #this uses a published regression
+#'
 get_lw_regression=function(species, maturity, plot=F){
 
   if(!exists("WEIGHT")) {
@@ -89,9 +105,9 @@ get_lw_regression=function(species, maturity, plot=F){
     len_to_wt<-function(length) {
       mean_len
     }
-  } else if(species==562) { #sardine (regression from 2019 assessment)
+  } else if(species==562) { #sardine
     len_to_wt<-function(length) {
-      0.0000075252*length^3.232205
+      tl<-1.157*length+0.724; exp(-12.555+0.052)*tl^3.135 #OLS from Palance et al. 2019
     }
   } else if(species==209) { #anchovy (combine A and Y lengths)
     fwts<-subset(WEIGHT,SPECIES==species)
@@ -105,9 +121,9 @@ get_lw_regression=function(species, maturity, plot=F){
     len_to_wt<-function(length) {
       exp(predict(len_reg, newdata = data.frame(STD_LENGTH=length)))
     }
-  } else if(species==148) { #spec dab, use regression for pac dab
-    species=147
-    fwts<-subset(WEIGHT,SPECIES==species & MATURITY==maturity)
+  } else if(species %in% c(147,148)) { #use regression for pac dab for spec dab (combine A and Y lengths)
+    #can add 149 to above once we have at least some length measurements
+    fwts<-subset(WEIGHT,SPECIES==147)
     len_reg<-lm(log(WEIGHT)~log(STD_LENGTH), data=fwts)
     len_to_wt<-function(length) {
       exp(predict(len_reg, newdata = data.frame(STD_LENGTH=length)))
@@ -142,7 +158,7 @@ get_lw_regression=function(species, maturity, plot=F){
 #' function to convert lengths into ages. This function (and the outputed
 #' function) are used internally in [`get_totals`] and [`get_distributions`] but
 #' it can be called independently, e.g. if you want to see what the
-#' regressions look like.
+#' regressions look like or use them for independent conversions.
 #'
 #' @details
 #'
@@ -166,7 +182,6 @@ get_lw_regression=function(species, maturity, plot=F){
 #' If the resulting function is unable to generate a regression for the input species, a
 #' warning will be displayed and the function will return NA for any
 #' length input.
-#'
 #'
 #' @return A function which takes a species code, vector of years, and vector of
 #'   lengths (mm) as input, and returns a vector of ages (days).
